@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"os"
 
-	jsonClient "github.com/pzsp-teams/lib-python/internal/json-client"
+	jsonClientLib "github.com/pzsp-teams/lib-python/internal/json-client"
 	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
 )
 
-var client *jsonClient.TeamsJSONClient
+var client *jsonClientLib.TeamsJSONClient
 var initialized bool
 
 func main() {
@@ -34,24 +34,7 @@ func main() {
 				continue
 			}
 
-			c, err := jsonClient.NewRealJSONClient(req)
-			if detectFail(writer, err) {
-				continue
-			}
-
-			client = c
-			initialized = true
-			respondResult(writer, "initialized")
-			continue
-		}
-
-		if req.Type == "initFake" {
-			if initialized {
-				respondError(writer, fmt.Errorf("client already initialized"))
-				continue
-			}
-
-			c, err := jsonClient.NewFakeJSONClient(req)
+			c, err := jsonClientLib.NewJSONClient(req)
 			if detectFail(writer, err) {
 				continue
 			}

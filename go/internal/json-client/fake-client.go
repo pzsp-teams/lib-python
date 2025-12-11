@@ -45,7 +45,7 @@ func (t *HijackTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 // --- 3. Fake JSON Client Factory ---
-func NewFakeJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
+func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 	// Parse parameters
 	mockServerURL, ok := req.Params["mockServerUrl"].(string)
 	if !ok || mockServerURL == "" {

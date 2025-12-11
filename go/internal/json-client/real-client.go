@@ -9,7 +9,7 @@ import (
 	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
 )
 
-func NewRealJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
+func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 	authConfig, err := req.Config.AuthConfigMap.ToAuthConfig()
 	if err != nil {
 		return nil, err
@@ -27,4 +27,3 @@ func NewRealJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 
 	return &TeamsJSONClient{client}, nil
 }
-

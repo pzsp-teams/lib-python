@@ -42,27 +42,25 @@ class TeamsClient:
         auth_config = config.load_auth_config()
         return self.execute(
             cmd_type="init",
-            params={
-                "config": {
-                    "senderConfig": {
-                        "maxRetries": sender_config.max_retries,
-                        "nextRetryDelay": sender_config.next_retry_delay,
-                        "timeout": sender_config.timeout,
-                    },
-                    "authConfig": {
-                        "clientID": auth_config.client_id,
-                        "tenant": auth_config.tenant,
-                        "email": auth_config.email,
-                        "scopes": auth_config.scopes,
-                        "authMethod": auth_config.auth_method,
-                    },
+            config={
+                "senderConfig": {
+                    "maxRetries": sender_config.max_retries,
+                    "nextRetryDelay": sender_config.next_retry_delay,
+                    "timeout": sender_config.timeout,
+                },
+                "authConfig": {
+                    "clientID": auth_config.client_id,
+                    "tenant": auth_config.tenant,
+                    "email": auth_config.email,
+                    "scopes": auth_config.scopes,
+                    "authMethod": auth_config.auth_method,
                 },
             },
         )
 
     def init_fake_client(self, mock_server_url: str) -> Any:
         return self.execute(
-            cmd_type="initFake",
+            cmd_type="init",
             params={
                 "mockServerUrl": mock_server_url,
             },
@@ -72,13 +70,16 @@ class TeamsClient:
         self,
         cmd_type: str,
         method: str | None = None,
+        config: dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
     ) -> Any:
         payload = {"type": cmd_type}
         if method:
             payload["method"] = method
         if params:
-            payload.update(params)
+            payload["params"] = params
+        if config:
+            payload["config"] = config
 
         json_payload = json.dumps(payload)
 
