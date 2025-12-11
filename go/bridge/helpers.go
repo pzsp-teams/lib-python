@@ -33,10 +33,3 @@ func safeScopes(m map[string]interface{}) ([]string, error) {
 	}
 	return out, nil
 }
-
-func validateAuthMethod(method string) (string, error) {
-	if method == "DEVICE_CODE" || method == "INTERACTIVE" {
-		return method, nil
-	}
-	return "", fmt.Errorf("invalid auth method: %s", method)
-}

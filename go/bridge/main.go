@@ -7,10 +7,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pzsp-teams/lib"
+	jsonClient "github.com/pzsp-teams/lib-python/internal/json-client"
+	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
 )
 
-var client *lib.Client
+var client jsonClient.TeamsJSONClient
 var initialized bool
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		var req Request
+		var req jsonModel.Request
 		err := json.Unmarshal([]byte(line), &req)
 		if err != nil {
 			respondError(writer, fmt.Errorf("invalid json: %w", err))
@@ -34,17 +35,7 @@ func main() {
 				continue
 			}
 
-			authConfig, err := req.Config.AuthConfigMap.ToAuthConfig()
-			if detectFail(writer, err) {
-				continue
-			}
-
-			senderConfig, err := req.Config.SenderConfigMap.ToSenderConfig()
-			if detectFail(writer, err) {
-				continue
-			}
-
-			c, err := lib.NewClient(context.TODO(), &authConfig, &senderConfig)
+			c, err := jsonClient.NewRealClient(req)
 			if detectFail(writer, err) {
 				continue
 			}
@@ -68,7 +59,7 @@ func main() {
 					respondError(writer, fmt.Errorf("invalid teamRef parameter"))
 					continue
 				}
-				channels, err := client.Channels.ListChannels(context.TODO(), teamRef)
+				channels, err := client.Channels().ListChannels(context.TODO(), teamRef)
 				if err != nil {
 					respondError(writer, err)
 				} else {

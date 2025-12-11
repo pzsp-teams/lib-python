@@ -1,4 +1,4 @@
-package main
+package jsonmodel
 
 import (
 	"fmt"
@@ -79,5 +79,12 @@ func (acm AuthConfigMap) ToAuthConfig() (lib.AuthConfig, error) {
         Scopes:     acm.Scopes,
         AuthMethod: authMethod,
     }, nil
+}
+
+func validateAuthMethod(method string) (string, error) {
+	if method == "DEVICE_CODE" || method == "INTERACTIVE" {
+		return method, nil
+	}
+	return "", fmt.Errorf("invalid auth method: %s", method)
 }
 
