@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -11,7 +10,7 @@ import (
 	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
 )
 
-var client jsonClient.TeamsJSONClient
+var client *jsonClient.TeamsJSONClient
 var initialized bool
 
 func main() {
@@ -35,7 +34,7 @@ func main() {
 				continue
 			}
 
-			c, err := jsonClient.NewRealClient(req)
+			c, err := jsonClient.NewRealJSONClient(req)
 			if detectFail(writer, err) {
 				continue
 			}
@@ -54,12 +53,7 @@ func main() {
 
 			switch req.Method {
 			case "listChannels":
-				teamRef := safeString(req.Params, "teamRef")
-				if teamRef == "" {
-					respondError(writer, fmt.Errorf("invalid teamRef parameter"))
-					continue
-				}
-				channels, err := client.Channels().ListChannels(context.TODO(), teamRef)
+				channels, err := client.ListChannels(req.Params)
 				if err != nil {
 					respondError(writer, err)
 				} else {
