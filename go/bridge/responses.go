@@ -10,6 +10,15 @@ type response struct {
 	Error  string      `json:"error,omitempty"`
 }
 
+func detectFail(writer *bufio.Writer, err error) bool {
+	if err != nil {
+		respondError(writer, err)
+		return true
+	}
+	return false
+}
+
+
 func respondError(writer *bufio.Writer, err error) {
 	response := response{
 		Error: err.Error(),

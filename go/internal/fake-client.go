@@ -1,3 +1,3 @@
 //go:build fake
 
-package internal
+package clientinterface
