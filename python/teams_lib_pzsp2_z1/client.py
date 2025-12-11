@@ -10,7 +10,7 @@ from teams_lib_pzsp2_z1.services.channels import ChannelsService
 
 
 class TeamsClient:
-    def __init__(self):
+    def __init__(self, auto_init: bool = True):
         self._lock = threading.Lock()
 
         self.proc = subprocess.Popen(  # noqa: S603
@@ -24,7 +24,8 @@ class TeamsClient:
 
         self.channels = ChannelsService(self)
 
-        self.init_client()
+        if auto_init:
+            self.init_client()
 
     def _binary(self):
         base = pathlib.Path(__file__).parent / "bin"

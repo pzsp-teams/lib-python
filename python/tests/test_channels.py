@@ -1,4 +1,5 @@
 from teams_lib_pzsp2_z1.client import TeamsClient
+from tests.init_fake_client import init_fake_client
 
 
 def test_list_channels_integration(httpserver):
@@ -27,14 +28,18 @@ def test_list_channels_integration(httpserver):
     ).respond_with_json(ms_graph_response)
 
     # Init fake client
-    client = TeamsClient()
-    client.init_fake_client(httpserver.url_for(""))
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
 
-    channels = client.channels.list_channels(fake_team_id)
+        channels = client.channels.list_channels("team-123")
 
-    assert len(channels) == 2
+        assert len(channels) == 2
 
-    first_channel = channels[0]
+        first_channel = channels[0]
 
-    assert first_channel["displayName"] == "General"
-    assert first_channel["id"] == "19:123123@thread.tacv2"
+        assert first_channel["displayName"] == "General"
+        assert first_channel["id"] == "19:123123@thread.tacv2"
+
+    finally:
+        client.close()
