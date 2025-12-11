@@ -1,12 +1,18 @@
 #!/bin/bash
 set -e
 
-# Directory to save the compiled binaries
-BIN_DIR="./python/teams_lib_pzsp2_z1/bin"
+# 1. Zapamiętajmy gdzie jesteśmy (katalog główny projektu)
+PROJECT_ROOT=$(pwd)
+
+# 2. Definiujemy ścieżkę wyjściową (absolutną, żeby działała po zmianie katalogu)
+BIN_DIR="$PROJECT_ROOT/python/teams_lib_pzsp2_z1/bin"
 mkdir -p "$BIN_DIR"
 
-# Path to Go bridge
-BRIDGE_PATH="./go/bridge/"
+# 3. Wchodzimy do katalogu 'go', gdzie leży plik go.mod
+cd go
+
+# Ścieżka do pakietu mostka (teraz relatywna względem katalogu 'go')
+BRIDGE_PKG="./bridge"
 
 # Read the mode from the first argument
 MODE=$1
@@ -15,16 +21,16 @@ if [[ "$MODE" == "real" ]]; then
     echo "=== Building REAL mode (Production) ==="
 
     echo "Building Linux (real)..."
-    GOOS=linux GOARCH=amd64 go build -tags real -o "$BIN_DIR/teamsClientLib_linux" "$BRIDGE_PATH"
+    GOOS=linux GOARCH=amd64 go build -tags real -o "$BIN_DIR/teamsClientLib_linux" "$BRIDGE_PKG"
 
     echo "Building Windows (real)..."
-    GOOS=windows GOARCH=amd64 go build -tags real -o "$BIN_DIR/teamsClientLib_windows.exe" "$BRIDGE_PATH"
+    GOOS=windows GOARCH=amd64 go build -tags real -o "$BIN_DIR/teamsClientLib_windows.exe" "$BRIDGE_PKG"
 
 elif [[ "$MODE" == "fake" ]]; then
     echo "=== Building FAKE mode (Integration Tests) ==="
 
     echo "Building Linux (fake)..."
-    GOOS=linux GOARCH=amd64 go build -tags fake -o "$BIN_DIR/teamsClientLib_linux" "$BRIDGE_PATH"
+    GOOS=linux GOARCH=amd64 go build -tags fake -o "$BIN_DIR/teamsClientLib_linux" "$BRIDGE_PKG"
 
 else
     echo "Error: Invalid argument. Usage: $0 [real|fake]"
