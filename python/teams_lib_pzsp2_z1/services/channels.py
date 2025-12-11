@@ -1,6 +1,6 @@
 from typing import Any
 
-from python.teams_lib_pzsp2_z1.services.base_service import BaseService
+from teams_lib_pzsp2_z1.services.base_service import BaseService
 
 
 class ChannelsService(BaseService):

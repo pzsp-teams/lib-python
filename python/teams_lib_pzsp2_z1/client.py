@@ -5,9 +5,8 @@ import subprocess
 import threading
 from typing import Any
 
-from python.teams_lib_pzsp2_z1.services.channels import ChannelsService
-
-import config
+from teams_lib_pzsp2_z1 import config
+from teams_lib_pzsp2_z1.services.channels import ChannelsService
 
 
 class TeamsClient:
@@ -27,14 +26,6 @@ class TeamsClient:
 
         self.init_client()
 
-    def get_response(self) -> Any:
-        res = json.loads(self.proc.stdout.readline())
-
-        if "error" in res and res["error"]:
-            raise RuntimeError(res["error"])
-
-        return res["result"]
-
     def _binary(self):
         base = pathlib.Path(__file__).parent / "bin"
         osname = platform.system()
@@ -51,7 +42,6 @@ class TeamsClient:
         auth_config = config.load_auth_config()
         return self.execute(
             cmd_type="init",
-            method=None,
             params={
                 "config": {
                     "senderConfig": {
@@ -70,8 +60,19 @@ class TeamsClient:
             },
         )
 
+    def init_fake_client(self, mock_server_url: str) -> Any:
+        return self.execute(
+            cmd_type="initFake",
+            params={
+                "mockServerUrl": mock_server_url,
+            },
+        )
+
     def execute(
-        self, cmd_type: str, method: str | None, params: dict[str, Any] | None = None
+        self,
+        cmd_type: str,
+        method: str | None = None,
+        params: dict[str, Any] | None = None,
     ) -> Any:
         payload = {"type": cmd_type}
         if method:

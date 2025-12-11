@@ -45,7 +45,7 @@ func main() {
 			continue
 		}
 
-		if req.Type == "init-fake" {
+		if req.Type == "initFake" {
 			if initialized {
 				respondError(writer, fmt.Errorf("client already initialized"))
 				continue
