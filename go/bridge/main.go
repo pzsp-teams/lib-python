@@ -45,6 +45,23 @@ func main() {
 			continue
 		}
 
+		if req.Type == "init-fake" {
+			if initialized {
+				respondError(writer, fmt.Errorf("client already initialized"))
+				continue
+			}
+
+			c, err := jsonClient.NewFakeJSONClient(req)
+			if detectFail(writer, err) {
+				continue
+			}
+
+			client = c
+			initialized = true
+			respondResult(writer, "initialized")
+			continue
+		}
+
 		if req.Type == "request" {
 			if client == nil {
 				respondError(writer, fmt.Errorf("client not initialized"))

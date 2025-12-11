@@ -6,7 +6,7 @@ import (
 )
 
 type ListChannelsParams struct {
-	TeamRef string
+	TeamRef string `json:"teamRef"`
 }
 
 func (jsonclient *TeamsJSONClient) ListChannels(params map[string]interface{}) (interface{}, error) {

@@ -4,6 +4,7 @@ package jsonclient
 
 import (
 	"context"
+	"fmt"
 	"crypto/tls"
 	"net/http"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
 
 	lib "github.com/pzsp-teams/lib"
+	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
 )
 
 // --- 1. Fake Auth Provider ---
@@ -43,7 +45,12 @@ func (t *HijackTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 // --- 3. Fake JSON Client Factory ---
-func NewFakeJSONClient(mockUrl string) (*TeamsJSONClient, error) {
+func NewFakeJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
+	// Parse parameters
+	mockServerURL, ok := req.Params["mockServerUrl"].(string)
+	if !ok || mockServerURL == "" {
+		return nil,  fmt.Errorf("invalid mockServerUrl parameter")
+	}
 
 	// A. Konfiguracja SenderConfig (tak jak w wersji Real)
 	senderConfig := lib.SenderConfig{
@@ -57,7 +64,7 @@ func NewFakeJSONClient(mockUrl string) (*TeamsJSONClient, error) {
 
 	hijackedHttpClient := &http.Client{
 		Transport: &HijackTransport{
-			MockServerURL: mockUrl,
+			MockServerURL: mockServerURL,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
