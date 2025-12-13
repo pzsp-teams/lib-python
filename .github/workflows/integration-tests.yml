@@ -1,4 +1,4 @@
-name: Python Integeration Tests
+name: Python Integration Tests
 
 on:
   push:
@@ -14,6 +14,9 @@ permissions:
   contents: write
 
 jobs:
+  # ====================================================
+  # 1. BUILD FAKE
+  # ====================================================
   build-fake:
     name: Build fake client
     runs-on: ubuntu-latest
@@ -48,6 +51,9 @@ jobs:
           path: python/teams_lib_pzsp2_z1/bin/
           retention-days: 1
 
+  # ====================================================
+  # 2. RUN TESTS
+  # ====================================================
   test-integration:
     name: Run Integration Tests
     runs-on: ubuntu-latest
@@ -83,8 +89,11 @@ jobs:
           uv pip install -e .
           uv run pytest -v tests/
 
-  update-release-branch:
-    name: Update Release Branch
+  # ====================================================
+  # 3. BUMP VERSION (COMMIT TO MAIN)
+  # ====================================================
+  bump-version:
+    name: Bump Version on Main
     runs-on: ubuntu-latest
     needs: test-integration
     if: github.ref == 'refs/heads/main'
@@ -92,7 +101,56 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+
+      - name: Bump Patch Version
+        run: |
+          cd python
+          python3 -c "
+          import re
+          file_path = 'pyproject.toml'
+          with open(file_path, 'r') as f:
+              content = f.read()
+          match = re.search(r'version = \"(\d+\.\d+)\.(\d+)\"', content)
+          if match:
+              prefix = match.group(1)
+              patch = int(match.group(2))
+              new_version = f'{prefix}.{patch + 1}'
+              new_content = re.sub(r'version = \"\d+\.\d+\.\d+\"', f'version = \"{new_version}\"', content)
+              with open(file_path, 'w') as f:
+                  f.write(new_content)
+              print(f'Bumped version to {new_version}')
+          else:
+              print('Version not found or invalid format')
+              exit(1)
+          "
+
+      - name: Commit and Push to Main
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+          git add python/pyproject.toml
+          git commit -m "Bump version [skip ci]"
+          git push origin main
+
+  # ====================================================
+  # 4. PREPARE RELEASE BRANCH
+  # ====================================================
+  update-release-branch:
+    name: Update Release Branch
+    runs-on: ubuntu-latest
+    needs: bump-version
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pull latest version from main
+        run: git pull origin main
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -116,6 +174,9 @@ jobs:
         run: |
           mkdir python_release
           cp -r python/* python_release/
+
+          grep "version =" python_release/pyproject.toml
+
           rm -rf python_release/tests
           find python_release -type d -name "__pycache__" -exec rm -rf {} +
           rm -rf python_release/.venv
