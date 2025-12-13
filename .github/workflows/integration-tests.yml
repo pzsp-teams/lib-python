@@ -46,18 +46,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: '3.14'
+          enable-cache: true
+          cache-dependency-glob: "python/uv.lock"
+
+      - name: Setup Python
+        run: uv python install 3.12
 
       - name: Install dependencies
         run: |
           cd python
-          pip install pytest pytest-httpserver -r requirements.txt
-          pip install -e .
+          uv sync --dev
 
       - name: Run Integration Tests
         run: |
           cd python
-          pytest -v tests/integration_tests/
+          uv run pytest -v tests/integration_tests/
