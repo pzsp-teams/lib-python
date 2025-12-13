@@ -4,10 +4,10 @@ package jsonclient
 
 import (
 	"context"
-	"fmt"
 	"crypto/tls"
+	"fmt"
 	"net/http"
-	"strings"
+	"net/url"
 
 	azcore "github.com/microsoft/kiota-abstractions-go"
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
@@ -35,11 +35,13 @@ type HijackTransport struct {
 }
 
 func (t *HijackTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.URL.Scheme = "http"
+	parsed, err := url.Parse(t.MockServerURL)
+	if err != nil {
+		return nil, err
+	}
 
-	targetHost := strings.TrimPrefix(t.MockServerURL, "http://")
-	targetHost = strings.TrimPrefix(targetHost, "https://")
-	req.URL.Host = targetHost
+	req.URL.Scheme = parsed.Scheme
+	req.URL.Host = parsed.Host
 
 	return t.Transport.RoundTrip(req)
 }
@@ -49,7 +51,7 @@ func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 	// Parse parameters
 	mockServerURL, ok := req.Params["mockServerUrl"].(string)
 	if !ok || mockServerURL == "" {
-		return nil,  fmt.Errorf("invalid mockServerUrl parameter")
+		return nil, fmt.Errorf("invalid mockServerUrl parameter")
 	}
 
 	// A. Konfiguracja SenderConfig (tak jak w wersji Real)

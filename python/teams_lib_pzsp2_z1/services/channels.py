@@ -11,12 +11,11 @@ class ChannelsService(BaseService):
                 "teamRef": teamRef,
             },
         )
-        channels_data = response.get("channels", [])
         return [
             Channel(
-                ID=channel["id"],
-                Name=channel["displayName"],
-                IsGeneral=(True if channel["isGeneral"] else False),
+                ID=channel["ID"],
+                Name=channel["Name"],
+                IsGeneral=(True if channel["IsGeneral"] else False),
             )
-            for channel in channels_data
+            for channel in response
         ]

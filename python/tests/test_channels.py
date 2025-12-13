@@ -7,9 +7,20 @@ def test_list_channels_integration(httpserver):
     Integration test: Python -> Go Binary -> Fake HTTP -> Python Mock Server
     """
     # Fake server config
+    fake_team_name = "Test Team"
     fake_team_id = "team-123-abc"
-    ms_graph_response = {
-        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('team-123-abc')/channels",
+    ms_graph_response_teams = {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+        "value": [
+            {
+                "id": fake_team_id,
+                "displayName": fake_team_name,
+                "description": "A team for testing",
+            },
+        ],
+    }
+    ms_graph_response_channels = {
+        "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{fake_team_id}')/channels",
         "value": [
             {
                 "id": "19:123123@thread.tacv2",
@@ -24,15 +35,18 @@ def test_list_channels_integration(httpserver):
         ],
     }
     httpserver.expect_request(
+        "/v1.0/users/me-token-to-replace/joinedTeams", method="GET"
+    ).respond_with_json(ms_graph_response_teams)
+    httpserver.expect_request(
         f"/v1.0/teams/{fake_team_id}/channels", method="GET"
-    ).respond_with_json(ms_graph_response)
+    ).respond_with_json(ms_graph_response_channels)
 
     # Init fake client
     client = TeamsClient(auto_init=False)
     try:
         init_fake_client(client, httpserver.url_for(""))
 
-        channels = client.channels.list_channels("team-123")
+        channels = client.channels.list_channels("Test Team")
 
         assert len(channels) == 2
 

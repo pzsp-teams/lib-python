@@ -80,4 +80,5 @@ jobs:
         run: |
           chmod +x python/teams_lib_pzsp2_z1/bin/*
           cd python
-          uv run pytest -v tests/integration_tests/
+          uv pip install -e .
+          uv run pytest -v tests/
