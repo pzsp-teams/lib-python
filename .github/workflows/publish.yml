@@ -12,7 +12,7 @@ jobs:
 
     permissions:
       contents: read
-      # id-token: write
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -34,5 +34,5 @@ jobs:
       - name: Build the package
         run: uv run python -m build
 
-      # - name: Publish to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

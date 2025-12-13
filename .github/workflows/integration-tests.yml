@@ -27,7 +27,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v5
         with:
-          go-version-file: './go/go.mod'
+          go-version-file: "./go/go.mod"
           check-latest: true
       - run: go version
 
@@ -101,7 +101,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ADMIN_PAT }}
           fetch-depth: 0
 
       - name: Bump Patch Version
@@ -155,7 +155,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: './go/go.mod'
+          go-version-file: "./go/go.mod"
           check-latest: true
 
       - name: Re-apply Go Dependency Update
