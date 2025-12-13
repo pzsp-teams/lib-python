@@ -10,13 +10,16 @@ on:
   repository_dispatch:
     types: [verify-new-go-lib-version]
 
+permissions:
+  contents: write
+
 jobs:
   build-fake:
     name: Build fake client
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup go
         uses: actions/setup-go@v5
@@ -33,10 +36,17 @@ jobs:
           go get github.com/pzsp-teams/lib@${{ github.event.client_payload.go_ref }}
           go mod tidy
 
-      - name: Build Bridge (Fake)
+      - name: Compile Fake Binary
         run: |
           chmod +x ./go/bridge/compileBridges.sh
           ./go/bridge/compileBridges.sh fake
+
+      - name: Upload Fake Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: fake-binary
+          path: python/teams_lib_pzsp2_z1/bin/
+          retention-days: 1
 
   test-integration:
     name: Run Integration Tests
@@ -44,7 +54,13 @@ jobs:
     needs: build-fake
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
+
+      - name: Download Fake Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: fake-binary
+          path: python/teams_lib_pzsp2_z1/bin/
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -62,5 +78,6 @@ jobs:
 
       - name: Run Integration Tests
         run: |
+          chmod +x python/teams_lib_pzsp2_z1/bin/*
           cd python
           uv run pytest -v tests/integration_tests/

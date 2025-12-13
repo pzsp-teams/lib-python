@@ -27,3 +27,6 @@ exclude = ["test_*.py", "tests/*"]
 
 [tool.ruff.lint]
 extend-select = ["I", "E", "W", "F", "C90", "B", "S", "UP", "PL"]
+
+[tool.setuptools]
+include-package-data = true
