@@ -36,10 +36,13 @@ def test_list_channels_integration(httpserver):
 
         assert len(channels) == 2
 
-        first_channel = channels[0]
+        assert channels[0].Name == "General"
+        assert channels[0].ID == "19:123123@thread.tacv2"
+        assert channels[0].IsGeneral == True
 
-        assert first_channel["displayName"] == "General"
-        assert first_channel["id"] == "19:123123@thread.tacv2"
+        assert channels[1].Name == "Development"
+        assert channels[1].ID == "19:999999@thread.tacv2"
+        assert channels[1].IsGeneral == False
 
     finally:
         client.close()

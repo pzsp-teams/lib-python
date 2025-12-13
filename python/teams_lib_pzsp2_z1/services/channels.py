@@ -16,7 +16,7 @@ class ChannelsService(BaseService):
             Channel(
                 ID=channel["id"],
                 Name=channel["displayName"],
-                IsGeneral=(channel["displayName"].lower() == "general"),
+                IsGeneral=(True if channel["isGeneral"] else False),
             )
             for channel in channels_data
         ]
