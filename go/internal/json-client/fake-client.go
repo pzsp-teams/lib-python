@@ -54,7 +54,6 @@ func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 		return nil, fmt.Errorf("invalid mockServerUrl parameter")
 	}
 
-	// A. Konfiguracja SenderConfig (tak jak w wersji Real)
 	senderConfig := lib.SenderConfig{
 		MaxRetries:     3,
 		NextRetryDelay: 2,
