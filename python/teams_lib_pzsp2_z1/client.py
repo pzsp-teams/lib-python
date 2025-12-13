@@ -10,7 +10,12 @@ from teams_lib_pzsp2_z1.services.channels import ChannelsService
 
 
 class TeamsClient:
-    def __init__(self, auto_init: bool = True):
+    def __init__(
+        self,
+        auto_init: bool = True,
+        cache_enabled: bool = False,
+        cache_path: str | None = None,
+    ):
         self._lock = threading.Lock()
 
         self.proc = subprocess.Popen(  # noqa: S603
@@ -25,7 +30,7 @@ class TeamsClient:
         self.channels = ChannelsService(self)
 
         if auto_init:
-            self.init_client()
+            self.init_client(cache_enabled, cache_path)
 
     def _binary(self):
         base = pathlib.Path(__file__).parent / "bin"
@@ -38,7 +43,9 @@ class TeamsClient:
         else:
             raise RuntimeError("Unsupported OS")
 
-    def init_client(self) -> Any:
+    def init_client(
+        self, cache_enabled: bool = False, cache_path: str | None = None
+    ) -> Any:
         sender_config = config.SenderConfig()
         auth_config = config.load_auth_config()
         return self.execute(
@@ -56,6 +63,8 @@ class TeamsClient:
                     "scopes": auth_config.scopes,
                     "authMethod": auth_config.auth_method,
                 },
+                "cacheEnabled": cache_enabled,
+                "cachePath": cache_path,
             },
         )
 

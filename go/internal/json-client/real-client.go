@@ -20,7 +20,22 @@ func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 		return nil, err
 	}
 
-	client, err := lib.NewClient(context.TODO(), &authConfig, &senderConfig)
+	cacheEnabled, err := jsonModel.ParseCacheEnabled(req.Params["cacheEnabled"])
+	if err != nil {
+		return nil, err
+	}
+
+	var cachePath *string
+	if cacheEnabled {
+		path, err := jsonModel.ParseCachePath(req.Params["cachePath"])
+		if err != nil {
+			return nil, err
+		}
+		cachePath = path
+	}
+
+
+	client, err := lib.NewClient(context.TODO(), authConfig, senderConfig, cacheEnabled, cachePath)
 	if err != nil {
 		return nil, err
 	}
