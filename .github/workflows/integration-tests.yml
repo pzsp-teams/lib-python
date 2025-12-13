@@ -1,0 +1,63 @@
+name: Python Integeration Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  repository_dispatch:
+    types: [verify-new-go-lib-version]
+
+jobs:
+  build-fake:
+    name: Build fake client
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go/go.mod'
+          check-latest: true
+      - run: go version
+
+      - name: Update Go Dependency (If triggered by Go Repo)
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "Triggered by Go Core commit: ${{ github.event.client_payload.go_ref }}"
+          cd go
+          go get github.com/pzsp-teams/lib@${{ github.event.client_payload.go_ref }}
+          go mod tidy
+
+      - name: Build Bridge (Fake)
+        run: |
+          chmod +x ./go/bridge/compileBridges.sh
+          ./go/bridge/compileBridges.sh fake
+
+  test-integration:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    needs: build-fake
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: |
+          cd python
+          pip install pytest pytest-httpserver -r requirements.txt
+          pip install -e .
+
+      - name: Run Integration Tests
+        run: |
+          cd python
+          pytest -v tests/integration_tests/
