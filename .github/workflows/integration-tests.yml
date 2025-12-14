@@ -28,6 +28,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: "./go/go.mod"
+          cache-dependency-path: "./go/go.sum"
           check-latest: true
       - run: go version
 
@@ -109,6 +110,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: "./go/go.mod"
+          cache-dependency-path: "./go/go.sum"
           check-latest: true
       - run: go version
 
@@ -140,6 +142,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-real
     if: |
+      always() &&
+      needs.build-real.result == 'success' &&
       github.ref == 'refs/heads/main' && (
         github.event_name == 'push' ||
         github.event_name == 'repository_dispatch'
@@ -189,7 +193,11 @@ jobs:
     name: Update Release Branch
     runs-on: ubuntu-latest
     needs: [bump-version, build-real]
-    if: github.ref == 'refs/heads/main'
+    if: |
+      always() &&
+      needs.bump-version.result == 'success' &&
+      needs.build-real.result == 'success' &&
+      github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
