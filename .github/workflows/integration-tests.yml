@@ -221,11 +221,18 @@ jobs:
           mkdir python_release
           cp -r python/* python_release/
 
-          grep "version =" python_release/pyproject.toml
+          mkdir -p python_release/.github/workflows
+
+          cp .github/workflows/publish.yml python_release/.github/workflows/
+
+          if [ -f "LICENSE" ]; then
+            cp LICENSE python_release/
+          fi
 
           rm -rf python_release/tests
           find python_release -type d -name "__pycache__" -exec rm -rf {} +
           rm -rf python_release/.venv
+          rm -rf python_release/uv.lock
 
           ls -R python_release/teams_lib_pzsp2_z1/bin
 
