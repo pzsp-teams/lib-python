@@ -1,12 +1,11 @@
 name: Python Integration Tests
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
+    types: [review_requested, ready_for_review]
+  push:
+    branches: [ main ]
   repository_dispatch:
     types: [verify-new-go-lib-version]
 
@@ -20,6 +19,7 @@ jobs:
   build-fake:
     name: Build fake client
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'repository_dispatch'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,6 +58,7 @@ jobs:
     name: Run Integration Tests
     runs-on: ubuntu-latest
     needs: build-fake
+    if: github.event_name == 'pull_request' || github.event_name == 'repository_dispatch'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -90,13 +91,59 @@ jobs:
           uv run pytest -v tests/
 
   # ====================================================
-  # 3. BUMP VERSION (COMMIT TO MAIN)
+  # 3. BUILD REAL BINARIES
+  # ====================================================
+
+  build-real:
+    name: Build real client
+    runs-on: ubuntu-latest
+    needs: test-integration
+    if: |
+      always() &&
+      (github.event_name == 'push' || needs.test-integration.result == 'success')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "./go/go.mod"
+          check-latest: true
+      - run: go version
+
+      - name: Update Go Dependency (If triggered by Go Repo)
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "Triggered by Go Core commit: ${{ github.event.client_payload.go_ref }}"
+          cd go
+          go get github.com/pzsp-teams/lib@${{ github.event.client_payload.go_ref }}
+          go mod tidy
+
+      - name: Compile Real Binaries
+        run: |
+          chmod +x ./go/bridge/compileBridges.sh
+          ./go/bridge/compileBridges.sh real
+
+      - name: Upload Real Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-binary
+          path: python/teams_lib_pzsp2_z1/bin/
+          retention-days: 1
+
+  # ====================================================
+  # 4. BUMP VERSION (COMMIT TO MAIN)
   # ====================================================
   bump-version:
     name: Bump Version on Main
     runs-on: ubuntu-latest
-    needs: test-integration
-    if: github.ref == 'refs/heads/main'
+    needs: build-real
+    if: |
+      github.ref == 'refs/heads/main' && (
+        github.event_name == 'push' ||
+        github.event_name == 'repository_dispatch'
+      )
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -136,42 +183,33 @@ jobs:
           git push origin main
 
   # ====================================================
-  # 4. PREPARE RELEASE BRANCH
+  # 5. PREPARE RELEASE BRANCH
   # ====================================================
   update-release-branch:
     name: Update Release Branch
     runs-on: ubuntu-latest
-    needs: bump-version
+    needs: [bump-version, build-real]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
-      - name: Pull latest version from main
+      - name: Ensure latest main (with bump)
         run: git pull origin main
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Download Real Binary
+        uses: actions/download-artifact@v4
         with:
-          go-version-file: "./go/go.mod"
-          check-latest: true
-
-      - name: Re-apply Go Dependency Update
-        if: github.event_name == 'repository_dispatch'
-        run: |
-          cd go
-          go get github.com/pzsp-teams/lib@${{ github.event.client_payload.go_ref }}
-          go mod tidy
-
-      - name: Compile Real Binaries
-        run: |
-          chmod +x ./go/bridge/compileBridges.sh
-          ./go/bridge/compileBridges.sh real
+          name: real-binary
+          path: python/teams_lib_pzsp2_z1/bin/
 
       - name: Prepare Client Directory
         run: |
+          chmod +x python/teams_lib_pzsp2_z1/bin/*
+
           mkdir python_release
           cp -r python/* python_release/
 
