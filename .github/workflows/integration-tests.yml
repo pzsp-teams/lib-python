@@ -204,6 +204,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
+          token: ${{ secrets.ADMIN_PAT }}
 
       - name: Ensure latest main (with bump)
         run: git pull origin main
@@ -238,7 +239,6 @@ jobs:
           rm -rf python_release/tests
           find python_release -type d -name "__pycache__" -exec rm -rf {} +
           rm -rf python_release/.venv
-          rm -rf python_release/uv.lock
 
           ls -R python_release
 
