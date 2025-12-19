@@ -28,6 +28,7 @@ class TeamsClient:
             bufsize=1,
         )
 
+        self.env_path = env_path
         self.channels = ChannelsService(self)
 
         if auto_init:
