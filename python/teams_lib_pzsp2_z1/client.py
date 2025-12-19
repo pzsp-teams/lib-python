@@ -13,6 +13,7 @@ class TeamsClient:
     def __init__(
         self,
         auto_init: bool = True,
+        env_path: str | None = None,
         cache_enabled: bool = False,
         cache_path: str | None = None,
     ):
@@ -47,7 +48,7 @@ class TeamsClient:
         self, cache_enabled: bool = False, cache_path: str | None = None
     ) -> Any:
         sender_config = config.SenderConfig()
-        auth_config = config.load_auth_config()
+        auth_config = config.load_auth_config(self.env_path)
         return self.execute(
             cmd_type="init",
             config={
