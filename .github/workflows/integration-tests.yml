@@ -212,29 +212,35 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: real-binary
-          path: python/teams_lib_pzsp2_z1/bin/
+          path: /tmp/real-binary
 
       - name: Prepare Client Directory
         run: |
-          chmod +x python/teams_lib_pzsp2_z1/bin/*
-
           mkdir python_release
           cp -r python/* python_release/
 
-          mkdir -p python_release/.github/workflows
+          # binaries
+          TARGET_BIN_DIR="python_release/teams_lib_pzsp2_z1/bin/"
+          mkdir -p $TARGET_BIN_DIR
+          find /tmp/real-binary -type f -exec cp {} $TARGET_BIN_DIR \;
+          chmod +x $TARGET_BIN_DIR/*
 
+          # publish workflow
+          mkdir -p python_release/.github/workflows
           cp .github/workflows/publish.yml python_release/.github/workflows/
 
+          # license file
           if [ -f "LICENSE" ]; then
             cp LICENSE python_release/
           fi
 
+          # clean up unneeded files
           rm -rf python_release/tests
           find python_release -type d -name "__pycache__" -exec rm -rf {} +
           rm -rf python_release/.venv
           rm -rf python_release/uv.lock
 
-          ls -R python_release/teams_lib_pzsp2_z1/bin
+          ls -R python_release
 
       - name: Commit and Push to Release Branch
         run: |
@@ -243,9 +249,9 @@ jobs:
           git checkout --orphan python-release
 
           git rm -rf .
-          cp -r python_release/* .
+          cp -a python_release/. .
           rm -rf python_release
-          git add .
 
+          git add .
           git commit -m "Release build: ${{ github.sha }}"
           git push -f origin python-release
