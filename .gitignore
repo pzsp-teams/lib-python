@@ -4,3 +4,4 @@ python/teams_lib_pzsp2_z1.egg-info
 python/teams_lib_pzsp2_z1/bin/*
 .env
 example.py
+.vscode

@@ -1,8 +1,11 @@
 import os
-import sys
 from dataclasses import dataclass
 
 from dotenv import load_dotenv
+
+
+class AuthConfigurationError(Exception):
+    pass
 
 
 @dataclass
@@ -21,17 +24,14 @@ class AuthConfig:
     auth_method: str
 
 
-def load_auth_config() -> AuthConfig:
-    load_dotenv()
+def load_auth_config(env_path: str | None = None) -> AuthConfig:
+    load_dotenv(env_path)
 
     cfg = AuthConfig(
         client_id=get_env("CLIENT_ID", ""),
         tenant=get_env("TENANT_ID", ""),
         email=get_env("EMAIL", ""),
-        scopes=get_env(
-            "SCOPES",
-            "https://graph.microsoft.com/.default"
-        ).split(","),
+        scopes=get_env("SCOPES", "https://graph.microsoft.com/.default").split(","),
         auth_method=get_env("AUTH_METHOD", "DEVICE_CODE"),
     )
 
@@ -44,18 +44,20 @@ def get_env(key: str, fallback: str) -> str:
 
 
 def validate(cfg: AuthConfig):
+    missing = []
     if not cfg.client_id:
-        print("Missing CLIENT ID", file=sys.stderr)
-        sys.exit(1)
-
+        missing.append("CLIENT_ID")
     if not cfg.tenant:
-        print("Missing TENANT ID", file=sys.stderr)
-        sys.exit(1)
-
+        missing.append("TENANT_ID")
     if not cfg.email:
-        print("Missing EMAIL", file=sys.stderr)
-        sys.exit(1)
+        missing.append("EMAIL")
+
+    if missing:
+        raise AuthConfigurationError(
+            f"Missing required environment variables: {', '.join(missing)}"
+        )
 
     if cfg.auth_method not in ("DEVICE_CODE", "INTERACTIVE"):
-        print("AUTH METHOD must be either DEVICE_CODE or INTERACTIVE", file=sys.stderr)
-        sys.exit(1)
+        raise AuthConfigurationError(
+            f"Invalid AUTH_METHOD: {cfg.auth_method}. Must be DEVICE_CODE or INTERACTIVE"
+        )
