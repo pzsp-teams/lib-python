@@ -41,7 +41,6 @@ def test_get_team_integration(httpserver):
 
     data = setup_fake_server(httpserver)
 
-    # Init fake client
     client = TeamsClient(auto_init=False)
     try:
         init_fake_client(client, httpserver.url_for(""))
@@ -55,6 +54,31 @@ def test_get_team_integration(httpserver):
         assert team.Description == data.teams[0].Description
         assert team.IsArchived == data.teams[0].IsArchived
         assert team.Visibility == data.teams[0].Visibility
+
+    finally:
+        client.close()
+
+
+def test_create_team_via_group_integration(httpserver):
+    """
+    Integration test: Python -> Go Binary -> Fake HTTP -> Python Mock Server
+    """
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        team = client.teams.create_via_group(
+            display_name=data.newTeamName,
+            mail_nickname=data.newGroupMailNickname,
+            visibility=data.newTeamVisibility,
+        )
+
+        assert team.ID == data.newGroupID
+        assert team.DisplayName == data.newTeamName
+        assert team.Visibility == data.newTeamVisibility
 
     finally:
         client.close()
