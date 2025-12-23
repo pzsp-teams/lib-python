@@ -11,6 +11,7 @@ class TeamsService(BaseService):
                 "teamRef": teamRef,
             },
         )
+
         return Team(
             ID=response["ID"],
             DisplayName=response["DisplayName"],

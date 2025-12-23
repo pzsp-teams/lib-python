@@ -2,6 +2,8 @@ package jsonclient
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/pzsp-teams/lib-python/internal/json-client/decoders"
 )
@@ -12,6 +14,9 @@ type getTeamParams struct {
 
 func (jsonclient *TeamsJSONClient) GetTeam(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[getTeamParams](p)
+
+	fmt.Fprintf(os.Stderr, "Decoded params: %+v\n", params)
+
 	if err != nil {
 		return nil, err
 	}
@@ -19,6 +24,9 @@ func (jsonclient *TeamsJSONClient) GetTeam(p map[string]interface{}) (interface{
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Fprintf(os.Stderr, "Received team: %+v\n", team)
+
 	return team, nil
 }
 
