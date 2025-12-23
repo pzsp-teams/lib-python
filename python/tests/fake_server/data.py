@@ -14,8 +14,15 @@ class FakeServerData:
                 DisplayName="Test Team",
                 Description="A team for testing",
                 IsArchived=False,
-                Visibility="Private",
+                Visibility="private",
             ),
+            Team(
+                ID="team-456-def",
+                DisplayName="Another Team",
+                Description="Another team for testing",
+                IsArchived=False,
+                Visibility="public",
+            )
         ]
         self.channels = {
             "team-123-abc": [
@@ -34,7 +41,6 @@ class FakeServerData:
 
     def get_myJoinedTeams_response(self) -> dict:
         return {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
             "value": [
                 {
                     "id": team.ID,
@@ -49,7 +55,6 @@ class FakeServerData:
 
     def get_listChannels_response(self, team_id: str) -> dict:
         return {
-            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/channels",
             "value": [
                 {
                     "id": channel.ID,
@@ -59,3 +64,15 @@ class FakeServerData:
                 for channel in self.channels.get(team_id, [])
             ],
         }
+
+    def get_team_response(self, team_id: str) -> dict | None:
+        return {
+            "id": team.ID,
+            "displayName": team.DisplayName,
+            "description": team.Description,
+            "isArchived": team.IsArchived,
+            "visibility": team.Visibility,
+        } if (team := next((t for t in self.teams if t.ID == team_id), None)) else None
+
+
+

@@ -4,9 +4,11 @@ import platform
 import subprocess
 import threading
 from typing import Any
+import sys
 
 from teams_lib_pzsp2_z1 import config
 from teams_lib_pzsp2_z1.services.channels import ChannelsService
+from teams_lib_pzsp2_z1.services.teams import TeamsService
 
 
 class TeamsClient:
@@ -23,13 +25,14 @@ class TeamsClient:
             [str(self._binary())],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=sys.stderr,
             text=True,
             bufsize=1,
         )
 
         self.env_path = env_path
         self.channels = ChannelsService(self)
+        self.teams = TeamsService(self)
 
         if auto_init:
             self.init_client(cache_enabled, cache_path)
