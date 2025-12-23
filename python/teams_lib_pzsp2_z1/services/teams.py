@@ -1,4 +1,4 @@
-from teams_lib_pzsp2_z1.model.team import Team
+from teams_lib_pzsp2_z1.model.team import MSTeamsUpdate, Team
 from teams_lib_pzsp2_z1.services.base_service import BaseService
 
 
@@ -36,7 +36,23 @@ class TeamsService(BaseService):
             for team in response
         ]
 
-    # def update //TODO
+    def update(self, teamRef: str, update: MSTeamsUpdate) -> Team:
+        params = {"teamRef": teamRef}
+        update_dict = {k: v for k, v in update.__dict__.items() if v is not None}
+        params["team"] = update_dict
+
+        response = self.client.execute(
+            cmd_type="request",
+            method="updateTeam",
+            params=params,
+        )
+        return Team(
+            ID=response["ID"],
+            DisplayName=response["DisplayName"],
+            Description=response["Description"],
+            IsArchived=(True if response["IsArchived"] else False),
+            Visibility=response["Visibility"],
+        )
 
     def create_via_group(
         self, display_name: str, mail_nickname: str, visibility: str
