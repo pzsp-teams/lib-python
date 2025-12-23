@@ -10,7 +10,7 @@ type getTeamParams struct {
 	TeamRef string `json:"teamRef"`
 }
 
-func (jsonclient *TeamsJSONClient) Get(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) GetTeam(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[getTeamParams](p)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ type updateTeamParams struct {
 	TeamPatch decoders.TeamPatchDTO `json:"team"`
 }
 
-func (jsonclient *TeamsJSONClient) Update(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) UpdateTeam(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[updateTeamParams](p)
 	msTeam := decoders.GetMSTeam(&params.TeamPatch)
 	if err != nil {
@@ -54,7 +54,7 @@ type createViaGroupParams struct {
 	Visibility   string `json:"visibility"`
 }
 
-func (jsonclient *TeamsJSONClient) CreateViaGroup(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) CreateTeamViaGroup(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[createViaGroupParams](p)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ type createFromTemplateParams struct {
 	Owners      []string `json:"owners"`
 }
 
-func (jsonclient *TeamsJSONClient) CreateFromTemplate(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) CreateTeamFromTemplate(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[createFromTemplateParams](p)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ type archiveTeamParams struct {
 	SpoReadOnlyFromMembers *bool  `json:"spoReadOnlyFromMembers,omitempty"`
 }
 
-func (jsonclient *TeamsJSONClient) Archive(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) ArchiveTeam(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[archiveTeamParams](p)
 	if err != nil {
 		return nil, err
@@ -105,7 +105,7 @@ type unarchiveTeamParams struct {
 	TeamRef string `json:"teamRef"`
 }
 
-func (jsonclient *TeamsJSONClient) Unarchive(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) UnarchiveTeam(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[unarchiveTeamParams](p)
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ type deleteTeamParams struct {
 	TeamRef string `json:"teamRef"`
 }
 
-func (jsonclient *TeamsJSONClient) Delete(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) DeleteTeam(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[deleteTeamParams](p)
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ type restoreTeamParams struct {
 	DeletedGroupID string `json:"deletedGroupId"`
 }
 
-func (jsonclient *TeamsJSONClient) RestoreDeleted(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) RestoreDeletedTeam(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[restoreTeamParams](p)
 	if err != nil {
 		return nil, err
