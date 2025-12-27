@@ -129,6 +129,21 @@ class FakeServerData:
             "visibility": team.Visibility,
         }
 
+    def get_createTeamFromTemplate_response(self, request_json: dict) -> dict:
+        new_team_id = "team-from-template-001"
+        new_team = Team(
+            ID=new_team_id,
+            DisplayName=request_json.get("displayName"),
+            Description=request_json.get("description"),
+            IsArchived=False,
+            Visibility="private",
+        )
+        self.teams.append(new_team)
+
+        return {
+            "id": new_team_id,
+        }
+
 
 
 

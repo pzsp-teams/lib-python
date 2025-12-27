@@ -84,6 +84,16 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Get Team Details"
     ))
 
+    # POST /teams
+    httpserver.expect_request(
+        "/v1.0/teams",
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_createTeamFromTemplate_response(req.json),
+        "Create Team from Template (POST)"
+    ))
+
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(
         lambda req: Response(

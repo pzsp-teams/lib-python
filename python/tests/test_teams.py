@@ -35,9 +35,6 @@ def test_list_my_teams_integration(httpserver):
         client.close()
 
 def test_get_team_integration(httpserver):
-    """
-    Integration test: Python -> Go Binary -> Fake HTTP -> Python Mock Server
-    """
 
     data = setup_fake_server(httpserver)
 
@@ -60,9 +57,6 @@ def test_get_team_integration(httpserver):
 
 
 def test_create_team_via_group_integration(httpserver):
-    """
-    Integration test: Python -> Go Binary -> Fake HTTP -> Python Mock Server
-    """
 
     data = setup_fake_server(httpserver)
 
@@ -79,6 +73,26 @@ def test_create_team_via_group_integration(httpserver):
         assert team.ID == data.newGroupID
         assert team.DisplayName == data.newTeamName
         assert team.Visibility == data.newTeamVisibility
+
+    finally:
+        client.close()
+
+
+def test_create_team_from_template_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        msg = client.teams.create_from_template(
+            display_name=data.newTeamName,
+            description="A team created from a template",
+            owners=["user-123-abc"],
+        )
+
+        assert msg == "id will be given later (async)"
 
     finally:
         client.close()
