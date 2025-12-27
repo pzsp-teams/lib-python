@@ -94,6 +94,26 @@ class FakeServerData:
             "visibility": team.Visibility,
         } if (team := next((t for t in self.teams if t.ID == team_id), None)) else None
 
+    def get_updateTeam_response(self, team_id: str, update_json: dict) -> dict | None:
+        team = next((t for t in self.teams if t.ID == team_id), None)
+        if not team:
+            return None
+
+        if "displayName" in update_json:
+            team.DisplayName = update_json["displayName"]
+        if "description" in update_json:
+            team.Description = update_json["description"]
+        if "visibility" in update_json:
+            team.Visibility = update_json["visibility"]
+
+        return {
+            "id": team.ID,
+            "displayName": team.DisplayName,
+            "description": team.Description,
+            "isArchived": team.IsArchived,
+            "visibility": team.Visibility,
+        }
+
     def get_createGroup_response(self, request_json: dict) -> dict:
         visibility = request_json.get("visibility").lower()
         if visibility not in ("private", "public"):
