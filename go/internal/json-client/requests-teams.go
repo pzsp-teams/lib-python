@@ -2,8 +2,6 @@ package jsonclient
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/pzsp-teams/lib-python/internal/json-client/decoders"
 )

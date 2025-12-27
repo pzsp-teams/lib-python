@@ -4,10 +4,7 @@ type HandlerFunc func(c *TeamsJSONClient, p map[string]interface{}) (interface{}
 
 var Handlers = map[string]HandlerFunc{
 
-	"listChannels": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
-		return c.ListChannels(p)
-	},
-
+	// TEAMS
 	"getTeam": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
 		return c.GetTeam(p)
 	},
@@ -42,5 +39,62 @@ var Handlers = map[string]HandlerFunc{
 
 	"restoreDeletedTeam": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
 		return c.RestoreDeletedTeam(p)
+	},
+
+	// CHANNELS
+	"listChannels": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.ListChannels(p)
+	},
+
+	"getChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.GetChannel(p)
+	},
+
+	"createStandardChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.CreateStandardChannel(p)
+	},
+
+	"createPrivateChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.CreatePrivateChannel(p)
+	},
+
+	"deleteChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.DeleteChannel(p)
+	},
+
+	"listChannelMembers": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.ListChannelMembers(p)
+	},
+
+	"addMemberToChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.AddMemberToChannel(p)
+	},
+
+	"removeMemberFromChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.RemoveMemberFromChannel(p)
+	},
+
+	"updateMemberRoleInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.UpdateMemberInChannel(p)
+	},
+
+	"sendMessageToChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.SendMessageToChannel(p)
+	},
+
+	"listMessagesInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.ListMessagesInChannel(p)
+	},
+
+	"getMessageInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.GetMessageInChannel(p)
+	},
+
+	"listMessageRepliesInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.ListMessageRepliesInChannel(p)
+	},
+
+	"getMessageReplyInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.GetMessageReplyInChannel(p)
 	},
 }
