@@ -1,3 +1,4 @@
+from python.teams_lib_pzsp2_z1.model.team import MSTeamsUpdate
 from teams_lib_pzsp2_z1.client import TeamsClient
 from tests.init_fake_client import init_fake_client
 from tests.fake_server.setup import setup_fake_server
@@ -49,6 +50,32 @@ def test_get_team_integration(httpserver):
         assert team.DisplayName == data.teams[0].DisplayName
         assert team.ID == data.teams[0].ID
         assert team.Description == data.teams[0].Description
+        assert team.IsArchived == data.teams[0].IsArchived
+        assert team.Visibility == data.teams[0].Visibility
+
+    finally:
+        client.close()
+
+
+def test_update_team_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        updated_description = "Updated team description"
+        team = client.teams.update(
+            teamRef=data.teams[0].DisplayName,
+            update=MSTeamsUpdate(
+                Description=updated_description,
+            ),
+        )
+
+        assert team.DisplayName == data.teams[0].DisplayName
+        assert team.ID == data.teams[0].ID
+        assert team.Description == updated_description
         assert team.IsArchived == data.teams[0].IsArchived
         assert team.Visibility == data.teams[0].Visibility
 
@@ -148,7 +175,6 @@ def test_delete_team_integration(httpserver):
         )
 
         assert success is True
-        # assert True is False
 
     finally:
         client.close()

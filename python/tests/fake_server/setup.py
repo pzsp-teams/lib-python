@@ -84,6 +84,19 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Get Team Details"
     ))
 
+    # PATCH /teams/{id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)"),
+        method="PATCH"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_updateTeam_response(
+            re.search(r"/teams/([^/]+)", req.path).group(1),
+            req.json
+        ),
+        "Update Team (PATCH)"
+    ))
+
     # POST /teams
     httpserver.expect_request(
         "/v1.0/teams",
