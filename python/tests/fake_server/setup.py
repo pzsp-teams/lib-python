@@ -94,6 +94,16 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Create Team from Template (POST)"
     ))
 
+    # POST /teams/{id}/archive
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/archive"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_archiveTeam_response(re.search(r"/teams/([^/]+)/archive", req.path).group(1)),
+        "Archive Team (POST)"
+    ))
+
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(
         lambda req: Response(

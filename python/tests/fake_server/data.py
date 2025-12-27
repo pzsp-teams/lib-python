@@ -29,6 +29,13 @@ class FakeServerData:
                 Description="Another team for testing",
                 IsArchived=False,
                 Visibility="public",
+            ),
+            Team(
+                ID="archived-team-789-ghi",
+                DisplayName="Archived Team",
+                Description="An archived team for testing",
+                IsArchived=True,
+                Visibility="private",
             )
         ]
         self.channels = {
@@ -143,6 +150,14 @@ class FakeServerData:
         return {
             "id": new_team_id,
         }
+
+    def get_archiveTeam_response(self, team_id: str) -> dict:
+        team = next((t for t in self.teams if t.ID == team_id), None)
+        if not team:
+            return {"success": False}
+
+        team.IsArchived = True
+        return {"success": True}
 
 
 
