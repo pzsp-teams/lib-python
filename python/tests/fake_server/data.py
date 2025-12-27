@@ -167,6 +167,31 @@ class FakeServerData:
         team.IsArchived = False
         return {"success": True}
 
+    def get_deleteTeam_response(self, team_id: str) -> dict:
+        team = next((t for t in self.teams if t.ID == team_id), None)
+        if not team:
+            return {"success": False}
+
+        self.teams.remove(team)
+        return {"success": True}
+
+    def get_restoreTeam_response(self, team_id: str) -> dict:
+        archived_team = next((t for t in self.teams if t.ID == team_id and t.IsArchived), None)
+        if not archived_team:
+            return {"success": False}
+
+        archived_team.IsArchived = False
+        return {
+            "id": archived_team.ID,
+            "displayName": archived_team.DisplayName,
+            "description": archived_team.Description,
+            "isArchived": archived_team.IsArchived,
+            "visibility": archived_team.Visibility,
+            "mailNickname": self.newGroupMailNickname
+        }
+
+
+
 
 
 

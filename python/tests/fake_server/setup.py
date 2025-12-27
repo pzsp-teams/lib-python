@@ -114,6 +114,26 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Unarchive Team (POST)"
     ))
 
+    # DELETE /teams/{id}/delete
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/groups/([^/]+)"),
+        method="DELETE"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_deleteTeam_response(re.search(r"/groups/([^/]+)", req.path).group(1)),
+        "Delete Team (DELETE)"
+    ))
+
+    # POST /teams/{id}/restore
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/directory/deletedItems/([^/]+)/restore"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_restoreTeam_response(re.search(r"/directory/deletedItems/([^/]+)/restore", req.path).group(1)),
+        "Restore Deleted Team (POST)"
+    ))
+
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(
         lambda req: Response(

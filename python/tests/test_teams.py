@@ -133,3 +133,40 @@ def test_unarchive_team_integration(httpserver):
 
     finally:
         client.close()
+
+
+def test_delete_team_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        success = client.teams.delete(
+            teamRef=data.teams[0].DisplayName,
+        )
+
+        assert success is True
+        # assert True is False
+
+    finally:
+        client.close()
+
+
+def test_restore_deleted_team_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        msg = client.teams.restore_deleted(
+            deleted_team_ID=data.teams[2].ID,
+        )
+
+        assert msg == data.teams[2].ID
+
+    finally:
+        client.close()

@@ -123,12 +123,12 @@ class TeamsService(BaseService):
         )
         return response == "deleted"
 
-    def restore_deleted(self, teamRef: str) -> str:
+    def restore_deleted(self, deleted_team_ID: str) -> str:
         response = self.client.execute(
             cmd_type="request",
             method="restoreDeletedTeam",
             params={
-                "teamRef": teamRef,
+                "deletedGroupID": deleted_team_ID,
             },
         )
-        return response["id"]
+        return response
