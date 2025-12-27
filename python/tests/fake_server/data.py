@@ -159,6 +159,14 @@ class FakeServerData:
         team.IsArchived = True
         return {"success": True}
 
+    def get_unarchiveTeam_response(self, team_id: str) -> dict:
+        team = next((t for t in self.teams if t.ID == team_id), None)
+        if not team:
+            return {"success": False}
+
+        team.IsArchived = False
+        return {"success": True}
+
 
 
 

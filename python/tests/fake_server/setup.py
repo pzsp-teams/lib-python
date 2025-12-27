@@ -104,6 +104,16 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Archive Team (POST)"
     ))
 
+    # POST /teams/{id}/unarchive
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/unarchive"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_unarchiveTeam_response(re.search(r"/teams/([^/]+)/unarchive", req.path).group(1)),
+        "Unarchive Team (POST)"
+    ))
+
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(
         lambda req: Response(
