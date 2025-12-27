@@ -115,3 +115,21 @@ def test_archive_team_integration(httpserver):
 
     finally:
         client.close()
+
+
+def test_unarchive_team_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        success = client.teams.unarchive(
+            teamRef=data.teams[2].DisplayName,
+        )
+
+        assert success is True
+
+    finally:
+        client.close()
