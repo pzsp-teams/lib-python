@@ -170,3 +170,21 @@ def test_restore_deleted_team_integration(httpserver):
 
     finally:
         client.close()
+
+
+def test_error_handling_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        try:
+            client.teams.get("non-existent-team")
+            assert False, "Expected an exception for non-existent team"
+        except Exception as e:
+            assert "Go Error" in str(e)
+
+    finally:
+        client.close()

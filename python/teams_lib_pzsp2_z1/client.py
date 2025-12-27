@@ -2,9 +2,9 @@ import json
 import pathlib
 import platform
 import subprocess
+import sys
 import threading
 from typing import Any
-import sys
 
 from teams_lib_pzsp2_z1 import config
 from teams_lib_pzsp2_z1.services.channels import ChannelsService
