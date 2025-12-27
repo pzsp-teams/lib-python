@@ -90,7 +90,7 @@ class TeamsService(BaseService):
                 "owners": owners,
             },
         )
-        return response["id"]
+        return response
 
     def archive(self, teamRef: str, spo_read_only_from_members: bool) -> bool:
         response = self.client.execute(
