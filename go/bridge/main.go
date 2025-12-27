@@ -51,19 +51,18 @@ func main() {
 				continue
 			}
 
-			switch req.Method {
-			case "listChannels":
-				channels, err := client.ListChannels(req.Params)
-				if err != nil {
-					respondError(writer, err)
-				} else {
-					respondResult(writer, channels)
-				}
-			default:
+			handler, exists := jsonClientLib.Handlers[req.Method]
+			if !exists {
 				respondError(writer, fmt.Errorf("unknown method"))
+				continue
 			}
+
+			result, err := handler(client, req.Params)
+			if err != nil {
+				respondError(writer, err)
+			}
+			respondResult(writer, result)
 			continue
 		}
-		respondError(writer, fmt.Errorf("unknown request type"))
 	}
 }

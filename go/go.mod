@@ -5,6 +5,7 @@ go 1.25.5
 require (
 	github.com/microsoft/kiota-abstractions-go v1.9.3
 	github.com/microsoftgraph/msgraph-sdk-go v1.90.0
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pzsp-teams/lib v0.0.0-20251213104555-e41d3adf599f
 )
 
