@@ -44,6 +44,33 @@ def setup_fake_server(httpserver) -> FakeServerData:
         req, data.get_myJoinedTeams_response(), "List Joined Teams"
     ))
 
+    # GET /teams/{team_id}/channels/{channel_id}/messages/{message_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_message_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)", req.path).group(2),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)", req.path).group(3)
+        ),
+        "Get Channel Message"
+    ))
+
+    # GET /teams/{team_id}/channels/{channel_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_messages_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(2)
+        ),
+        "List Channel Messages"
+    ))
+
     # GET /teams/{team_id}/channels/{channel_id}
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)"),
@@ -172,6 +199,21 @@ def setup_fake_server(httpserver) -> FakeServerData:
         ),
         "Create Channel (POST)"
     ))
+
+    # DELETE /teams/{team_id}/channels/{channel_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)"),
+        method="DELETE"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_delete_channel_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)", req.path).group(2)
+        ),
+        "Delete Channel (DELETE)"
+    ))
+
+
 
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(

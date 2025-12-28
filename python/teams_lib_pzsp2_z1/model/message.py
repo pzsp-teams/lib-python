@@ -7,19 +7,22 @@ class MessageContentType(Enum):
     TEXT = "text"
     HTML = "html"
 
+
 @dataclass
 class MessageFrom:
     UserID: str
     DisplayName: str
+
 
 @dataclass
 class Message:
     ID: str
     Content: str
     ContentType: MessageContentType
-    CreateDateTime: datetime
+    CreatedDateTime: datetime
     From: MessageFrom
     ReplyCount: int
+
 
 @dataclass
 class MessageBody:
@@ -32,8 +35,8 @@ class MessageBody:
             "Content": self.Content,
         }
 
+
 @dataclass
 class ListMessagesOptions:
     Top: int | None = None
     ExpandReplies: bool = False
-

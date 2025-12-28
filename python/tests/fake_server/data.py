@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from teams_lib_pzsp2_z1.model.team import Team
 from teams_lib_pzsp2_z1.model.channel import Channel
+from teams_lib_pzsp2_z1.model.message import Message, MessageFrom
 from dataclasses import field
 
 @dataclass
@@ -49,6 +50,58 @@ class FakeServerData:
                     ID="19:999999@thread.tacv2",
                     Name="Development",
                     IsGeneral=False,
+                ),
+            ],
+        }
+        self.messages = {
+            "19:123123@thread.tacv2": [
+                Message(
+                    ID="msg-001",
+                    Content="Hello, team!",
+                    ContentType="text",
+                    From=MessageFrom(
+                        UserID="user-123-abc",
+                        DisplayName="Alice"
+                    ),
+                    CreatedDateTime="2024-01-01T10:00:00Z",
+                    ReplyCount=0,
+                ),
+                Message(
+                    ID="msg-002",
+                    Content="Don't forget the meeting at 3 PM.",
+                    ContentType="text",
+                    From=MessageFrom(
+                        UserID="user-456-def",
+                        DisplayName="Bob"
+                    ),
+                    CreatedDateTime="2024-01-01T11:00:00Z",
+                    ReplyCount=2,
+                ),
+            ],
+        }
+        self.replies = {
+            "msg-002": [
+                Message(
+                    ID="msg-002-reply-001",
+                    Content="Thanks for the reminder!",
+                    ContentType="text",
+                    From=MessageFrom(
+                        UserID="user-789-ghi",
+                        DisplayName="Charlie"
+                    ),
+                    CreatedDateTime="2024-01-01T12:00:00Z",
+                    ReplyCount=0,
+                ),
+                Message(
+                    ID="msg-002-reply-002",
+                    Content="I'll be there.",
+                    ContentType="text",
+                    From=MessageFrom(
+                        UserID="user-123-abc",
+                        DisplayName="Alice"
+                    ),
+                    CreatedDateTime="2024-01-01T12:30:00Z",
+                    ReplyCount=0,
                 ),
             ],
         }
@@ -244,6 +297,57 @@ class FakeServerData:
             "description": description,
             "isGeneral": new_channel.IsGeneral,
             "membershipType": "standard"
+        }
+
+    def get_delete_channel_response(self, team_id: str, channel_id: str) -> dict:
+        channel = next((c for c in self.channels.get(team_id, []) if c.ID == channel_id), None)
+        if not channel:
+            return {"success": False}
+
+        self.channels[team_id].remove(channel)
+        return {"success": True}
+
+    def get_list_messages_response(self, team_id: str, channel_id: str) -> dict:
+        return {
+            "value": [
+                {
+                    "id": message.ID,
+                    "body": {
+                        "content": message.Content,
+                        "contentType": message.ContentType,
+                    },
+                    "from": {
+                        "user": {
+                            "id": message.From.UserID,
+                            "displayName": message.From.DisplayName,
+                        }
+                    },
+                    "createdDateTime": message.CreatedDateTime,
+                    "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
+                }
+                for message in self.messages.get(channel_id, [])
+            ],
+        }
+
+    def get_message_response(self, team_id: str, channel_id: str, message_id: str) -> dict | None:
+        message = next((m for m in self.messages.get(channel_id, []) if m.ID == message_id), None)
+        if not message:
+            return None
+
+        return {
+            "id": message.ID,
+            "body": {
+                "content": message.Content,
+                "contentType": message.ContentType,
+            },
+            "from": {
+                "user": {
+                    "id": message.From.UserID,
+                    "displayName": message.From.DisplayName,
+                }
+            },
+            "createdDateTime": message.CreatedDateTime,
+            "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
         }
 
 
