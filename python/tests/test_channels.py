@@ -29,3 +29,24 @@ def test_list_channels_integration(httpserver):
 
     finally:
         client.close()
+
+
+def test_get_channel_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        channel = client.channels.get(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=data.channels[data.teams[0].ID][1].Name,
+        )
+
+        assert channel.Name == data.channels[data.teams[0].ID][1].Name
+        assert channel.ID == data.channels[data.teams[0].ID][1].ID
+        assert channel.IsGeneral == data.channels[data.teams[0].ID][1].IsGeneral
+
+    finally:
+        client.close()

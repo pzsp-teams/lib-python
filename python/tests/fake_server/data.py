@@ -210,6 +210,17 @@ class FakeServerData:
             "mailNickname": self.newGroupMailNickname
         }
 
+    def get_channel_response(self, team_id: str, channel_id: str) -> dict | None:
+        channel = next((c for c in self.channels.get(team_id, []) if c.ID == channel_id), None)
+        if not channel:
+            return None
+
+        return {
+            "id": channel.ID,
+            "displayName": channel.Name,
+            "isGeneral": channel.IsGeneral,
+        }
+
 
 
 
