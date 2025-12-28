@@ -1,4 +1,5 @@
 from teams_lib_pzsp2_z1.model.channel import Channel
+from teams_lib_pzsp2_z1.model.member import Member
 from teams_lib_pzsp2_z1.model.message import (
     Message,
     MessageBody,
@@ -237,4 +238,55 @@ class ChannelsService(BaseService):
             ReplyCount=response["ReplyCount"],
         )
 
-    
+    def list_members(self, teamRef: str, channelRef: str) -> list[Member]:
+        response = self.client.execute(
+            cmd_type="request",
+            method="listChannelMembers",
+            params={
+                "teamRef": teamRef,
+                "channelRef": channelRef,
+            },
+        )
+        return [Member(**member) for member in response]
+
+    def add_member(
+            self, teamRef: str, channelRef: str, userRef: str, isOwner: bool
+    ) -> Member:
+        response = self.client.execute(
+            cmd_type="request",
+            method="addChannelMember",
+            params={
+                "teamRef": teamRef,
+                "channelRef": channelRef,
+                "userRef": userRef,
+                "isOwner": isOwner,
+            },
+        )
+        return Member(**response)
+
+    def update_member_role(
+            self, teamRef: str, channelRef: str, userRef: str, isOwner: bool
+    ) -> Member:
+        response = self.client.execute(
+            cmd_type="request",
+            method="updateChannelMemberRole",
+            params={
+                "teamRef": teamRef,
+                "channelRef": channelRef,
+                "userRef": userRef,
+                "isOwner": isOwner,
+            },
+        )
+        return Member(**response)
+
+    def remove_member(self, teamRef: str, channelRef: str, userRef: str) -> bool:
+        response = self.client.execute(
+            cmd_type="request",
+            method="removeChannelMember",
+            params={
+                "teamRef": teamRef,
+                "channelRef": channelRef,
+                "userRef": userRef,
+            },
+        )
+        return response == "removed"
