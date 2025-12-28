@@ -57,6 +57,8 @@ class FakeServerData:
         self.newGroupMailNickname = "new-team-nickname"
         self.newTeamVisibility = "private"
         self.potentialTeams = []
+        self.newChannelName = "New Channel"
+        self.newChannelID = "19:newchannelid@thread.tacv2"
 
 
     def get_myJoinedTeams_response(self) -> dict:
@@ -220,6 +222,30 @@ class FakeServerData:
             "displayName": channel.Name,
             "isGeneral": channel.IsGeneral,
         }
+
+    def get_create_channel_response(self, team_id: str, request_json: dict) -> dict:
+        display_name = request_json.get("displayName")
+        description = request_json.get("description", display_name)
+
+        new_channel = Channel(
+            ID=self.newChannelID,
+            Name=display_name,
+            IsGeneral=False,
+        )
+
+        if team_id not in self.channels:
+            self.channels[team_id] = []
+
+        self.channels[team_id].append(new_channel)
+
+        return {
+            "id": new_channel.ID,
+            "displayName": new_channel.Name,
+            "description": description,
+            "isGeneral": new_channel.IsGeneral,
+            "membershipType": "standard"
+        }
+
 
 
 
