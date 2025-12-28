@@ -160,6 +160,19 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Restore Deleted Team (POST)"
     ))
 
+    # POST /teams/{id}/channels
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_create_channel_response(
+            re.search(r"/teams/([^/]+)/channels", req.path).group(1),
+            req.json
+        ),
+        "Create Channel (POST)"
+    ))
+
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(
         lambda req: Response(

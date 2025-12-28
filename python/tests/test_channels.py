@@ -50,3 +50,24 @@ def test_get_channel_integration(httpserver):
 
     finally:
         client.close()
+
+
+def test_create_standard_channel_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        channel = client.channels.create_standard(
+            teamRef=data.teams[0].DisplayName,
+            display_name=data.newChannelName,
+        )
+
+        assert channel.Name == data.newChannelName
+        assert channel.ID == data.newChannelID
+        assert channel.IsGeneral is False
+
+    finally:
+        client.close()
