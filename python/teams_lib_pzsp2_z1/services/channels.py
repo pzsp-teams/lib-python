@@ -60,11 +60,11 @@ class ChannelsService(BaseService):
         )
 
     def create_private(
-            self,
-            teamRef: str,
-            display_name: str,
-            member_refs: list[str],
-            owner_refs: list[str]
+        self,
+        teamRef: str,
+        display_name: str,
+        member_refs: list[str],
+        owner_refs: list[str],
     ) -> Channel:
         response = self.client.execute(
             cmd_type="request",
@@ -109,7 +109,7 @@ class ChannelsService(BaseService):
             ID=response["ID"],
             Content=response["Content"],
             ContentType=MessageContentType(response["ContentType"]),
-            CreateDateTime=response["CreateDateTime"],
+            CreatedDateTime=response["CreatedDateTime"],
             From=MessageFrom(
                 UserID=response["From"]["UserID"],
                 DisplayName=response["From"]["DisplayName"],
@@ -117,16 +117,16 @@ class ChannelsService(BaseService):
             ReplyCount=response["ReplyCount"],
         )
 
-    def list_messages_in_channel(
-            self,
-            teamRef: str,
-            channelRef: str,
-            top: int | None = 10,
-            expand_replies: bool = False,
+    def list_messages(
+        self,
+        teamRef: str,
+        channelRef: str,
+        top: int | None = 10,
+        expand_replies: bool = False,
     ):
         response = self.client.execute(
             cmd_type="request",
-            method="listChannelMessages",
+            method="listMessagesInChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,
@@ -142,7 +142,7 @@ class ChannelsService(BaseService):
                 ID=message["ID"],
                 Content=message["Content"],
                 ContentType=MessageContentType(message["ContentType"]),
-                CreateDateTime=message["CreateDateTime"],
+                CreatedDateTime=message["CreatedDateTime"],
                 From=MessageFrom(
                     UserID=message["From"]["UserID"],
                     DisplayName=message["From"]["DisplayName"],
@@ -155,7 +155,7 @@ class ChannelsService(BaseService):
     def get_message(self, teamRef: str, channelRef: str, messageID: str) -> Message:
         response = self.client.execute(
             cmd_type="request",
-            method="getChannelMessage",
+            method="getMessageInChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,
@@ -167,7 +167,7 @@ class ChannelsService(BaseService):
             ID=response["ID"],
             Content=response["Content"],
             ContentType=MessageContentType(response["ContentType"]),
-            CreateDateTime=response["CreateDateTime"],
+            CreatedDateTime=response["CreatedDateTime"],
             From=MessageFrom(
                 UserID=response["From"]["UserID"],
                 DisplayName=response["From"]["DisplayName"],
@@ -176,15 +176,15 @@ class ChannelsService(BaseService):
         )
 
     def list_message_replies(
-            self,
-            teamRef: str,
-            channelRef: str,
-            messageID: str,
-            top: int | None = 10,
+        self,
+        teamRef: str,
+        channelRef: str,
+        messageID: str,
+        top: int | None = 10,
     ):
         response = self.client.execute(
             cmd_type="request",
-            method="listChannelMessageReplies",
+            method="listMessageRepliesInChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,
@@ -198,7 +198,7 @@ class ChannelsService(BaseService):
                 ID=message["ID"],
                 Content=message["Content"],
                 ContentType=MessageContentType(message["ContentType"]),
-                CreateDateTime=message["CreateDateTime"],
+                CreatedDateTime=message["CreatedDateTime"],
                 From=MessageFrom(
                     UserID=message["From"]["UserID"],
                     DisplayName=message["From"]["DisplayName"],
@@ -209,15 +209,15 @@ class ChannelsService(BaseService):
         ]
 
     def get_message_reply(
-            self,
-            teamRef: str,
-            channelRef: str,
-            messageID: str,
-            replyID: str,
+        self,
+        teamRef: str,
+        channelRef: str,
+        messageID: str,
+        replyID: str,
     ) -> Message:
         response = self.client.execute(
             cmd_type="request",
-            method="getChannelMessageReply",
+            method="getMessageReplyInChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,
@@ -230,7 +230,7 @@ class ChannelsService(BaseService):
             ID=response["ID"],
             Content=response["Content"],
             ContentType=MessageContentType(response["ContentType"]),
-            CreateDateTime=response["CreateDateTime"],
+            CreatedDateTime=response["CreatedDateTime"],
             From=MessageFrom(
                 UserID=response["From"]["UserID"],
                 DisplayName=response["From"]["DisplayName"],
@@ -250,7 +250,7 @@ class ChannelsService(BaseService):
         return [Member(**member) for member in response]
 
     def add_member(
-            self, teamRef: str, channelRef: str, userRef: str, isOwner: bool
+        self, teamRef: str, channelRef: str, userRef: str, isOwner: bool
     ) -> Member:
         response = self.client.execute(
             cmd_type="request",
@@ -265,7 +265,7 @@ class ChannelsService(BaseService):
         return Member(**response)
 
     def update_member_role(
-            self, teamRef: str, channelRef: str, userRef: str, isOwner: bool
+        self, teamRef: str, channelRef: str, userRef: str, isOwner: bool
     ) -> Member:
         response = self.client.execute(
             cmd_type="request",
