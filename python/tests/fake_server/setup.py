@@ -44,6 +44,36 @@ def setup_fake_server(httpserver) -> FakeServerData:
         req, data.get_myJoinedTeams_response(), "List Joined Teams"
     ))
 
+
+    # GET /teams/{team_id}/channels/{channel_id}/messages/{message_id}/replies/{reply_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies/([^/]+)"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_reply_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies/([^/]+)", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies/([^/]+)", req.path).group(2),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies/([^/]+)", req.path).group(3),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies/([^/]+)", req.path).group(4)
+        ),
+        "Get Message Reply"
+    ))
+
+    # GET /teams/{team_id}/channels/{channel_id}/messages/{message_id}/replies
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_replies_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies", req.path).group(2),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)/replies", req.path).group(3)
+        ),
+        "List Message Replies"
+    ))
+
     # GET /teams/{team_id}/channels/{channel_id}/messages/{message_id}
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages/([^/]+)"),
