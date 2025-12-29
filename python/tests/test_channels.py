@@ -176,3 +176,65 @@ def test_get_message_integration(httpserver):
         client.close()
 
 
+def test_list_replies_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        replies = client.channels.list_message_replies(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=data.channels[data.teams[0].ID][0].Name,
+            messageID=data.messages[data.channels[data.teams[0].ID][0].ID][1].ID,
+        )
+
+        assert len(replies) == len(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID])
+        assert replies[0].ID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ID
+        assert replies[0].Content == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].Content
+        assert replies[0].ContentType == MessageContentType(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ContentType)
+        assert replies[0].From.UserID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].From.UserID
+        assert replies[0].From.DisplayName == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].From.DisplayName
+        assert replies[0].CreatedDateTime == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].CreatedDateTime
+
+        assert replies[1].ID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].ID
+        assert replies[1].Content == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].Content
+        assert replies[1].ContentType == MessageContentType(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].ContentType)
+        assert replies[1].From.UserID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].From.UserID
+        assert replies[1].From.DisplayName == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].From.DisplayName
+        assert replies[1].CreatedDateTime == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].CreatedDateTime
+
+    finally:
+        client.close()
+
+
+def test_get_reply_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        reply = client.channels.get_message_reply(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=data.channels[data.teams[0].ID][0].Name,
+            messageID=data.messages[data.channels[data.teams[0].ID][0].ID][1].ID,
+            replyID=data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ID,
+        )
+
+        assert reply.ID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ID
+        assert reply.Content == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].Content
+        assert reply.ContentType == MessageContentType(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ContentType)
+        assert reply.From.UserID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].From.UserID
+        assert reply.From.DisplayName == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].From.DisplayName
+        assert reply.CreatedDateTime == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].CreatedDateTime
+
+    finally:
+        client.close()
+
+
+
+
+

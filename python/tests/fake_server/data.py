@@ -350,6 +350,47 @@ class FakeServerData:
             "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
         }
 
+    def get_list_replies_response(self, team_id: str, channel_id: str, message_id: str) -> dict:
+        return {
+            "value": [
+                {
+                    "id": reply.ID,
+                    "body": {
+                        "content": reply.Content,
+                        "contentType": reply.ContentType,
+                    },
+                    "from": {
+                        "user": {
+                            "id": reply.From.UserID,
+                            "displayName": reply.From.DisplayName,
+                        }
+                    },
+                    "createdDateTime": reply.CreatedDateTime,
+                }
+                for reply in self.replies.get(message_id, [])
+            ],
+        }
+
+    def get_reply_response(self, team_id: str, channel_id: str, message_id: str, reply_id: str) -> dict | None:
+        reply = next((r for r in self.replies.get(message_id, []) if r.ID == reply_id), None)
+        if not reply:
+            return None
+
+        return {
+            "id": reply.ID,
+            "body": {
+                "content": reply.Content,
+                "contentType": reply.ContentType,
+            },
+            "from": {
+                "user": {
+                    "id": reply.From.UserID,
+                    "displayName": reply.From.DisplayName,
+                }
+            },
+            "createdDateTime": reply.CreatedDateTime,
+        }
+
 
 
 
