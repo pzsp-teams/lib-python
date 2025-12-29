@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from teams_lib_pzsp2_z1.model.team import Team
 from teams_lib_pzsp2_z1.model.channel import Channel
 from teams_lib_pzsp2_z1.model.message import Message, MessageFrom
+from teams_lib_pzsp2_z1.model.member import Member
 from dataclasses import field
 
 @dataclass
@@ -105,6 +106,26 @@ class FakeServerData:
                 ),
             ],
         }
+        self.members = {
+            "team-123-abc": {
+                "19:123123@thread.tacv2": [
+                    Member(
+                        ID="user-123-abc",
+                        UserID="user-123-abc",
+                        DisplayName="Alice",
+                        Role="owner",
+                        Email="alice@example.com"
+                    ),
+                    Member(
+                        ID="user-456-def",
+                        UserID="user-456-def",
+                        DisplayName="Bob",
+                        Role="member",
+                        Email="bob@example.com"
+                    ),
+                ],
+            }
+        }
         self.newGroupID = "group-789-ghi"
         self.newTeamName = "New Team"
         self.newGroupMailNickname = "new-team-nickname"
@@ -123,6 +144,15 @@ class FakeServerData:
             CreatedDateTime="2024-01-02T10:00:00Z",
             ReplyCount=0,
         )
+        self.newMemberTemplate = Member(
+            ID="user-new-002",
+            UserID="new-user-002",
+            DisplayName="New Member",
+            Role="owner",
+            Email="newmember@example.com"
+        )
+
+
 
 
     def get_myJoinedTeams_response(self) -> dict:
@@ -417,6 +447,71 @@ class FakeServerData:
             },
             "createdDateTime": reply.CreatedDateTime,
         }
+
+    def get_add_member_response(self, team_id: str, request_json: dict) -> dict:
+        roles = []
+        if self.newMemberTemplate.Role == "owner":
+            roles = ["owner"]
+
+        return {
+            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/members/$entity",
+            "@odata.type": "#microsoft.graph.aadUserConversationMember",
+
+            "id": self.newMemberTemplate.ID,
+            "roles": roles,
+            "displayName": self.newMemberTemplate.DisplayName,
+            "userId": self.newMemberTemplate.UserID,
+            "email": self.newMemberTemplate.Email,
+        }
+
+    def get_update_member_role_response(self, team_id: str, channel_id: str, member_id: str, request_json: dict) -> dict | None:
+        channel_members = self.members.get(team_id, {}).get(channel_id, [])
+
+        member = next((m for m in channel_members if m.ID == member_id), None)
+        if not member:
+            return None
+
+        if "roles" in request_json:
+            member.Role = "owner" if "owner" in request_json["roles"] else "member"
+
+        return {
+            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/channels('{channel_id}')/members/$entity",
+            "@odata.type": "#microsoft.graph.aadUserConversationMember",
+            "id": member.ID,
+            "userId": member.UserID,
+            "displayName": member.DisplayName,
+            "roles": [member.Role] if member.Role == "owner" else [],
+            "email": member.Email,
+        }
+
+    def get_list_members_response(self, team_id: str, channel_id: str) -> dict:
+        return {
+            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/channels('{channel_id}')/members",
+            "value": [
+                {
+                    "@odata.type": "#microsoft.graph.aadUserConversationMember",
+                    "id": member.ID,
+                    "userId": member.UserID,
+                    "displayName": member.DisplayName,
+                    "roles": [member.Role] if member.Role == "owner" else [],
+                    "email": member.Email,
+                }
+                for member in self.members.get(team_id, {}).get(channel_id, [])
+            ],
+        }
+
+    def get_remove_member_response(self, team_id: str, channel_id: str, member_id: str) -> dict:
+        channel_members = self.members.get(team_id, {}).get(channel_id, [])
+
+        member = next((m for m in channel_members if m.ID == member_id), None)
+        if not member:
+            return {"success": False}
+
+        channel_members.remove(member)
+        return {"success": True}
+
+
+
 
 
 

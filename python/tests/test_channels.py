@@ -264,6 +264,113 @@ def test_get_reply_integration(httpserver):
         client.close()
 
 
+def test_list_members_integration(httpserver):
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        team_id = data.teams[0].ID
+        channel = data.channels[team_id][0]
+        channel_id = channel.ID
+
+        members = client.channels.list_members(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=channel.Name,
+        )
+
+        expected_members = data.members[team_id][channel_id]
+
+        assert len(members) == len(expected_members)
+
+        assert members[0].UserID == expected_members[0].UserID
+        assert members[0].DisplayName == expected_members[0].DisplayName
+        expected_role_0 = "owner" if expected_members[0].Role == "owner" else ""
+        assert members[0].Role == expected_role_0
+        assert members[0].Email == expected_members[0].Email
+        assert members[0].ID == expected_members[0].ID
+
+        assert members[1].UserID == expected_members[1].UserID
+        assert members[1].DisplayName == expected_members[1].DisplayName
+        expected_role_1 = "owner" if expected_members[1].Role == "owner" else ""
+        assert members[1].Role == expected_role_1
+        assert members[1].Email == expected_members[1].Email
+        assert members[1].ID == expected_members[1].ID
+
+    finally:
+        client.close()
+
+
+def test_add_member_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        member = client.channels.add_member(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=data.channels[data.teams[0].ID][1].Name,
+            userRef=data.newMemberTemplate.DisplayName,
+            isOwner=True if data.newMemberTemplate.Role == "owner" else False,
+        )
+
+        assert member.UserID == data.newMemberTemplate.UserID
+        assert member.DisplayName == data.newMemberTemplate.DisplayName
+        assert member.Role == data.newMemberTemplate.Role
+        assert member.Email == data.newMemberTemplate.Email
+        assert member.ID == data.newMemberTemplate.ID
+
+    finally:
+        client.close()
+
+
+def test_update_member_role_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        member = client.channels.update_member_role(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=data.channels[data.teams[0].ID][0].Name,
+            userRef=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].DisplayName,
+            isOwner=True
+        )
+
+        assert member.UserID == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].UserID
+        assert member.DisplayName == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].DisplayName
+        assert member.Role == "owner"
+        assert member.Email == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].Email
+        assert member.ID == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].ID
+    finally:
+        client.close()
+
+
+def test_remove_member_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        success = client.channels.remove_member(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=data.channels[data.teams[0].ID][0].Name,
+            userRef=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].DisplayName,
+        )
+
+        assert success is True
+
+    finally:
+        client.close()
+
+
 
 
 
