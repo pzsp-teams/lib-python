@@ -97,4 +97,29 @@ var Handlers = map[string]HandlerFunc{
 	"getMessageReplyInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
 		return c.GetMessageReplyInChannel(p)
 	},
+
+	// CHATS
+	"createOneOnOneChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.CreateOneToOneChat(p)
+	},
+
+	"createGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.CreateGroupChat(p)
+	},
+
+	"sendMessageInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.SendMessageInChat(p)
+	},
+
+	"listMyChats": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.ListMyChats(p)
+	},
+
+	"listMembersInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.ListMembersInChat(p)
+	},
+
+	"addMemberToChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.AddMemberToChat(p)
+	},
 }
