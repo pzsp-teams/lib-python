@@ -254,7 +254,7 @@ class ChannelsService(BaseService):
     ) -> Member:
         response = self.client.execute(
             cmd_type="request",
-            method="addChannelMember",
+            method="addMemberToChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,
@@ -269,7 +269,7 @@ class ChannelsService(BaseService):
     ) -> Member:
         response = self.client.execute(
             cmd_type="request",
-            method="updateChannelMemberRole",
+            method="updateMemberRoleInChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,
@@ -282,7 +282,7 @@ class ChannelsService(BaseService):
     def remove_member(self, teamRef: str, channelRef: str, userRef: str) -> bool:
         response = self.client.execute(
             cmd_type="request",
-            method="removeChannelMember",
+            method="removeMemberFromChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,

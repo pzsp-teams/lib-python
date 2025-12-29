@@ -44,6 +44,63 @@ def setup_fake_server(httpserver) -> FakeServerData:
         req, data.get_myJoinedTeams_response(), "List Joined Teams"
     ))
 
+    #POST /teams/{team_id}/channels/{channel_id}/members
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_add_member_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members", req.path).group(1),
+            req.json
+        ),
+        "Add member to channel"
+    ))
+
+
+    # PATCH /teams/{tid}/channels/{cid}/members/{mid}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members/([^/]+)"),
+        method="PATCH"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_update_member_role_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members/([^/]+)", req.path).group(1), # team_id
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members/([^/]+)", req.path).group(2), # channel_id
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members/([^/]+)", req.path).group(3), # member_id
+            req.json
+        ),
+        "Update Member Role"
+    ))
+
+    # DELETE /teams/{team_id}/channels/{channel_id}/members/{member_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members/([^/]+)"),
+        method="DELETE"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_remove_member_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members/([^/]+)", req.path).group(1), # team_id
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members/([^/]+)", req.path).group(2), # channel_id
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members/([^/]+)", req.path).group(3)  # member_id
+        ),
+        "Remove Member from Channel"
+    ))
+
+    #GET /teams/{team_id}/channels/{channel_id}/members
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_members_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/members", req.path).group(2)
+        ),
+        "List channel members"
+    ))
+
+
     #POST /teams/{team_id}/channels/{channel_id}/messages
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages"),
