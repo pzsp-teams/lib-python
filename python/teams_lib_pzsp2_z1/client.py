@@ -8,6 +8,7 @@ from typing import Any
 
 from teams_lib_pzsp2_z1 import config
 from teams_lib_pzsp2_z1.services.channels import ChannelsService
+from teams_lib_pzsp2_z1.services.chats import ChatsService
 from teams_lib_pzsp2_z1.services.teams import TeamsService
 
 
@@ -33,6 +34,7 @@ class TeamsClient:
         self.env_path = env_path
         self.channels = ChannelsService(self)
         self.teams = TeamsService(self)
+        self.chats = ChatsService(self)
 
         if auto_init:
             self.init_client(cache_enabled, cache_path)
