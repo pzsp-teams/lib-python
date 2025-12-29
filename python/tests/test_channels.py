@@ -1,7 +1,7 @@
 from teams_lib_pzsp2_z1.client import TeamsClient
 from tests.init_fake_client import init_fake_client
 from tests.fake_server.setup import setup_fake_server
-from teams_lib_pzsp2_z1.model.message import MessageContentType
+from teams_lib_pzsp2_z1.model.message import MessageContentType, MessageBody
 
 
 def test_list_channels_integration(httpserver):
@@ -111,6 +111,35 @@ def test_delete_channel_integration(httpserver):
         )
 
         assert success is True
+
+    finally:
+        client.close()
+
+
+def test_send_message_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        message = client.channels.send_message(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=data.channels[data.teams[0].ID][0].Name,
+            body=MessageBody(
+                Content=data.newMessageTemplate.Content,
+                ContentType=MessageContentType.TEXT
+            )
+        )
+
+        assert message.ID == data.newMessageTemplate.ID
+        assert message.Content == data.newMessageTemplate.Content
+        assert message.ContentType == MessageContentType(data.newMessageTemplate.ContentType)
+        assert message.From.UserID == data.newMessageTemplate.From.UserID
+        assert message.From.DisplayName == data.newMessageTemplate.From.DisplayName
+        assert message.ReplyCount == data.newMessageTemplate.ReplyCount
+        assert message.CreatedDateTime == data.newMessageTemplate.CreatedDateTime
 
     finally:
         client.close()

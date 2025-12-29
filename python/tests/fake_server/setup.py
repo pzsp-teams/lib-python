@@ -44,6 +44,20 @@ def setup_fake_server(httpserver) -> FakeServerData:
         req, data.get_myJoinedTeams_response(), "List Joined Teams"
     ))
 
+    #POST /teams/{team_id}/channels/{channel_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_send_message_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(2),
+            req.json
+        ),
+        "Create Channel Message"
+    ))
+
 
     # GET /teams/{team_id}/channels/{channel_id}/messages/{message_id}/replies/{reply_id}
     httpserver.expect_request(

@@ -112,6 +112,17 @@ class FakeServerData:
         self.potentialTeams = []
         self.newChannelName = "New Channel"
         self.newChannelID = "19:newchannelid@thread.tacv2"
+        self.newMessageTemplate = Message(
+            ID="new-message-id",
+            Content="This is a new message.",
+            ContentType="text",
+            From=MessageFrom(
+                UserID="user-new-001",
+                DisplayName="New User"
+            ),
+            CreatedDateTime="2024-01-02T10:00:00Z",
+            ReplyCount=0,
+        )
 
 
     def get_myJoinedTeams_response(self) -> dict:
@@ -307,6 +318,22 @@ class FakeServerData:
         self.channels[team_id].remove(channel)
         return {"success": True}
 
+    def get_send_message_response(self, team_id: str, channel_id: str, request_json: dict) -> dict:
+        return {
+            "id": self.newMessageTemplate.ID,
+            "body": {
+                "content": request_json.get("body", {}).get("content"),
+                "contentType": request_json.get("body", {}).get("contentType"),
+            },
+            "from": {
+                "user": {
+                    "id": self.newMessageTemplate.From.UserID,
+                    "displayName": self.newMessageTemplate.From.DisplayName,
+                }
+            },
+            "createdDateTime": self.newMessageTemplate.CreatedDateTime,
+        }
+
     def get_list_messages_response(self, team_id: str, channel_id: str) -> dict:
         return {
             "value": [
@@ -390,6 +417,8 @@ class FakeServerData:
             },
             "createdDateTime": reply.CreatedDateTime,
         }
+
+
 
 
 

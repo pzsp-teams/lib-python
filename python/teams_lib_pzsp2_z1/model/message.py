@@ -35,6 +35,10 @@ class MessageBody:
             "Content": self.Content,
         }
 
+    def __iter__(self):
+        yield "ContentType", self.ContentType.value
+        yield "Content", self.Content
+
 
 @dataclass
 class ListMessagesOptions:
