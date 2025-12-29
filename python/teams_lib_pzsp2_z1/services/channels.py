@@ -97,7 +97,7 @@ class ChannelsService(BaseService):
     def send_message(self, teamRef: str, channelRef: str, body: MessageBody) -> Message:
         response = self.client.execute(
             cmd_type="request",
-            method="sendChannelMessage",
+            method="sendMessageToChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,
