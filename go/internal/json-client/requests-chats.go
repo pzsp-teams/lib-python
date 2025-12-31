@@ -2,6 +2,7 @@ package jsonclient
 
 import (
 	"context"
+	"time"
 
 	"github.com/pzsp-teams/lib-python/internal/json-client/decoders"
 	"github.com/pzsp-teams/lib/chats"
@@ -149,10 +150,146 @@ func (jsonclient *TeamsJSONClient) SendMessageInChat(p map[string]interface{}) (
 	return message, nil
 }
 
-func (jsonclient *TeamsJSONClient) ListMyChats(_ map[string]interface{}) (interface{}, error) {
-	chats, err := jsonclient.client.Chats.ListMyJoined(context.TODO())
+type messageInChatParams struct {
+	ChatRef   decoders.ChatRefDTO `json:"chatRef"`
+	MessageID string              `json:"messageId"`
+}
+
+func (jsonclient *TeamsJSONClient) DeleteMessageInChat(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[messageInChatParams](p)
 	if err != nil {
 		return nil, err
 	}
-	return chats, nil
+	chatRef, err := decoders.GetChatRef(params.ChatRef)
+	if err != nil {
+		return nil, err
+	}
+	err = jsonclient.client.Chats.DeleteMessage(context.TODO(), chatRef, params.MessageID)
+	if err != nil {
+		return nil, err
+	}
+	return "deleted", nil
+}
+
+func (jsonclient *TeamsJSONClient) GetMessageInChat(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[messageInChatParams](p)
+	if err != nil {
+		return nil, err
+	}
+	chatRef, err := decoders.GetChatRef(params.ChatRef)
+	if err != nil {
+		return nil, err
+	}
+	message, err := jsonclient.client.Chats.GetMessage(context.TODO(), chatRef, params.MessageID)
+	if err != nil {
+		return nil, err
+	}
+	return message, nil
+}
+
+type ListMyChatsParams struct {
+	ChatType string `json:"chatType"`
+}
+
+func (jsonclient *TeamsJSONClient) ListMyChats(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[ListMyChatsParams](p)
+	if err != nil {
+		return nil, err
+	}
+	var chatType models.ChatType
+	if params.ChatType != "" {
+		chatType = models.ChatType(params.ChatType)
+	}
+	chatsList, err := jsonclient.client.Chats.ListChats(context.TODO(), &chatType)
+	if err != nil {
+		return nil, err
+	}
+	return chatsList, nil
+}
+
+type listChatMessagesParams struct {
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
+	Top       *int32    `json:"top"`
+}
+
+func (jsonclient *TeamsJSONClient) ListMyChatMessages(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[listChatMessagesParams](p)
+	if err != nil {
+		return nil, err
+	}
+	messages, err := jsonclient.client.Chats.ListAllMessages(context.TODO(), &params.StartTime, &params.EndTime, params.Top)
+	if err != nil {
+		return nil, err
+	}
+	return messages, nil
+}
+
+func (jsonclient *TeamsJSONClient) ListPinnedMessagesInChat(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[baseChatParams](p)
+	if err != nil {
+		return nil, err
+	}
+	chatRef, err := decoders.GetChatRef(params.ChatRef)
+	if err != nil {
+		return nil, err
+	}
+	messages, err := jsonclient.client.Chats.ListPinnedMessages(context.TODO(), chatRef)
+	if err != nil {
+		return nil, err
+	}
+	return messages, nil
+}
+
+func (jsonclient *TeamsJSONClient) PinMessageInChat(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[messageInChatParams](p)
+	if err != nil {
+		return nil, err
+	}
+	chatRef, err := decoders.GetChatRef(params.ChatRef)
+	if err != nil {
+		return nil, err
+	}
+	err = jsonclient.client.Chats.PinMessage(context.TODO(), chatRef, params.MessageID)
+	if err != nil {
+		return nil, err
+	}
+	return "pinned", nil
+}
+
+func (jsonclient *TeamsJSONClient) UnpinMessageInChat(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[messageInChatParams](p)
+	if err != nil {
+		return nil, err
+	}
+	chatRef, err := decoders.GetChatRef(params.ChatRef)
+	if err != nil {
+		return nil, err
+	}
+	err = jsonclient.client.Chats.UnpinMessage(context.TODO(), chatRef, params.MessageID)
+	if err != nil {
+		return nil, err
+	}
+	return "unpinned", nil
+}
+
+type mentionInChatParams struct {
+	ChatRef decoders.ChatRefDTO `json:"chatRef"`
+	RawMentions []string		`json:"rawMentions"`
+}
+
+func (jsonclient *TeamsJSONClient) GetMentionsInChat(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[mentionInChatParams](p)
+	if err != nil {
+		return nil, err
+	}
+	chatRef, err := decoders.GetChatRef(params.ChatRef)
+	if err != nil {
+		return nil, err
+	}
+	mentions, err := jsonclient.client.Chats.GetMentions(context.TODO(), chatRef, params.RawMentions)
+	if err != nil {
+		return nil, err
+	}
+	return mentions, nil
 }
