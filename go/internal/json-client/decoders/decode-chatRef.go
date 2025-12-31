@@ -26,3 +26,5 @@ func GetChatRef(dto ChatRefDTO) (chats.ChatRef, error) {
 		return nil, fmt.Errorf("unknown chat type: %s", dto.Type)
 	}
 }
+
+
