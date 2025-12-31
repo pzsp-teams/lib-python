@@ -89,8 +89,8 @@ func (jsonclient *TeamsJSONClient) DeleteChannel(p map[string]interface{}) (inte
 }
 
 type sendMessageToChannelParams struct {
-	TeamRef    string         `json:"teamRef"`
-	ChannelRef string         `json:"channelRef"`
+	TeamRef    string                  `json:"teamRef"`
+	ChannelRef string                  `json:"channelRef"`
 	Body       decoders.MessageBodyDTO `json:"body"`
 }
 
@@ -104,6 +104,29 @@ func (jsonclient *TeamsJSONClient) SendMessageToChannel(p map[string]interface{}
 		return nil, err
 	}
 	sentMessage, err := jsonclient.client.Channels.SendMessage(context.TODO(), params.TeamRef, params.ChannelRef, *body)
+	if err != nil {
+		return nil, err
+	}
+	return sentMessage, nil
+}
+
+type sendReplyToChannelParams struct {
+	TeamRef    string                  `json:"teamRef"`
+	ChannelRef string                  `json:"channelRef"`
+	MessageID  string                  `json:"messageId"`
+	Body       decoders.MessageBodyDTO `json:"body"`
+}
+
+func (jsonclient *TeamsJSONClient) SendReplyToChannel(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[sendReplyToChannelParams](p)
+	if err != nil {
+		return nil, err
+	}
+	body, err := decoders.DecodeParams[models.MessageBody](&params.Body)
+	if err != nil {
+		return nil, err
+	}
+	sentMessage, err := jsonclient.client.Channels.SendReply(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID, *body)
 	if err != nil {
 		return nil, err
 	}
@@ -254,3 +277,20 @@ func (jsonclient *TeamsJSONClient) RemoveMemberFromChannel(p map[string]interfac
 	return "removed", nil
 }
 
+type getMentionsInChannelParams struct {
+	TeamRef     string   `json:"teamRef"`
+	ChannelRef  string   `json:"channelRef"`
+	RawMentions []string `json:"rawMentions"`
+}
+
+func (jsonclient *TeamsJSONClient) GetMentionsInChannel(p map[string]interface{}) (interface{}, error) {
+	params, err := decoders.DecodeParams[getMentionsInChannelParams](p)
+	if err != nil {
+		return nil, err
+	}
+	mentions, err := jsonclient.client.Channels.GetMentions(context.TODO(), params.TeamRef, params.ChannelRef, params.RawMentions)
+	if err != nil {
+		return nil, err
+	}
+	return mentions, nil
+}
