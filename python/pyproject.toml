@@ -1,6 +1,6 @@
 [project]
 name = "teams_lib_pzsp2_z1"
-version = "0.1.11"
+version = "0.1.12"
 description = "Bridge to Go client for Teams API"
 readme = "README.md"
 requires-python = ">=3.12"
