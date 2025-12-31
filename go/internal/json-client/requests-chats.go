@@ -60,7 +60,7 @@ func (jsonclient *TeamsJSONClient) AddMemberGroupToChat(p map[string]interface{}
 	return member, nil
 }
 
-func (jsonclient *TeamsJSONClient) RemoveMemberToGroupChat(p map[string]interface{}) (interface{}, error) {
+func (jsonclient *TeamsJSONClient) RemoveMemberFromGroupChat(p map[string]interface{}) (interface{}, error) {
 	params, err := decoders.DecodeParams[groupChatMemberParams](p)
 	if err != nil {
 		return nil, err
