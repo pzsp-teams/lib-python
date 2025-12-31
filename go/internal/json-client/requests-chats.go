@@ -13,16 +13,10 @@ type createOneToOneChatParams struct {
 	RecipientRef string `json:"recipientRef"`
 }
 
-func (jsonclient *TeamsJSONClient) CreateOneToOneChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[createOneToOneChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chat, err := jsonclient.client.Chats.CreateOneOneOne(context.TODO(), params.RecipientRef)
-	if err != nil {
-		return nil, err
-	}
-	return chat, nil
+func (c *TeamsJSONClient) CreateOneToOneChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params createOneToOneChatParams) (interface{}, error) {
+		return c.client.Chats.CreateOneOneOne(context.TODO(), params.RecipientRef)
+	})
 }
 
 type createGroupChatParams struct {
@@ -31,16 +25,10 @@ type createGroupChatParams struct {
 	IncludeMe     bool     `json:"includeMe"`
 }
 
-func (jsonclient *TeamsJSONClient) CreateGroupChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[createGroupChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chat, err := jsonclient.client.Chats.CreateGroup(context.TODO(), params.RecipientRefs, params.Topic, params.IncludeMe)
-	if err != nil {
-		return nil, err
-	}
-	return chat, nil
+func (c *TeamsJSONClient) CreateGroupChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params createGroupChatParams) (interface{}, error) {
+		return c.client.Chats.CreateGroup(context.TODO(), params.RecipientRefs, params.Topic, params.IncludeMe)
+	})
 }
 
 type groupChatMemberParams struct {
@@ -48,44 +36,27 @@ type groupChatMemberParams struct {
 	UserRef      string `json:"userRef"`
 }
 
-func (jsonclient *TeamsJSONClient) AddMemberGroupToChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[groupChatMemberParams](p)
-	if err != nil {
-		return nil, err
-	}
-	member, err := jsonclient.client.Chats.AddMemberToGroupChat(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
-	if err != nil {
-		return nil, err
-	}
-	return member, nil
+func (c *TeamsJSONClient) AddMemberGroupToChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params groupChatMemberParams) (interface{}, error) {
+		return c.client.Chats.AddMemberToGroupChat(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
+	})
 }
 
-func (jsonclient *TeamsJSONClient) RemoveMemberFromGroupChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[groupChatMemberParams](p)
-	if err != nil {
-		return nil, err
-	}
-	err = jsonclient.client.Chats.RemoveMemberFromGroupChat(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
-	if err != nil {
-		return nil, err
-	}
-	return "removed", nil
+func (c *TeamsJSONClient) RemoveMemberFromGroupChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params groupChatMemberParams) (interface{}, error) {
+		err := c.client.Chats.RemoveMemberFromGroupChat(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
+		return "removed", err
+	})
 }
 
 type listMembersInChatParams struct {
 	GroupChatRef string `json:"groupChatRef"`
 }
 
-func (jsonclient *TeamsJSONClient) ListGroupChatMembers(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[listMembersInChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	members, err := jsonclient.client.Chats.ListGroupChatMembers(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef})
-	if err != nil {
-		return nil, err
-	}
-	return members, nil
+func (c *TeamsJSONClient) ListGroupChatMembers(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params listMembersInChatParams) (interface{}, error) {
+		return c.client.Chats.ListGroupChatMembers(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef})
+	})
 }
 
 type updateGroupChatTopicParams struct {
@@ -93,36 +64,24 @@ type updateGroupChatTopicParams struct {
 	Topic        string `json:"topic"`
 }
 
-func (jsonclient *TeamsJSONClient) UpdateGroupChatTopic(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[updateGroupChatTopicParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chat, err := jsonclient.client.Chats.UpdateGroupChatTopic(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.Topic)
-	if err != nil {
-		return nil, err
-	}
-	return chat, nil
+func (c *TeamsJSONClient) UpdateGroupChatTopic(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params updateGroupChatTopicParams) (interface{}, error) {
+		return c.client.Chats.UpdateGroupChatTopic(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.Topic)
+	})
 }
 
 type baseChatParams struct {
 	ChatRef decoders.ChatRefDTO `json:"chatRef"`
 }
 
-func (jsonclient *TeamsJSONClient) ListMessagesInChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[baseChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chatRef, err := decoders.GetChatRef(params.ChatRef)
-	if err != nil {
-		return nil, err
-	}
-	messages, err := jsonclient.client.Chats.ListMessages(context.TODO(), chatRef)
-	if err != nil {
-		return nil, err
-	}
-	return messages, nil
+func (c *TeamsJSONClient) ListMessagesInChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params baseChatParams) (interface{}, error) {
+		chatRef, err := decoders.GetChatRef(params.ChatRef)
+		if err != nil {
+			return nil, err
+		}
+		return c.client.Chats.ListMessages(context.TODO(), chatRef)
+	})
 }
 
 type sendMessageInChatParams struct {
@@ -130,24 +89,18 @@ type sendMessageInChatParams struct {
 	Body    decoders.MessageBodyDTO `json:"body"`
 }
 
-func (jsonclient *TeamsJSONClient) SendMessageInChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[sendMessageInChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chatRef, err := decoders.GetChatRef(params.ChatRef)
-	if err != nil {
-		return nil, err
-	}
-	body, err := decoders.DecodeParams[models.MessageBody](&params.Body)
-	if err != nil {
-		return nil, err
-	}
-	message, err := jsonclient.client.Chats.SendMessage(context.TODO(), chatRef, *body)
-	if err != nil {
-		return nil, err
-	}
-	return message, nil
+func (c *TeamsJSONClient) SendMessageInChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params sendMessageInChatParams) (interface{}, error) {
+		chatRef, err := decoders.GetChatRef(params.ChatRef)
+		if err != nil {
+			return nil, err
+		}
+		body, err := decoders.DecodeParams[models.MessageBody](params.Body)
+		if err != nil {
+			return nil, err
+		}
+		return c.client.Chats.SendMessage(context.TODO(), chatRef, *body)
+	})
 }
 
 type messageInChatParams struct {
@@ -155,56 +108,39 @@ type messageInChatParams struct {
 	MessageID string              `json:"messageId"`
 }
 
-func (jsonclient *TeamsJSONClient) DeleteMessageInChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[messageInChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chatRef, err := decoders.GetChatRef(params.ChatRef)
-	if err != nil {
-		return nil, err
-	}
-	err = jsonclient.client.Chats.DeleteMessage(context.TODO(), chatRef, params.MessageID)
-	if err != nil {
-		return nil, err
-	}
-	return "deleted", nil
+func (c *TeamsJSONClient) DeleteMessageInChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params messageInChatParams) (interface{}, error) {
+		chatRef, err := decoders.GetChatRef(params.ChatRef)
+		if err != nil {
+			return nil, err
+		}
+		err = c.client.Chats.DeleteMessage(context.TODO(), chatRef, params.MessageID)
+		return "deleted", err
+	})
 }
 
-func (jsonclient *TeamsJSONClient) GetMessageInChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[messageInChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chatRef, err := decoders.GetChatRef(params.ChatRef)
-	if err != nil {
-		return nil, err
-	}
-	message, err := jsonclient.client.Chats.GetMessage(context.TODO(), chatRef, params.MessageID)
-	if err != nil {
-		return nil, err
-	}
-	return message, nil
+func (c *TeamsJSONClient) GetMessageInChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params messageInChatParams) (interface{}, error) {
+		chatRef, err := decoders.GetChatRef(params.ChatRef)
+		if err != nil {
+			return nil, err
+		}
+		return c.client.Chats.GetMessage(context.TODO(), chatRef, params.MessageID)
+	})
 }
 
 type ListMyChatsParams struct {
 	ChatType string `json:"chatType"`
 }
 
-func (jsonclient *TeamsJSONClient) ListMyChats(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[ListMyChatsParams](p)
-	if err != nil {
-		return nil, err
-	}
-	var chatType models.ChatType
-	if params.ChatType != "" {
-		chatType = models.ChatType(params.ChatType)
-	}
-	chatsList, err := jsonclient.client.Chats.ListChats(context.TODO(), &chatType)
-	if err != nil {
-		return nil, err
-	}
-	return chatsList, nil
+func (c *TeamsJSONClient) ListMyChats(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params ListMyChatsParams) (interface{}, error) {
+		var chatType models.ChatType
+		if params.ChatType != "" {
+			chatType = models.ChatType(params.ChatType)
+		}
+		return c.client.Chats.ListChats(context.TODO(), &chatType)
+	})
 }
 
 type listChatMessagesParams struct {
@@ -213,83 +149,55 @@ type listChatMessagesParams struct {
 	Top       *int32    `json:"top"`
 }
 
-func (jsonclient *TeamsJSONClient) ListMyChatMessages(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[listChatMessagesParams](p)
-	if err != nil {
-		return nil, err
-	}
-	messages, err := jsonclient.client.Chats.ListAllMessages(context.TODO(), &params.StartTime, &params.EndTime, params.Top)
-	if err != nil {
-		return nil, err
-	}
-	return messages, nil
+func (c *TeamsJSONClient) ListMyChatMessages(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params listChatMessagesParams) (interface{}, error) {
+		return c.client.Chats.ListAllMessages(context.TODO(), &params.StartTime, &params.EndTime, params.Top)
+	})
 }
 
-func (jsonclient *TeamsJSONClient) ListPinnedMessagesInChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[baseChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chatRef, err := decoders.GetChatRef(params.ChatRef)
-	if err != nil {
-		return nil, err
-	}
-	messages, err := jsonclient.client.Chats.ListPinnedMessages(context.TODO(), chatRef)
-	if err != nil {
-		return nil, err
-	}
-	return messages, nil
+func (c *TeamsJSONClient) ListPinnedMessagesInChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params baseChatParams) (interface{}, error) {
+		chatRef, err := decoders.GetChatRef(params.ChatRef)
+		if err != nil {
+			return nil, err
+		}
+		return c.client.Chats.ListPinnedMessages(context.TODO(), chatRef)
+	})
 }
 
-func (jsonclient *TeamsJSONClient) PinMessageInChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[messageInChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chatRef, err := decoders.GetChatRef(params.ChatRef)
-	if err != nil {
-		return nil, err
-	}
-	err = jsonclient.client.Chats.PinMessage(context.TODO(), chatRef, params.MessageID)
-	if err != nil {
-		return nil, err
-	}
-	return "pinned", nil
+func (c *TeamsJSONClient) PinMessageInChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params messageInChatParams) (interface{}, error) {
+		chatRef, err := decoders.GetChatRef(params.ChatRef)
+		if err != nil {
+			return nil, err
+		}
+		err = c.client.Chats.PinMessage(context.TODO(), chatRef, params.MessageID)
+		return "pinned", err
+	})
 }
 
-func (jsonclient *TeamsJSONClient) UnpinMessageInChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[messageInChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chatRef, err := decoders.GetChatRef(params.ChatRef)
-	if err != nil {
-		return nil, err
-	}
-	err = jsonclient.client.Chats.UnpinMessage(context.TODO(), chatRef, params.MessageID)
-	if err != nil {
-		return nil, err
-	}
-	return "unpinned", nil
+func (c *TeamsJSONClient) UnpinMessageInChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params messageInChatParams) (interface{}, error) {
+		chatRef, err := decoders.GetChatRef(params.ChatRef)
+		if err != nil {
+			return nil, err
+		}
+		err = c.client.Chats.UnpinMessage(context.TODO(), chatRef, params.MessageID)
+		return "unpinned", err
+	})
 }
 
 type mentionInChatParams struct {
-	ChatRef decoders.ChatRefDTO `json:"chatRef"`
-	RawMentions []string		`json:"rawMentions"`
+	ChatRef     decoders.ChatRefDTO `json:"chatRef"`
+	RawMentions []string            `json:"rawMentions"`
 }
 
-func (jsonclient *TeamsJSONClient) GetMentionsInChat(p map[string]interface{}) (interface{}, error) {
-	params, err := decoders.DecodeParams[mentionInChatParams](p)
-	if err != nil {
-		return nil, err
-	}
-	chatRef, err := decoders.GetChatRef(params.ChatRef)
-	if err != nil {
-		return nil, err
-	}
-	mentions, err := jsonclient.client.Chats.GetMentions(context.TODO(), chatRef, params.RawMentions)
-	if err != nil {
-		return nil, err
-	}
-	return mentions, nil
+func (c *TeamsJSONClient) GetMentionsInChat(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params mentionInChatParams) (interface{}, error) {
+		chatRef, err := decoders.GetChatRef(params.ChatRef)
+		if err != nil {
+			return nil, err
+		}
+		return c.client.Chats.GetMentions(context.TODO(), chatRef, params.RawMentions)
+	})
 }
