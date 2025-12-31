@@ -88,15 +88,10 @@ func (jsonclient *TeamsJSONClient) DeleteChannel(p map[string]interface{}) (inte
 	return "deleted", nil
 }
 
-type messageBodyDTO struct {
-	ContentType string `json:"contentType"`
-	Content     string `json:"content"`
-}
-
 type sendMessageToChannelParams struct {
 	TeamRef    string         `json:"teamRef"`
 	ChannelRef string         `json:"channelRef"`
-	Body       messageBodyDTO `json:"body"`
+	Body       decoders.MessageBodyDTO `json:"body"`
 }
 
 func (jsonclient *TeamsJSONClient) SendMessageToChannel(p map[string]interface{}) (interface{}, error) {
