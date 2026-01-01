@@ -5,7 +5,8 @@ package jsonclient
 import (
 	"context"
 
-	lib "github.com/pzsp-teams/lib"
+	"github.com/pzsp-teams/lib"
+	"github.com/pzsp-teams/lib/config"
 	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
 )
 
@@ -20,22 +21,26 @@ func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 		return nil, err
 	}
 
-	cacheEnabled, err := jsonModel.ParseCacheEnabled(req.Params["cacheEnabled"])
+	cacheMode, err := jsonModel.ParseCacheMode(req.Params["cacheMode"])
 	if err != nil {
 		return nil, err
 	}
-
-	var cachePath *string
-	if cacheEnabled {
-		path, err := jsonModel.ParseCachePath(req.Params["cachePath"])
-		if err != nil {
+	cachePath, err := jsonModel.ParseCachePath(req.Params["cachePath"])
+	if err != nil {
+		if cacheMode == config.CacheDisabled {
+			cachePath = nil
+		} else {
 			return nil, err
 		}
-		cachePath = path
+	}
+	cacheConfig := config.CacheConfig{
+		Mode: config.CacheDisabled,
+		Provider: config.CacheProviderJSONFile,
+		Path: cachePath,
 	}
 
 
-	client, err := lib.NewClient(context.TODO(), authConfig, senderConfig, cacheEnabled, cachePath)
+	client, err := lib.NewClient(context.TODO(), authConfig, senderConfig, &cacheConfig)
 	if err != nil {
 		return nil, err
 	}

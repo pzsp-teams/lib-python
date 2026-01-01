@@ -3,7 +3,7 @@ package jsonmodel
 import (
 	"fmt"
 
-	"github.com/pzsp-teams/lib"
+	"github.com/pzsp-teams/lib/config"
 )
 
 type Request struct {
@@ -26,7 +26,7 @@ type SenderConfigMap struct {
 	Timeout        int `json:"timeout"`
 }
 
-func (scm SenderConfigMap) ToSenderConfig() (*lib.SenderConfig, error) {
+func (scm SenderConfigMap) ToSenderConfig() (*config.SenderConfig, error) {
 	if scm.MaxRetries < 0 {
 		return nil, fmt.Errorf("maxRetries cannot be negative")
 	}
@@ -37,7 +37,7 @@ func (scm SenderConfigMap) ToSenderConfig() (*lib.SenderConfig, error) {
 		return nil, fmt.Errorf("timeout must be > 0")
 	}
 
-	return &lib.SenderConfig{
+	return &config.SenderConfig{
 		MaxRetries:     scm.MaxRetries,
 		NextRetryDelay: scm.NextRetryDelay,
 		Timeout:        scm.Timeout,
@@ -52,7 +52,7 @@ type AuthConfigMap struct {
 	AuthMethod string   `json:"authMethod"`
 }
 
-func (acm AuthConfigMap) ToAuthConfig() (*lib.AuthConfig, error) {
+func (acm AuthConfigMap) ToAuthConfig() (*config.AuthConfig, error) {
 	if acm.ClientID == "" {
 		return nil, fmt.Errorf("clientId is required")
 	}
@@ -74,25 +74,13 @@ func (acm AuthConfigMap) ToAuthConfig() (*lib.AuthConfig, error) {
 		return nil, err
 	}
 
-	return &lib.AuthConfig{
+	return &config.AuthConfig{
 		ClientID:   acm.ClientID,
 		Tenant:     acm.Tenant,
 		Email:      acm.Email,
 		Scopes:     acm.Scopes,
-		AuthMethod: authMethod,
+		AuthMethod: config.Method(authMethod),
 	}, nil
-}
-
-func ParseCacheEnabled(value interface{}) (bool, error) {
-    if value == nil {
-        return false, nil // default
-    }
-
-    enabled, ok := value.(bool)
-    if !ok {
-        return false, fmt.Errorf("cacheEnabled must be boolean")
-    }
-    return enabled, nil
 }
 
 func ParseCachePath(value interface{}) (*string, error) {
@@ -102,6 +90,27 @@ func ParseCachePath(value interface{}) (*string, error) {
     }
     return &path, nil
 }
+
+func ParseCacheMode(value interface{}) (config.CacheMode, error) {
+	switch v := value.(type) {
+	case string:
+		switch v {
+		case "DISABLED":
+			return config.CacheDisabled, nil
+		case "SYNC":
+			return config.CacheSync, nil
+		case "ASYNC":
+			return config.CacheAsync, nil
+		default:
+			return config.CacheDisabled, fmt.Errorf("invalid cacheMode: %s", v)
+		}
+	case nil:
+		return config.CacheDisabled, fmt.Errorf("invalid cacheMode: %s", v)
+	default:
+		return config.CacheDisabled, fmt.Errorf("cacheMode must be a string")
+	}
+}
+
 
 func validateAuthMethod(method string) (string, error) {
 	if method == "DEVICE_CODE" || method == "INTERACTIVE" {

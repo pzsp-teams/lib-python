@@ -129,7 +129,8 @@ def test_send_message_integration(httpserver):
             channelRef=data.channels[data.teams[0].ID][0].Name,
             body=MessageBody(
                 Content=data.newMessageTemplate.Content,
-                ContentType=MessageContentType.TEXT
+                ContentType=MessageContentType.TEXT,
+                Mentions=[],
             )
         )
 
