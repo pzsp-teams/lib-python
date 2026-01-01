@@ -1,5 +1,8 @@
-from teams_lib_pzsp2_z1.model.chat import Chat, ChatType, ChatRef
+from datetime import datetime
+
+from teams_lib_pzsp2_z1.model.chat import Chat, ChatRef, ChatType
 from teams_lib_pzsp2_z1.model.member import Member
+from teams_lib_pzsp2_z1.model.mention import Mention
 from teams_lib_pzsp2_z1.model.message import (
     Message,
     MessageBody,
@@ -7,8 +10,6 @@ from teams_lib_pzsp2_z1.model.message import (
     MessageFrom,
 )
 from teams_lib_pzsp2_z1.services.base_service import BaseService
-
-from datetime import datetime
 
 
 class ChatsService(BaseService):
@@ -83,7 +84,7 @@ class ChatsService(BaseService):
     def list_group_chat_members(self, group_chat_ref: str) -> list[Member]:
         members = self.client.execute(
             cmd_type="request",
-            method="listGroupChatMembers",
+            method="listMembersInGroupChat",
             params={
                 "groupChatRef": group_chat_ref,
             },
@@ -120,7 +121,7 @@ class ChatsService(BaseService):
     def list_messages(self, chat_ref: str) -> list[Message]:
         messages = self.client.execute(
             cmd_type="request",
-            method="listChatMessages",
+            method="listMessagesInChat",
             params={
                 "chatRef": chat_ref,
             },
@@ -145,7 +146,7 @@ class ChatsService(BaseService):
     def send_message(self, chat_ref: ChatRef, body: MessageBody) -> Message:
         message = self.client.execute(
             cmd_type="request",
-            method="sendMessageToChat",
+            method="sendMessageInChat",
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
@@ -174,7 +175,7 @@ class ChatsService(BaseService):
     def delete_message(self, chat_ref: ChatRef, message_id: str) -> bool:
         result = self.client.execute(
             cmd_type="request",
-            method="deleteMessageFromChat",
+            method="deleteMessageInChat",
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
@@ -189,7 +190,7 @@ class ChatsService(BaseService):
     def get_message(self, chat_ref: ChatRef, message_id: str) -> Message:
         message = self.client.execute(
             cmd_type="request",
-            method="getMessageFromChat",
+            method="getMessageInChat",
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
@@ -219,7 +220,7 @@ class ChatsService(BaseService):
 
         chats = self.client.execute(
             cmd_type="request",
-            method="listMyJoinedChats",
+            method="listMyChats",
             params=params,
         )
 
@@ -238,7 +239,7 @@ class ChatsService(BaseService):
     ) -> list[Message]:
         messages = self.client.execute(
             cmd_type="request",
-            method="listAllMessages",
+            method="listMyChatMessages",
             params={
                 "startTime": start_time.isoformat(),
                 "endTime": end_time.isoformat(),
@@ -265,7 +266,7 @@ class ChatsService(BaseService):
     def list_pinned_messages(self, chat_ref: ChatRef) -> list[Message]:
         messages = self.client.execute(
             cmd_type="request",
-            method="listPinnedMessages",
+            method="listPinnedMessagesInChat",
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
@@ -321,4 +322,24 @@ class ChatsService(BaseService):
 
         return result == "unpinned"
 
-    # def get_mentions(self, chat_ref: ChatRef, raw_mentions: list[str])
+    def get_mentions(self, chat_ref: ChatRef, raw_mentions: list[str]) -> list[Mention]:
+        mentions = self.client.execute(
+            cmd_type="request",
+            method="getMentionsInChat",
+            params={
+                "chatRef": {
+                    "ref": chat_ref.Ref,
+                    "type": chat_ref.type.value,
+                },
+                "rawMentions": raw_mentions,
+            },
+        )
+
+        return [
+            Mention(
+                ID=mention["ID"],
+                Mentioned=mention["Mentioned"],
+                MentionText=mention["MentionText"],
+            )
+            for mention in mentions
+        ]
