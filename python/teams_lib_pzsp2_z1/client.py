@@ -17,7 +17,7 @@ class TeamsClient:
         self,
         auto_init: bool = True,
         env_path: str | None = None,
-        cache_enabled: bool = False,
+        cache_mode: config.CacheMode = config.CacheMode.DISABLED,
         cache_path: str | None = None,
     ):
         self._lock = threading.Lock()
@@ -37,7 +37,7 @@ class TeamsClient:
         self.chats = ChatsService(self)
 
         if auto_init:
-            self.init_client(cache_enabled, cache_path)
+            self.init_client(cache_mode, cache_path)
 
     def _binary(self):
         base = pathlib.Path(__file__).parent / "bin"

@@ -21,11 +21,11 @@ func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 		return nil, err
 	}
 
-	cacheMode, err := jsonModel.ParseCacheMode(req.Params["cacheMode"])
+	cacheMode, err := jsonModel.ParseCacheMode(req.Config.CacheMode)
 	if err != nil {
 		return nil, err
 	}
-	cachePath, err := jsonModel.ParseCachePath(req.Params["cachePath"])
+	cachePath, err := jsonModel.ParseCachePath(req.Config.CachePath)
 	if err != nil {
 		if cacheMode == config.CacheDisabled {
 			cachePath = nil
