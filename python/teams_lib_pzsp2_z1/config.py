@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from enum import Enum
 
 from dotenv import load_dotenv
 
@@ -23,6 +24,16 @@ class AuthConfig:
     scopes: list[str]
     auth_method: str
 
+
+class CacheMode(Enum):
+    DISABLED = "DISABLED"
+    SYNC = "SYNC"
+    ASYNC = "ASYNC"
+
+@dataclass
+class CacheConfig:
+    mode: CacheMode
+    path: str | None = None
 
 def load_auth_config(env_path: str | None = None) -> AuthConfig:
     load_dotenv(env_path)
