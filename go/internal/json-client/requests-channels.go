@@ -2,6 +2,8 @@ package jsonclient
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/pzsp-teams/lib-python/internal/json-client/decoders"
 	"github.com/pzsp-teams/lib/models"
@@ -172,6 +174,11 @@ func (c *TeamsJSONClient) AddMemberToChannel(p map[string]interface{}) (interfac
 
 func (c *TeamsJSONClient) UpdateMemberInChannel(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params addOrUpdateMemberToChannelParams) (interface{}, error) {
+
+		// --- LOGOWANIE NA STDERR ---
+        fmt.Fprintf(os.Stderr, "\n[GO DEBUG] UpdateMemberInChannel PARAMS:\n -> TeamRef: '%s'\n -> ChannelRef: '%s'\n -> UserRef: '%s'\n -> IsOwner: %v\n",
+            params.TeamRef, params.ChannelRef, params.UserRef, params.IsOwner)
+        // ---------------------------
 		return c.client.Channels.UpdateMemberRole(context.TODO(), params.TeamRef, params.ChannelRef, params.UserRef, params.IsOwner)
 	})
 }
@@ -184,6 +191,11 @@ type removeMemberFromChannelParams struct {
 
 func (c *TeamsJSONClient) RemoveMemberFromChannel(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params removeMemberFromChannelParams) (interface{}, error) {
+
+		// --- LOGOWANIE NA STDERR ---
+        fmt.Fprintf(os.Stderr, "\n[GO DEBUG] RemoveMemberFromChannel PARAMS:\n -> TeamRef: '%s'\n -> ChannelRef: '%s'\n -> UserRef: '%s'\n",
+            params.TeamRef, params.ChannelRef, params.UserRef)
+        // ---------------------------
 		err := c.client.Channels.RemoveMember(context.TODO(), params.TeamRef, params.ChannelRef, params.UserRef)
 		return "removed", err
 	})
