@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
+from teams_lib_pzsp2_z1.model.mention import Mention
+
 
 class MessageContentType(Enum):
     TEXT = "text"
@@ -28,6 +30,7 @@ class Message:
 class MessageBody:
     ContentType: MessageContentType
     Content: str
+    Mentions: list[Mention]
 
     def __dict__(self):
         return {

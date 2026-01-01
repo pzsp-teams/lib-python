@@ -1,5 +1,6 @@
 from teams_lib_pzsp2_z1.model.channel import Channel
 from teams_lib_pzsp2_z1.model.member import Member
+from teams_lib_pzsp2_z1.model.mention import Mention
 from teams_lib_pzsp2_z1.model.message import (
     Message,
     MessageBody,
@@ -290,3 +291,17 @@ class ChannelsService(BaseService):
             },
         )
         return response == "removed"
+
+    def get_mentions(
+        self, teamRef: str, channelRef: str, rawMentions: list[str]
+    ) -> list[Mention]:
+        response = self.client.execute(
+            cmd_type="request",
+            method="getChannelMentions",
+            params={
+                "teamRef": teamRef,
+                "channelRef": channelRef,
+                "rawMentions": rawMentions,
+            },
+        )
+        return [Mention(**mention) for mention in response]
