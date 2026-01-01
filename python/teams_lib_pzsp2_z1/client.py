@@ -51,7 +51,9 @@ class TeamsClient:
             raise RuntimeError("Unsupported OS")
 
     def init_client(
-        self, cache_enabled: bool = False, cache_path: str | None = None
+        self,
+        cache_mode: config.CacheMode = config.CacheMode.DISABLED,
+        cache_path: str | None = None,
     ) -> Any:
         sender_config = config.SenderConfig()
         auth_config = config.load_auth_config(self.env_path)
@@ -70,7 +72,7 @@ class TeamsClient:
                     "scopes": auth_config.scopes,
                     "authMethod": auth_config.auth_method,
                 },
-                "cacheEnabled": cache_enabled,
+                "cacheMode": cache_mode.value,
                 "cachePath": cache_path,
             },
         )
