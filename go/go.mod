@@ -6,7 +6,7 @@ require (
 	github.com/microsoft/kiota-abstractions-go v1.9.3
 	github.com/microsoftgraph/msgraph-sdk-go v1.92.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/pzsp-teams/lib v0.0.0-20260101113908-bafa8ca37eae
+	github.com/pzsp-teams/lib v0.0.0-20260101185821-fa4110d82a33
 )
 
 require (
