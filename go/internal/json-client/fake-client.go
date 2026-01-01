@@ -12,7 +12,7 @@ import (
 	azcore "github.com/microsoft/kiota-abstractions-go"
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
 
-	lib "github.com/pzsp-teams/lib"
+	"github.com/pzsp-teams/lib/config"
 	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
 )
 
@@ -54,7 +54,7 @@ func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 		return nil, fmt.Errorf("invalid mockServerUrl parameter")
 	}
 
-	senderConfig := lib.SenderConfig{
+	senderConfig := config.SenderConfig{
 		MaxRetries:     3,
 		NextRetryDelay: 2,
 		Timeout:        5,
