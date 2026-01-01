@@ -44,8 +44,8 @@ class FakeServerData:
             "team-123-abc": [
                 Channel(
                     ID="19:123123@thread.tacv2",
-                    Name="General",
-                    IsGeneral=True,
+                    Name="Something",
+                    IsGeneral=False,
                 ),
                 Channel(
                     ID="19:999999@thread.tacv2",
@@ -171,11 +171,15 @@ class FakeServerData:
 
     def get_listChannels_response(self, team_id: str) -> dict:
         return {
+            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/channels",
             "value": [
                 {
+                    "@odata.type": "#microsoft.graph.channel",
                     "id": channel.ID,
                     "displayName": channel.Name,
                     "isGeneral": channel.IsGeneral,
+                    "membershipType": "standard",
+                    "email": ""
                 }
                 for channel in self.channels.get(team_id, [])
             ],
@@ -509,15 +513,3 @@ class FakeServerData:
 
         channel_members.remove(member)
         return {"success": True}
-
-
-
-
-
-
-
-
-
-
-
-
