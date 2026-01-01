@@ -16,7 +16,7 @@ type Request struct {
 type Config struct {
 	SenderConfigMap SenderConfigMap `json:"senderConfig"`
 	AuthConfigMap   AuthConfigMap   `json:"authConfig"`
-	CacheEnabled    bool            `json:"cacheEnabled"`
+	CacheMode       string          `json:"cacheMode,omitempty"`
 	CachePath       string          `json:"cachePath,omitempty"`
 }
 
@@ -84,33 +84,25 @@ func (acm AuthConfigMap) ToAuthConfig() (*config.AuthConfig, error) {
 }
 
 func ParseCachePath(value interface{}) (*string, error) {
-    path, ok := value.(string)
-    if !ok || path == "" {
-        return nil, fmt.Errorf("cachePath must be a non-empty string")
-    }
-    return &path, nil
+	path, ok := value.(string)
+	if !ok || path == "" {
+		return nil, fmt.Errorf("cachePath must be a non-empty string")
+	}
+	return &path, nil
 }
 
 func ParseCacheMode(value interface{}) (config.CacheMode, error) {
-	switch v := value.(type) {
-	case string:
-		switch v {
-		case "DISABLED":
-			return config.CacheDisabled, nil
-		case "SYNC":
-			return config.CacheSync, nil
-		case "ASYNC":
-			return config.CacheAsync, nil
-		default:
-			return config.CacheDisabled, fmt.Errorf("invalid cacheMode: %s", v)
-		}
-	case nil:
-		return config.CacheDisabled, fmt.Errorf("invalid cacheMode: %s", v)
+	switch value {
+	case "DISABLED":
+		return config.CacheDisabled, nil
+	case "SYNC":
+		return config.CacheSync, nil
+	case "ASYNC":
+		return config.CacheAsync, nil
 	default:
-		return config.CacheDisabled, fmt.Errorf("cacheMode must be a string")
+		return config.CacheDisabled, fmt.Errorf("invalid cacheMode: %s", value)
 	}
 }
-
 
 func validateAuthMethod(method string) (string, error) {
 	if method == "DEVICE_CODE" || method == "INTERACTIVE" {
