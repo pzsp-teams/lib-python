@@ -13,6 +13,7 @@ import (
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
 
 	"github.com/pzsp-teams/lib/config"
+	"github.com/pzsp-teams/lib"
 	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
 )
 
@@ -60,8 +61,11 @@ func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 		Timeout:        5,
 	}
 
-	cacheEnabled := false
-	var cachePath *string = nil
+	cacheConfig := config.CacheConfig{
+		Mode: config.CacheDisabled,
+		Provider: config.CacheProviderJSONFile,
+		Path: nil,
+	}
 
 	hijackedHttpClient := &http.Client{
 		Transport: &HijackTransport{
@@ -85,7 +89,7 @@ func NewJSONClient(req jsonModel.Request) (*TeamsJSONClient, error) {
 
 	graphClient := graph.NewGraphServiceClient(adapter)
 
-	client, err := lib.NewClientFromGraphClient(graphClient, &senderConfig, cacheEnabled, cachePath)
+	client, err := lib.NewClientFromGraphClient(graphClient, &senderConfig, &cacheConfig)
 	if err != nil {
 		return nil, err
 	}
