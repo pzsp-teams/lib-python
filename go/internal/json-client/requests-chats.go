@@ -36,7 +36,7 @@ type groupChatMemberParams struct {
 	UserRef      string `json:"userRef"`
 }
 
-func (c *TeamsJSONClient) AddMemberGroupToChat(p map[string]interface{}) (interface{}, error) {
+func (c *TeamsJSONClient) AddMemberToGroupChat(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params groupChatMemberParams) (interface{}, error) {
 		return c.client.Chats.AddMemberToGroupChat(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
 	})

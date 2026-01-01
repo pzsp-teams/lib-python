@@ -115,8 +115,8 @@ var Handlers = map[string]HandlerFunc{
 		return c.CreateGroupChat(p)
 	},
 
-	"addMemberGroupToChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
-		return c.AddMemberGroupToChat(p)
+	"addMemberToGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.AddMemberToGroupChat(p)
 	},
 
 	"removeMemberFromGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
