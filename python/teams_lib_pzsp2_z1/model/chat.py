@@ -13,3 +13,8 @@ class Chat:
     Type: ChatType
     IsHidden: bool
     Topic: str
+
+@dataclass
+class ChatRef:
+    Ref: str
+    type: ChatType
