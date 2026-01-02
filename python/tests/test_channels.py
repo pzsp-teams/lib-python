@@ -2,6 +2,7 @@ from teams_lib_pzsp2_z1.client import TeamsClient
 from tests.init_fake_client import init_fake_client
 from tests.fake_server.setup import setup_fake_server
 from teams_lib_pzsp2_z1.model.message import MessageContentType, MessageBody
+from teams_lib_pzsp2_z1.model.mention import MentionKind
 
 
 def test_list_channels_integration(httpserver):
@@ -367,6 +368,28 @@ def test_remove_member_integration(httpserver):
         )
 
         assert success is True
+
+    finally:
+        client.close()
+
+def test_get_mention_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        mention = client.channels.get_mentions(
+            teamRef=data.teams[0].DisplayName,
+            channelRef=data.channels[data.teams[0].ID][0].Name,
+            raw_mentions=MentionKind.TEAM.value,
+        )
+
+        assert mention[0].Kind == MentionKind.TEAM.value
+        assert mention[0].AtID == 0
+        assert mention[0].Text == data.teams[0].DisplayName
+        assert mention[0].TargetID == data.teams[0].ID
 
     finally:
         client.close()

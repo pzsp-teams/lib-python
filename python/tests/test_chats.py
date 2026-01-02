@@ -3,6 +3,7 @@ from tests.init_fake_client import init_fake_client
 from tests.fake_server.setup import setup_fake_server
 from teams_lib_pzsp2_z1.model.chat import ChatType, ChatRef
 from teams_lib_pzsp2_z1.model.message import MessageContentType, MessageBody
+from teams_lib_pzsp2_z1.model.mention import MentionKind
 from datetime import datetime
 
 
@@ -420,6 +421,31 @@ def test_unpin_message_in_chat_integration(httpserver):
         )
 
         assert result is True
+
+    finally:
+        client.close()
+
+
+def test_get_mention_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        mention = client.chats.get_mentions(
+            chat_ref=ChatRef(
+                Ref=data.group_chats[0].Topic,
+                Type=ChatType.GROUP,
+            ),
+            raw_mentions=MentionKind.EVERYONE.value,
+        )
+
+        assert mention[0].Kind == MentionKind.EVERYONE.value
+        assert mention[0].AtID == 0
+        assert mention[0].Text == "Everyone"
+        assert mention[0].TargetID == data.group_chats[0].ID
 
     finally:
         client.close()

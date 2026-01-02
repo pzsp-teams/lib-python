@@ -334,9 +334,10 @@ class ChatsService(BaseService):
 
         return [
             Mention(
-                ID=mention["ID"],
-                Mentioned=mention["Mentioned"],
-                MentionText=mention["MentionText"],
+                Kind=mention["Kind"],
+                AtID=mention["AtID"],
+                Text=mention["Text"],
+                TargetID=mention["TargetID"],
             )
             for mention in mentions
         ]
