@@ -145,6 +145,32 @@ class FakeServerData:
                 ),
             ],
         }
+        self.chat_messages = {
+            "chat-123-abc": [
+                Message(
+                    ID="msg-001",
+                    Content="Hello, team!",
+                    ContentType="text",
+                    From=MessageFrom(
+                        UserID="user-123-abc",
+                        DisplayName="Alice"
+                    ),
+                    CreatedDateTime="2024-01-01T10:00:00Z",
+                    ReplyCount=0,
+                ),
+                Message(
+                    ID="msg-002",
+                    Content="Don't forget the meeting at 3 PM.",
+                    ContentType="text",
+                    From=MessageFrom(
+                        UserID="user-456-def",
+                        DisplayName="Bob"
+                    ),
+                    CreatedDateTime="2024-01-01T11:00:00Z",
+                    ReplyCount=2,
+                ),
+            ],
+        }
         self.users = [
             Member(
                 ID="user-123-abc",
@@ -680,3 +706,51 @@ class FakeServerData:
             "isHiddenForAllMembers": chat.IsHidden,
             "topic": chat.Topic,
         }
+
+    def get_list_messages_in_chat_response(self, chat_id: str) -> dict:
+        return {
+            "value": [
+                {
+                    "id": message.ID,
+                    "body": {
+                        "content": message.Content,
+                        "contentType": message.ContentType,
+                    },
+                    "from": {
+                        "user": {
+                            "id": message.From.UserID,
+                            "displayName": message.From.DisplayName,
+                        }
+                    },
+                    "createdDateTime": message.CreatedDateTime,
+                    "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
+                }
+                for message in self.chat_messages.get(chat_id, [])
+            ],
+        }
+
+    def get_send_message_in_chat_response(self, chat_id: str, request_json: dict) -> dict:
+        return {
+            "id": self.newMessageTemplate.ID,
+            "body": {
+                "content": request_json.get("body", {}).get("content"),
+                "contentType": request_json.get("body", {}).get("contentType"),
+            },
+            "from": {
+                "user": {
+                    "id": self.newMessageTemplate.From.UserID,
+                    "displayName": self.newMessageTemplate.From.DisplayName,
+                }
+            },
+            "createdDateTime": self.newMessageTemplate.CreatedDateTime,
+        }
+
+    def get_delete_message_in_chat_response(self, chat_id: str, message_id: str) -> dict:
+        chat_messages = self.chat_messages.get(chat_id, [])
+
+        message = next((m for m in chat_messages if m.ID == message_id), None)
+        if not message:
+            return {"success": False}
+
+        chat_messages.remove(message)
+        return {"success": True}

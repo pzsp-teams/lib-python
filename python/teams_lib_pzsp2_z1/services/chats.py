@@ -118,27 +118,29 @@ class ChatsService(BaseService):
             Topic=response["Topic"],
         )
 
-    def list_messages(self, chat_ref: str) -> list[Message]:
+    def list_messages(self, chat_ref: ChatRef) -> list[Message]:
         messages = self.client.execute(
             cmd_type="request",
             method="listMessagesInChat",
             params={
-                "chatRef": chat_ref,
+                "chatRef": {
+                    "ref": chat_ref.Ref,
+                    "type": chat_ref.Type.value,
+                },
             },
         )
 
         return [
             Message(
                 ID=message["ID"],
-                Body=MessageBody(
-                    Content=message["Body"]["Content"],
-                    ContentType=MessageContentType(message["Body"]["ContentType"]),
-                ),
+                Content=message["Content"],
+                ContentType=MessageContentType(message["ContentType"]),
                 From=MessageFrom(
                     UserID=message["From"]["UserID"],
                     DisplayName=message["From"]["DisplayName"],
                 ),
                 CreatedDateTime=message["CreatedDateTime"],
+                ReplyCount=message["ReplyCount"],
             )
             for message in messages
         ]
@@ -150,7 +152,7 @@ class ChatsService(BaseService):
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
-                    "type": chat_ref.type.value,
+                    "type": chat_ref.Type.value,
                 },
                 "body": {
                     "content": body.Content,
@@ -161,15 +163,14 @@ class ChatsService(BaseService):
 
         return Message(
             ID=message["ID"],
-            Body=MessageBody(
-                Content=message["Body"]["Content"],
-                ContentType=MessageContentType(message["Body"]["ContentType"]),
-            ),
+            Content=message["Content"],
+            ContentType=MessageContentType(message["ContentType"]),
             From=MessageFrom(
                 UserID=message["From"]["UserID"],
                 DisplayName=message["From"]["DisplayName"],
             ),
             CreatedDateTime=message["CreatedDateTime"],
+            ReplyCount=message["ReplyCount"],
         )
 
     def delete_message(self, chat_ref: ChatRef, message_id: str) -> bool:
@@ -179,7 +180,7 @@ class ChatsService(BaseService):
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
-                    "type": chat_ref.type.value,
+                    "type": chat_ref.Type.value,
                 },
                 "messageID": message_id,
             },
@@ -194,7 +195,7 @@ class ChatsService(BaseService):
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
-                    "type": chat_ref.type.value,
+                    "type": chat_ref.Type.value,
                 },
                 "messageID": message_id,
             },
@@ -202,15 +203,14 @@ class ChatsService(BaseService):
 
         return Message(
             ID=message["ID"],
-            Body=MessageBody(
-                Content=message["Body"]["Content"],
-                ContentType=MessageContentType(message["Body"]["ContentType"]),
-            ),
+            Content=message["Content"],
+            ContentType=MessageContentType(message["ContentType"]),
             From=MessageFrom(
                 UserID=message["From"]["UserID"],
                 DisplayName=message["From"]["DisplayName"],
             ),
             CreatedDateTime=message["CreatedDateTime"],
+            ReplyCount=message["ReplyCount"],
         )
 
     def list_my_joined(self, chat_type: ChatType | None = None) -> list[Chat]:
@@ -250,15 +250,14 @@ class ChatsService(BaseService):
         return [
             Message(
                 ID=message["ID"],
-                Body=MessageBody(
-                    Content=message["Body"]["Content"],
-                    ContentType=MessageContentType(message["Body"]["ContentType"]),
-                ),
+                Content=message["Content"],
+                ContentType=MessageContentType(message["ContentType"]),
                 From=MessageFrom(
                     UserID=message["From"]["UserID"],
                     DisplayName=message["From"]["DisplayName"],
                 ),
                 CreatedDateTime=message["CreatedDateTime"],
+                ReplyCount=message["ReplyCount"],
             )
             for message in messages
         ]
@@ -270,7 +269,7 @@ class ChatsService(BaseService):
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
-                    "type": chat_ref.type.value,
+                    "type": chat_ref.Type.value,
                 },
             },
         )
@@ -278,15 +277,14 @@ class ChatsService(BaseService):
         return [
             Message(
                 ID=message["ID"],
-                Body=MessageBody(
-                    Content=message["Body"]["Content"],
-                    ContentType=MessageContentType(message["Body"]["ContentType"]),
-                ),
+                Content=message["Content"],
+                ContentType=MessageContentType(message["ContentType"]),
                 From=MessageFrom(
                     UserID=message["From"]["UserID"],
                     DisplayName=message["From"]["DisplayName"],
                 ),
                 CreatedDateTime=message["CreatedDateTime"],
+                ReplyCount=message["ReplyCount"],
             )
             for message in messages
         ]
@@ -298,14 +296,13 @@ class ChatsService(BaseService):
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
-                    "type": chat_ref.type.value,
+                    "type": chat_ref.Type.value,
                 },
                 "messageID": message_id,
             },
         )
 
         return result == "pinned"
-
 
     def unpin_message(self, chat_ref: ChatRef, message_id: str) -> bool:
         result = self.client.execute(
@@ -314,7 +311,7 @@ class ChatsService(BaseService):
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
-                    "type": chat_ref.type.value,
+                    "type": chat_ref.Type.value,
                 },
                 "messageID": message_id,
             },
@@ -329,7 +326,7 @@ class ChatsService(BaseService):
             params={
                 "chatRef": {
                     "ref": chat_ref.Ref,
-                    "type": chat_ref.type.value,
+                    "type": chat_ref.Type.value,
                 },
                 "rawMentions": raw_mentions,
             },

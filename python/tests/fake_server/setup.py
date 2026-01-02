@@ -143,6 +143,44 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Update Chat"
     ))
 
+    #GET /chats/{chat_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/messages"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_messages_in_chat_response(
+            re.search(r"/chats/([^/]+)/messages", req.path).group(1)
+        ),
+        "List Chat Messages"
+    ))
+
+    #POST /chats/{chat_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/messages"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_send_message_in_chat_response(
+            re.search(r"/chats/([^/]+)/messages", req.path).group(1),
+            req.json
+        ),
+        "Send Chat Message"
+    ))
+
+    #DELETE /chats/{chat_id}/messages/{message_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/messages/([^/]+)"),
+        method="DELETE"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_delete_message_in_chat_response(
+            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(1),
+            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(2)
+        ),
+        "Delete Chat Message"
+    ))
+
     #POST /teams/{team_id}/channels/{channel_id}/members
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members"),
