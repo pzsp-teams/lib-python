@@ -92,6 +92,18 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Create Chat"
     ))
 
+    #GET /chats/{chat_id}/members
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/members"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_group_chat_members_response(
+            re.search(r"/chats/([^/]+)/members", req.path).group(1)
+        ),
+        "List Chat Members"
+    ))
+
     #POST /teams/{team_id}/channels/{channel_id}/members
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members"),

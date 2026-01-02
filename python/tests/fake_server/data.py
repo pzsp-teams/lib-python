@@ -127,6 +127,24 @@ class FakeServerData:
                 ],
             }
         }
+        self.group_chat_members = {
+            "chat-123-abc": [
+                Member(
+                    ID="user-123-abc",
+                    UserID="user-123-abc",
+                    DisplayName="Alice",
+                    Role="owner",
+                    Email="alice@example.com"
+                ),
+                Member(
+                    ID="user-456-def",
+                    UserID="user-456-def",
+                    DisplayName="Bob",
+                    Role="member",
+                    Email="bob@example.com"
+                ),
+            ],
+        }
         self.users = [
             Member(
                 ID="user-123-abc",
@@ -614,4 +632,36 @@ class FakeServerData:
                 "topic": self.newChatTemplate.Topic,
             }
 
+
+    def get_add_member_to_group_chat_response(self, chat_id: str, request_json: dict) -> dict:
+        return {
+            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#chats('{chat_id}')/members/$entity",
+            "@odata.type": "#microsoft.graph.aadUserConversationMember",
+            "id": self.newMemberTemplate.ID,
+            "roles": [self.newMemberTemplate.Role] if self.newMemberTemplate.Role == "owner" else [],
+            "displayName": self.newMemberTemplate.DisplayName,
+            "userId": self.newMemberTemplate.UserID,
+            "email": self.newMemberTemplate.Email,
+        }
+
+    def get_remove_member_from_group_chat_response(self, chat_id: str, member_id: str) -> dict:
+        return {
+            "success": True
+        }
+
+    def get_list_group_chat_members_response(self, chat_id: str) -> dict:
+        return {
+            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#chats('{chat_id}')/members",
+            "value": [
+                {
+                    "@odata.type": "#microsoft.graph.aadUserConversationMember",
+                    "id": member.ID,
+                    "userId": member.UserID,
+                    "displayName": member.DisplayName,
+                    "roles": [member.Role] if member.Role == "owner" else [],
+                    "email": member.Email,
+                }
+                for member in self.group_chat_members.get(chat_id, [])
+            ],
+        }
 

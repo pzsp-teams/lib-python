@@ -76,3 +76,53 @@ def test_create_group_chat_integration(httpserver):
 
     finally:
         client.close()
+
+def test_create_one_on_one_chat_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        chat = client.chats.create_one_on_one(
+            recipient_ref=data.users[0].Email,
+        )
+
+        assert chat.ID == data.newChatTemplate.ID
+        assert chat.Type == ChatType.ONEONONE
+        assert chat.Topic == None
+        assert chat.IsHidden == data.newChatTemplate.IsHidden
+
+    finally:
+        client.close()
+
+
+def test_list_group_chat_members_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        members = client.chats.list_group_chat_members(data.group_chats[0].Topic)
+
+        assert len(members) == len(data.group_chat_members[data.group_chats[0].ID])
+
+        assert members[0].ID == data.group_chat_members[data.group_chats[0].ID][0].ID
+        assert members[0].UserID == data.group_chat_members[data.group_chats[0].ID][0].UserID
+        assert members[0].DisplayName == data.group_chat_members[data.group_chats[0].ID][0].DisplayName
+        if data.group_chat_members[data.group_chats[0].ID][0].Role == "owner":
+            assert members[0].Role == "owner"
+        assert members[0].Email == data.group_chat_members[data.group_chats[0].ID][0].Email
+
+        assert members[1].ID == data.group_chat_members[data.group_chats[0].ID][1].ID
+        assert members[1].UserID == data.group_chat_members[data.group_chats[0].ID][1].UserID
+        assert members[1].DisplayName == data.group_chat_members[data.group_chats[0].ID][1].DisplayName
+        if data.group_chat_members[data.group_chats[0].ID][1].Role == "owner":
+            assert members[1].Role == "owner"
+        assert members[1].Email == data.group_chat_members[data.group_chats[0].ID][1].Email
+
+    finally:
+        client.close()

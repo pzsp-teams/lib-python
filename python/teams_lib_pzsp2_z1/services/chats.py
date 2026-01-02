@@ -94,8 +94,8 @@ class ChatsService(BaseService):
             Member(
                 ID=member["ID"],
                 DisplayName=member["DisplayName"],
-                UserRef=member["UserRef"],
-                Roles=member["Roles"],
+                UserID=member["UserID"],
+                Role=member["Role"],
                 Email=member["Email"],
             )
             for member in members
