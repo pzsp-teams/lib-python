@@ -126,3 +126,66 @@ def test_list_group_chat_members_integration(httpserver):
 
     finally:
         client.close()
+
+
+def test_add_group_chat_member_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        member = client.chats.add_member_to_group_chat(
+            group_chat_ref=data.group_chats[0].Topic,
+            user_ref=data.newMemberTemplate.Email,
+        )
+
+        assert member.ID == data.newMemberTemplate.ID
+        assert member.UserID == data.newMemberTemplate.UserID
+        assert member.DisplayName == data.newMemberTemplate.DisplayName
+        assert member.Role == data.newMemberTemplate.Role
+        assert member.Email == data.newMemberTemplate.Email
+    finally:
+        client.close()
+
+
+def test_remove_group_chat_member_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        result = client.chats.remove_member_from_group_chat(
+            group_chat_ref=data.group_chats[0].Topic,
+            member_ref=data.group_chat_members[data.group_chats[0].ID][0].Email,
+        )
+
+        assert result is True
+
+    finally:
+        client.close()
+
+
+def test_update_group_chat_topic_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        chat = client.chats.update_group_chat_topic(
+            group_chat_ref=data.group_chats[0].Topic,
+            new_topic=data.updatedGroupChatTopic,
+        )
+
+        assert chat.ID == data.group_chats[0].ID
+        assert chat.Type == data.group_chats[0].Type
+        assert chat.Topic == data.updatedGroupChatTopic
+        assert chat.IsHidden == data.group_chats[0].IsHidden
+
+    finally:
+        client.close()

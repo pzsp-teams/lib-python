@@ -62,8 +62,8 @@ class ChatsService(BaseService):
         return Member(
             ID=member["ID"],
             DisplayName=member["DisplayName"],
-            UserRef=member["UserRef"],
-            Roles=member["Roles"],
+            UserID=member["UserID"],
+            Role=member["Role"],
             Email=member["Email"],
         )
 
@@ -135,7 +135,7 @@ class ChatsService(BaseService):
                     ContentType=MessageContentType(message["Body"]["ContentType"]),
                 ),
                 From=MessageFrom(
-                    UserRef=message["From"]["UserRef"],
+                    UserID=message["From"]["UserID"],
                     DisplayName=message["From"]["DisplayName"],
                 ),
                 CreatedDateTime=message["CreatedDateTime"],
@@ -166,7 +166,7 @@ class ChatsService(BaseService):
                 ContentType=MessageContentType(message["Body"]["ContentType"]),
             ),
             From=MessageFrom(
-                UserRef=message["From"]["UserRef"],
+                UserID=message["From"]["UserID"],
                 DisplayName=message["From"]["DisplayName"],
             ),
             CreatedDateTime=message["CreatedDateTime"],
@@ -207,7 +207,7 @@ class ChatsService(BaseService):
                 ContentType=MessageContentType(message["Body"]["ContentType"]),
             ),
             From=MessageFrom(
-                UserRef=message["From"]["UserRef"],
+                UserID=message["From"]["UserID"],
                 DisplayName=message["From"]["DisplayName"],
             ),
             CreatedDateTime=message["CreatedDateTime"],
@@ -255,7 +255,7 @@ class ChatsService(BaseService):
                     ContentType=MessageContentType(message["Body"]["ContentType"]),
                 ),
                 From=MessageFrom(
-                    UserRef=message["From"]["UserRef"],
+                    UserID=message["From"]["UserID"],
                     DisplayName=message["From"]["DisplayName"],
                 ),
                 CreatedDateTime=message["CreatedDateTime"],
@@ -283,7 +283,7 @@ class ChatsService(BaseService):
                     ContentType=MessageContentType(message["Body"]["ContentType"]),
                 ),
                 From=MessageFrom(
-                    UserRef=message["From"]["UserRef"],
+                    UserID=message["From"]["UserID"],
                     DisplayName=message["From"]["DisplayName"],
                 ),
                 CreatedDateTime=message["CreatedDateTime"],
