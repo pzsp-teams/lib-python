@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from teams_lib_pzsp2_z1.model.team import Team
+from teams_lib_pzsp2_z1.model.chat import Chat, ChatType
 from teams_lib_pzsp2_z1.model.channel import Channel
 from teams_lib_pzsp2_z1.model.message import Message, MessageFrom
 from teams_lib_pzsp2_z1.model.member import Member
@@ -126,6 +127,28 @@ class FakeServerData:
                 ],
             }
         }
+        self.group_chats = [
+            Chat(
+                ID="chat-123-abc",
+                Type=ChatType.GROUP,
+                IsHidden=False,
+                Topic="Project Discussion",
+            ),
+            Chat(
+                ID="chat-456-def",
+                Type=ChatType.GROUP,
+                IsHidden=True,
+                Topic="Secret Plans",
+            ),
+        ]
+        self.oneonone_chats = [
+            Chat(
+                ID="chat-789-ghi",
+                Type=ChatType.ONEONONE,
+                IsHidden=False,
+                Topic="",
+            ),
+        ]
         self.newGroupID = "group-789-ghi"
         self.newTeamName = "New Team"
         self.newGroupMailNickname = "new-team-nickname"
@@ -513,3 +536,28 @@ class FakeServerData:
 
         channel_members.remove(member)
         return {"success": True}
+
+    def get_list_chats_response(self, chat_type: ChatType) -> dict:
+        if chat_type == ChatType.ONEONONE:
+            chats = self.oneonone_chats
+        else:
+            chats = self.group_chats
+
+        print(chat_type)
+        print(chat_type == ChatType.ONEONONE)
+
+        return {
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats",
+            "@odata.count": len(chats),
+            "value": [
+                {
+                    "id": chat.ID,
+                    "chatType": "oneOnOne" if chat.Type == ChatType.ONEONONE else "group",
+                    "isHiddenForAllMembers": chat.IsHidden,
+                    "topic": chat.Topic,
+                }
+                for chat in chats
+            ],
+        }
+
+
