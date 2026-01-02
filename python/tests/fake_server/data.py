@@ -745,3 +745,23 @@ class FakeServerData:
             "createdDateTime": self.newMessageTemplate.CreatedDateTime,
         }
 
+    def get_get_message_in_chat_response(self, chat_id: str, message_id: str) -> dict | None:
+        message = next((m for m in self.chat_messages.get(chat_id, []) if m.ID == message_id), None)
+        if not message:
+            return None
+
+        return {
+            "id": message.ID,
+            "body": {
+                "content": message.Content,
+                "contentType": message.ContentType,
+            },
+            "from": {
+                "user": {
+                    "id": message.From.UserID,
+                    "displayName": message.From.DisplayName,
+                }
+            },
+            "createdDateTime": message.CreatedDateTime,
+            "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
+        }
