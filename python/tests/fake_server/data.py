@@ -745,12 +745,3 @@ class FakeServerData:
             "createdDateTime": self.newMessageTemplate.CreatedDateTime,
         }
 
-    def get_delete_message_in_chat_response(self, chat_id: str, message_id: str) -> dict:
-        chat_messages = self.chat_messages.get(chat_id, [])
-
-        message = next((m for m in chat_messages if m.ID == message_id), None)
-        if not message:
-            return {"success": False}
-
-        chat_messages.remove(message)
-        return {"success": True}

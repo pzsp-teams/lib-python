@@ -2,7 +2,7 @@ from teams_lib_pzsp2_z1.client import TeamsClient
 from tests.init_fake_client import init_fake_client
 from tests.fake_server.setup import setup_fake_server
 from teams_lib_pzsp2_z1.model.chat import ChatType, ChatRef
-from teams_lib_pzsp2_z1.model.message import MessageContentType
+from teams_lib_pzsp2_z1.model.message import MessageContentType, MessageBody
 
 
 def test_list_my_group_chats_integration(httpserver):
@@ -224,6 +224,58 @@ def test_list_messeges_in_chat_integration(httpserver):
         assert messages[1].From.DisplayName == data.chat_messages[data.group_chats[0].ID][1].From.DisplayName
         assert messages[1].ReplyCount == data.chat_messages[data.group_chats[0].ID][1].ReplyCount
         assert messages[1].CreatedDateTime == data.chat_messages[data.group_chats[0].ID][1].CreatedDateTime
+
+    finally:
+        client.close()
+
+def test_send_message_in_chat_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        message = client.chats.send_message(
+            chat_ref=ChatRef(
+                Ref=data.group_chats[0].Topic,
+                Type=ChatType.GROUP,
+            ),
+            body=MessageBody(
+                Content=data.newMessageTemplate.Content,
+                ContentType=MessageContentType(data.newMessageTemplate.ContentType),
+                Mentions=[],
+            )
+        )
+
+        assert message.ID == data.newMessageTemplate.ID
+        assert message.Content == data.newMessageTemplate.Content
+        assert message.ContentType == MessageContentType(data.newMessageTemplate.ContentType)
+        assert message.From.UserID == data.newMessageTemplate.From.UserID
+        assert message.From.DisplayName == data.newMessageTemplate.From.DisplayName
+        assert message.ReplyCount == data.newMessageTemplate.ReplyCount
+        assert message.CreatedDateTime == data.newMessageTemplate.CreatedDateTime
+
+    finally:
+        client.close()
+
+def test_delete_message_in_chat_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        result = client.chats.delete_message(
+            chat_ref=ChatRef(
+                Ref=data.group_chats[0].Topic,
+                Type=ChatType.GROUP,
+            ),
+            message_id=data.chat_messages[data.group_chats[0].ID][0].ID,
+        )
+
+        assert result is True
 
     finally:
         client.close()
