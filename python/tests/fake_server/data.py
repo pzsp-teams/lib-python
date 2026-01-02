@@ -617,9 +617,6 @@ class FakeServerData:
         else:
             chats = self.group_chats
 
-        print(chat_type)
-        print(chat_type == ChatType.ONEONONE)
-
         return {
             "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats",
             "@odata.count": len(chats),
@@ -793,3 +790,15 @@ class FakeServerData:
                 for message in self.chat_messages[self.group_chats[0].ID]
             ],
         }
+
+    def get_list_pinned_messages_in_chat_response(self, chat_id: str) -> dict:
+        return {
+            "value": [
+                {
+                    "@odata.type": "#microsoft.graph.pinnedChatMessageInfo",
+                    "id": message.ID,
+                }
+                for message in self.chat_messages.get(chat_id, [])
+            ],
+        }
+
