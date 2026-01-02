@@ -3,6 +3,7 @@ import json
 import re
 import sys
 from werkzeug.wrappers import Response
+from teams_lib_pzsp2_z1.model.chat import ChatType
 
 def setup_fake_server(httpserver) -> FakeServerData:
     """
@@ -43,6 +44,33 @@ def setup_fake_server(httpserver) -> FakeServerData:
     ).respond_with_handler(lambda req: make_log_response(
         req, data.get_myJoinedTeams_response(), "List Joined Teams"
     ))
+
+    def handle_chats_request(req):
+        filter_param = req.args.get('$filter', '')
+        chat_type = None
+        match = re.search(r"chatType\s+eq\s+'([^']+)'", filter_param)
+
+        if match:
+            chat_type = match.group(1)
+
+        print(f"DEBUG: Parsowanie filtra: '{filter_param}' -> Typ: '{chat_type}'")
+
+        if chat_type == "oneOnOne":
+            chat_type = ChatType.ONEONONE
+        elif chat_type == "group":
+            chat_type = ChatType.GROUP
+
+        return make_log_response(
+            req,
+            data.get_list_chats_response(chat_type),
+            f"List Chats ({chat_type})"
+        )
+
+    # GET /users/me/chats
+    httpserver.expect_request(
+        "/v1.0/users/me-token-to-replace/chats",
+        method="GET"
+    ).respond_with_handler(handle_chats_request)
 
     #POST /teams/{team_id}/channels/{channel_id}/members
     httpserver.expect_request(

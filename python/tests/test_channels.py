@@ -339,7 +339,7 @@ def test_update_member_role_integration(httpserver):
         member = client.channels.update_member_role(
             teamRef=data.teams[0].DisplayName,
             channelRef=data.channels[data.teams[0].ID][0].Name,
-            userRef=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].DisplayName,
+            userRef=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].Email,
             isOwner=True
         )
 
@@ -363,7 +363,7 @@ def test_remove_member_integration(httpserver):
         success = client.channels.remove_member(
             teamRef=data.teams[0].DisplayName,
             channelRef=data.channels[data.teams[0].ID][0].Name,
-            userRef=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].DisplayName,
+            userRef=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].Email,
         )
 
         assert success is True
