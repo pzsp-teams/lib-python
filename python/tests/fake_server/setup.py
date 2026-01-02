@@ -56,6 +56,34 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "List All Chat Messages"
     ))
 
+    #GET /chats/{chat_id}/pinnedMessages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_pinned_messages_in_chat_response(
+            re.search(r"/chats/([^/]+)/pinnedMessages", req.path).group(1)
+        ),
+        "List Pinned Chat Messages"
+    ))
+
+    # POST /chats/{chat_id}/pinnedMessages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages"),
+        method="POST"
+    ).respond_with_response(
+        Response(status=204)
+    )
+
+    # DELETE /chats/{chat_id}/pinnedMessages/{message_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages/([^/]+)"),
+        method="DELETE"
+    ).respond_with_response(
+        Response(status=204)
+    )
+
     def handle_chats_request(req):
         filter_param = req.args.get('$filter', '')
         chat_type = None
@@ -63,8 +91,6 @@ def setup_fake_server(httpserver) -> FakeServerData:
 
         if match:
             chat_type = match.group(1)
-
-        print(f"DEBUG: Parsowanie filtra: '{filter_param}' -> Typ: '{chat_type}'")
 
         if chat_type == "oneOnOne":
             chat_type = ChatType.ONEONONE
