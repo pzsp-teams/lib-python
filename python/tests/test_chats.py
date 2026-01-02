@@ -279,3 +279,29 @@ def test_delete_message_in_chat_integration(httpserver):
 
     finally:
         client.close()
+
+def test_get_message_in_chat_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        message = client.chats.get_message(
+            chat_ref=ChatRef(
+                Ref=data.group_chats[0].Topic,
+                Type=ChatType.GROUP,
+            ),
+            message_id=data.chat_messages[data.group_chats[0].ID][0].ID,
+        )
+
+        assert message.ID == data.chat_messages[data.group_chats[0].ID][0].ID
+        assert message.Content == data.chat_messages[data.group_chats[0].ID][0].Content
+        assert message.ContentType == MessageContentType(data.chat_messages[data.group_chats[0].ID][0].ContentType)
+        assert message.From.UserID == data.chat_messages[data.group_chats[0].ID][0].From.UserID
+        assert message.From.DisplayName == data.chat_messages[data.group_chats[0].ID][0].From.DisplayName
+        assert message.ReplyCount == data.chat_messages[data.group_chats[0].ID][0].ReplyCount
+        assert message.CreatedDateTime == data.chat_messages[data.group_chats[0].ID][0].CreatedDateTime
+    finally:
+        client.close()

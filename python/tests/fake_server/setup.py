@@ -66,6 +66,20 @@ def setup_fake_server(httpserver) -> FakeServerData:
             f"List Chats ({chat_type})"
         )
 
+
+    #GET /chats/{chat_id}/messages/{message_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/messages/([^/]+)"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_get_message_in_chat_response(
+            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(1),
+            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(2)
+        ),
+        "Get Chat Message"
+    ))
+
     #GET /chats/{chat_id}/messages
     httpserver.expect_request(
         re.compile(r"^/v1.0/chats/([^/]+)/messages"),
@@ -167,8 +181,6 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Update Chat"
     ))
 
-
-
     #POST /chats/{chat_id}/messages
     httpserver.expect_request(
         re.compile(r"^/v1.0/chats/([^/]+)/messages"),
@@ -189,6 +201,7 @@ def setup_fake_server(httpserver) -> FakeServerData:
     ).respond_with_response(
         Response(status=204)
     )
+
 
     #POST /teams/{team_id}/channels/{channel_id}/members
     httpserver.expect_request(
