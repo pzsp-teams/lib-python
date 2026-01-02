@@ -221,6 +221,7 @@ class FakeServerData:
             IsHidden=False,
             Topic="New Chat Topic"
         )
+        self.updatedGroupChatTopic = "Updated Chat Topic"
 
 
 
@@ -665,3 +666,17 @@ class FakeServerData:
             ],
         }
 
+    def get_update_group_chat_topic_response(self, chat_id: str, request_json: dict) -> dict:
+        chat = next((c for c in self.group_chats if c.ID == chat_id), None)
+        if not chat:
+            return {}
+
+        chat.Topic = request_json.get("topic", chat.Topic)
+
+        return {
+            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#chats('{chat_id}')",
+            "id": chat.ID,
+            "chatType": "group",
+            "isHiddenForAllMembers": chat.IsHidden,
+            "topic": chat.Topic,
+        }

@@ -104,6 +104,45 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "List Chat Members"
     ))
 
+    #POST /chats/{chat_id}/members
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/members"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_add_member_to_group_chat_response(
+            re.search(r"/chats/([^/]+)/members", req.path).group(1),
+            req.json
+        ),
+        "Add Chat Member"
+    ))
+
+    #DELETE /chats/{chat_id}/members/{member_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/members/([^/]+)"),
+        method="DELETE"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_remove_member_from_group_chat_response(
+            re.search(r"/chats/([^/]+)/members/([^/]+)", req.path).group(1),
+            re.search(r"/chats/([^/]+)/members/([^/]+)", req.path).group(2)
+        ),
+        "Remove Chat Member"
+    ))
+
+    #PATCH /chats/{chat_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)"),
+        method="PATCH"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_update_group_chat_topic_response(
+            re.search(r"/chats/([^/]+)", req.path).group(1),
+            req.json
+        ),
+        "Update Chat"
+    ))
+
     #POST /teams/{team_id}/channels/{channel_id}/members
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members"),
