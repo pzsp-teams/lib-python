@@ -72,6 +72,26 @@ def setup_fake_server(httpserver) -> FakeServerData:
         method="GET"
     ).respond_with_handler(handle_chats_request)
 
+    # GET /users/me
+    httpserver.expect_request(
+        "/v1.0/users/me-token-to-replace",
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_me_response(),
+        "Get Users"
+    ))
+
+    #POST /chats
+    httpserver.expect_request(
+        "/v1.0/chats",
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_create_chat_response(req.json),
+        "Create Chat"
+    ))
+
     #POST /teams/{team_id}/channels/{channel_id}/members
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members"),

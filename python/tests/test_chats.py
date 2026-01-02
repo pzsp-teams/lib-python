@@ -33,13 +33,9 @@ def test_list_my_group_chats_integration(httpserver):
         client.close()
 
 def test_list_my_one_on_one_chats_integration(httpserver):
-    """
-    Integration test: Python -> Go Binary -> Fake HTTP -> Python Mock Server
-    """
 
     data = setup_fake_server(httpserver)
 
-    # Init fake client
     client = TeamsClient(auto_init=False)
     try:
         init_fake_client(client, httpserver.url_for(""))
@@ -51,6 +47,32 @@ def test_list_my_one_on_one_chats_integration(httpserver):
         assert chats[0].Type == data.oneonone_chats[0].Type
         assert chats[0].Topic == data.oneonone_chats[0].Topic
         assert chats[0].IsHidden == data.oneonone_chats[0].IsHidden
+
+    finally:
+        client.close()
+
+
+def test_create_group_chat_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        chat = client.chats.create_group_chat(
+            topic=data.newChatTemplate.Topic,
+            recipient_refs=[
+                data.users[0].Email,
+                data.users[1].Email,
+            ],
+            include_me=True,
+        )
+
+        assert chat.ID == data.newChatTemplate.ID
+        assert chat.Type == ChatType.GROUP
+        assert chat.Topic == data.newChatTemplate.Topic
+        assert chat.IsHidden == data.newChatTemplate.IsHidden
 
     finally:
         client.close()
