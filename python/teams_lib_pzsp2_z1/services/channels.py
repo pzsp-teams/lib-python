@@ -293,15 +293,15 @@ class ChannelsService(BaseService):
         return response == "removed"
 
     def get_mentions(
-        self, teamRef: str, channelRef: str, rawMentions: list[str]
+        self, teamRef: str, channelRef: str, raw_mentions: list[str]
     ) -> list[Mention]:
         response = self.client.execute(
             cmd_type="request",
-            method="getChannelMentions",
+            method="getMentionsInChannel",
             params={
                 "teamRef": teamRef,
                 "channelRef": channelRef,
-                "rawMentions": rawMentions,
+                "rawMentions": raw_mentions,
             },
         )
         return [Mention(**mention) for mention in response]
