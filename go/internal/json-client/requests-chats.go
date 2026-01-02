@@ -2,7 +2,6 @@ package jsonclient
 
 import (
 	"context"
-	"time"
 
 	"github.com/pzsp-teams/lib-python/internal/json-client/decoders"
 	"github.com/pzsp-teams/lib/chats"
@@ -144,14 +143,18 @@ func (c *TeamsJSONClient) ListMyChats(p map[string]interface{}) (interface{}, er
 }
 
 type listChatMessagesParams struct {
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
 	Top       *int32    `json:"top"`
 }
 
 func (c *TeamsJSONClient) ListMyChatMessages(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params listChatMessagesParams) (interface{}, error) {
-		return c.client.Chats.ListAllMessages(context.TODO(), &params.StartTime, &params.EndTime, params.Top)
+		parsedStartTime, parsedEndTime, err := decoders.DecodeTimeRange(params.StartTime, params.EndTime)
+		if err != nil {
+			return nil, err
+		}
+		return c.client.Chats.ListAllMessages(context.TODO(), parsedStartTime, parsedEndTime, params.Top)
 	})
 }
 

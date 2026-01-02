@@ -3,6 +3,7 @@ from tests.init_fake_client import init_fake_client
 from tests.fake_server.setup import setup_fake_server
 from teams_lib_pzsp2_z1.model.chat import ChatType, ChatRef
 from teams_lib_pzsp2_z1.model.message import MessageContentType, MessageBody
+from datetime import datetime
 
 
 def test_list_my_group_chats_integration(httpserver):
@@ -303,5 +304,41 @@ def test_get_message_in_chat_integration(httpserver):
         assert message.From.DisplayName == data.chat_messages[data.group_chats[0].ID][0].From.DisplayName
         assert message.ReplyCount == data.chat_messages[data.group_chats[0].ID][0].ReplyCount
         assert message.CreatedDateTime == data.chat_messages[data.group_chats[0].ID][0].CreatedDateTime
+    finally:
+        client.close()
+
+
+def test_get_all_messages_in_chat_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        messages = client.chats.list_all_messages(
+            start_time=datetime.min,
+            end_time=datetime.max,
+            top=50,
+        )
+
+        assert len(messages) == len(data.chat_messages[data.group_chats[0].ID])
+
+        assert messages[0].ID == data.chat_messages[data.group_chats[0].ID][0].ID
+        assert messages[0].Content == data.chat_messages[data.group_chats[0].ID][0].Content
+        assert messages[0].ContentType == MessageContentType(data.chat_messages[data.group_chats[0].ID][0].ContentType)
+        assert messages[0].From.UserID == data.chat_messages[data.group_chats[0].ID][0].From.UserID
+        assert messages[0].From.DisplayName == data.chat_messages[data.group_chats[0].ID][0].From.DisplayName
+        assert messages[0].ReplyCount == 0
+        assert messages[0].CreatedDateTime == data.chat_messages[data.group_chats[0].ID][0].CreatedDateTime
+
+        assert messages[1].ID == data.chat_messages[data.group_chats[0].ID][1].ID
+        assert messages[1].Content == data.chat_messages[data.group_chats[0].ID][1].Content
+        assert messages[1].ContentType == MessageContentType(data.chat_messages[data.group_chats[0].ID][1].ContentType)
+        assert messages[1].From.UserID == data.chat_messages[data.group_chats[0].ID][1].From.UserID
+        assert messages[1].From.DisplayName == data.chat_messages[data.group_chats[0].ID][1].From.DisplayName
+        assert messages[1].ReplyCount == 0
+        assert messages[1].CreatedDateTime == data.chat_messages[data.group_chats[0].ID][1].CreatedDateTime
+
     finally:
         client.close()

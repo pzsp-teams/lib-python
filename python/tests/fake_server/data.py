@@ -765,3 +765,31 @@ class FakeServerData:
             "createdDateTime": message.CreatedDateTime,
             "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
         }
+
+    def get_all_messeges_in_chats_response(self) -> dict:
+        return {
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(chatMessage)",
+            "@odata.count": len(self.chat_messages),
+            "value": [
+                {
+                    "@odata.type": "#microsoft.graph.chatMessage",
+                    "id": message.ID,
+                    "etag": message.ID,
+                    "messageType": "message",
+                    "chatId": self.group_chats[0].ID,
+                    "body": {
+                        "content": message.Content,
+                        "contentType": message.ContentType,
+                    },
+                    "from": {
+                        "user": {
+                            "id": message.From.UserID,
+                            "displayName": message.From.DisplayName,
+                        }
+                    },
+                    "createdDateTime": message.CreatedDateTime,
+                    "lastModifiedDateTime": message.CreatedDateTime,
+                }
+                for message in self.chat_messages[self.group_chats[0].ID]
+            ],
+        }
