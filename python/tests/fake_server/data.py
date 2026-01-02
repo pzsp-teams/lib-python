@@ -1,256 +1,169 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Optional, List, Dict, Any
+
 from teams_lib_pzsp2_z1.model.team import Team
 from teams_lib_pzsp2_z1.model.chat import Chat, ChatType
 from teams_lib_pzsp2_z1.model.channel import Channel
 from teams_lib_pzsp2_z1.model.message import Message, MessageFrom
 from teams_lib_pzsp2_z1.model.member import Member
-from dataclasses import field
+
+# --- Constants for OData ---
+ODATA_CONTEXT = "@odata.context"
+ODATA_TYPE = "@odata.type"
+ODATA_COUNT = "@odata.count"
+GRAPH_URL = "https://graph.microsoft.com/v1.0/$metadata"
 
 @dataclass
 class FakeServerData:
-    teams: list[Team]
-    channels: dict[str, list[Channel]]
+    teams: List[Team]
+    channels: Dict[str, List[Channel]]
 
+    # State tracking variables
     newGroupID: str
     newTeamName: str
     newGroupMailNickname: str
     newTeamVisibility: str
-    potentialTeams: list[Team] = field(default_factory=list)
+    potentialTeams: List[Team] = field(default_factory=list)
 
-    def __init__(self) -> FakeServerData:
+    # Initial data containers
+    messages: Dict[str, List[Message]] = field(default_factory=dict)
+    replies: Dict[str, List[Message]] = field(default_factory=dict)
+    members: Dict[str, Dict[str, List[Member]]] = field(default_factory=dict)
+    group_chat_members: Dict[str, List[Member]] = field(default_factory=dict)
+    chat_messages: Dict[str, List[Message]] = field(default_factory=dict)
+    users: List[Member] = field(default_factory=list)
+    me: Member = field(default_factory=Member) # type: ignore
+    group_chats: List[Chat] = field(default_factory=list)
+    oneonone_chats: List[Chat] = field(default_factory=list)
+
+    # Templates and temporary state
+    newChannelName: str = "New Channel"
+    newChannelID: str = "19:newchannelid@thread.tacv2"
+    newMessageTemplate: Message = field(default_factory=lambda: Message(
+        ID="new-message-id",
+        Content="This is a new message.",
+        ContentType="text",
+        From=MessageFrom(UserID="user-new-001", DisplayName="New User"),
+        CreatedDateTime="2024-01-02T10:00:00Z",
+        ReplyCount=0,
+    ))
+    newMemberTemplate: Member = field(default_factory=lambda: Member(
+        ID="user-new-002", UserID="new-user-002", DisplayName="New Member",
+        Role="owner", Email="newmember@example.com"
+    ))
+    newChatTemplate: Chat = field(default_factory=lambda: Chat(
+        ID="new-chat-001", Type=ChatType.GROUP, IsHidden=False, Topic="New Chat Topic"
+    ))
+    updatedGroupChatTopic: str = "Updated Chat Topic"
+
+    def __init__(self) -> None:
+        # --- Teams ---
         self.teams = [
-            Team(
-                ID="team-123-abc",
-                DisplayName="Test Team",
-                Description="A team for testing",
-                IsArchived=False,
-                Visibility="private",
-            ),
-            Team(
-                ID="team-456-def",
-                DisplayName="Another Team",
-                Description="Another team for testing",
-                IsArchived=False,
-                Visibility="public",
-            ),
-            Team(
-                ID="archived-team-789-ghi",
-                DisplayName="Archived Team",
-                Description="An archived team for testing",
-                IsArchived=True,
-                Visibility="private",
-            )
+            Team(ID="team-123-abc", DisplayName="Test Team", Description="A team for testing", IsArchived=False, Visibility="private"),
+            Team(ID="team-456-def", DisplayName="Another Team", Description="Another team for testing", IsArchived=False, Visibility="public"),
+            Team(ID="archived-team-789-ghi", DisplayName="Archived Team", Description="An archived team for testing", IsArchived=True, Visibility="private")
         ]
+        self.potentialTeams = []
+
+        # --- Channels ---
         self.channels = {
             "team-123-abc": [
-                Channel(
-                    ID="19:123123@thread.tacv2",
-                    Name="Something",
-                    IsGeneral=False,
-                ),
-                Channel(
-                    ID="19:999999@thread.tacv2",
-                    Name="Development",
-                    IsGeneral=False,
-                ),
+                Channel(ID="19:123123@thread.tacv2", Name="Something", IsGeneral=False),
+                Channel(ID="19:999999@thread.tacv2", Name="Development", IsGeneral=False),
             ],
         }
+
+        # --- Messages (Channel) ---
         self.messages = {
             "19:123123@thread.tacv2": [
-                Message(
-                    ID="msg-001",
-                    Content="Hello, team!",
-                    ContentType="text",
-                    From=MessageFrom(
-                        UserID="user-123-abc",
-                        DisplayName="Alice"
-                    ),
-                    CreatedDateTime="2024-01-01T10:00:00Z",
-                    ReplyCount=0,
-                ),
-                Message(
-                    ID="msg-002",
-                    Content="Don't forget the meeting at 3 PM.",
-                    ContentType="text",
-                    From=MessageFrom(
-                        UserID="user-456-def",
-                        DisplayName="Bob"
-                    ),
-                    CreatedDateTime="2024-01-01T11:00:00Z",
-                    ReplyCount=2,
-                ),
+                Message(ID="msg-001", Content="Hello, team!", ContentType="text", From=MessageFrom(UserID="user-123-abc", DisplayName="Alice"), CreatedDateTime="2024-01-01T10:00:00Z", ReplyCount=0),
+                Message(ID="msg-002", Content="Don't forget the meeting at 3 PM.", ContentType="text", From=MessageFrom(UserID="user-456-def", DisplayName="Bob"), CreatedDateTime="2024-01-01T11:00:00Z", ReplyCount=2),
             ],
         }
+
+        # --- Replies ---
         self.replies = {
             "msg-002": [
-                Message(
-                    ID="msg-002-reply-001",
-                    Content="Thanks for the reminder!",
-                    ContentType="text",
-                    From=MessageFrom(
-                        UserID="user-789-ghi",
-                        DisplayName="Charlie"
-                    ),
-                    CreatedDateTime="2024-01-01T12:00:00Z",
-                    ReplyCount=0,
-                ),
-                Message(
-                    ID="msg-002-reply-002",
-                    Content="I'll be there.",
-                    ContentType="text",
-                    From=MessageFrom(
-                        UserID="user-123-abc",
-                        DisplayName="Alice"
-                    ),
-                    CreatedDateTime="2024-01-01T12:30:00Z",
-                    ReplyCount=0,
-                ),
+                Message(ID="msg-002-reply-001", Content="Thanks for the reminder!", ContentType="text", From=MessageFrom(UserID="user-789-ghi", DisplayName="Charlie"), CreatedDateTime="2024-01-01T12:00:00Z", ReplyCount=0),
+                Message(ID="msg-002-reply-002", Content="I'll be there.", ContentType="text", From=MessageFrom(UserID="user-123-abc", DisplayName="Alice"), CreatedDateTime="2024-01-01T12:30:00Z", ReplyCount=0),
             ],
         }
+
+        # --- Members (Channel) ---
         self.members = {
             "team-123-abc": {
                 "19:123123@thread.tacv2": [
-                    Member(
-                        ID="user-123-abc",
-                        UserID="user-123-abc",
-                        DisplayName="Alice",
-                        Role="owner",
-                        Email="alice@example.com"
-                    ),
-                    Member(
-                        ID="user-456-def",
-                        UserID="user-456-def",
-                        DisplayName="Bob",
-                        Role="member",
-                        Email="bob@example.com"
-                    ),
+                    Member(ID="user-123-abc", UserID="user-123-abc", DisplayName="Alice", Role="owner", Email="alice@example.com"),
+                    Member(ID="user-456-def", UserID="user-456-def", DisplayName="Bob", Role="member", Email="bob@example.com"),
                 ],
             }
         }
-        self.group_chat_members = {
-            "chat-123-abc": [
-                Member(
-                    ID="user-123-abc",
-                    UserID="user-123-abc",
-                    DisplayName="Alice",
-                    Role="owner",
-                    Email="alice@example.com"
-                ),
-                Member(
-                    ID="user-456-def",
-                    UserID="user-456-def",
-                    DisplayName="Bob",
-                    Role="member",
-                    Email="bob@example.com"
-                ),
-            ],
-        }
-        self.chat_messages = {
-            "chat-123-abc": [
-                Message(
-                    ID="msg-001",
-                    Content="Hello, team!",
-                    ContentType="text",
-                    From=MessageFrom(
-                        UserID="user-123-abc",
-                        DisplayName="Alice"
-                    ),
-                    CreatedDateTime="2024-01-01T10:00:00Z",
-                    ReplyCount=0,
-                ),
-                Message(
-                    ID="msg-002",
-                    Content="Don't forget the meeting at 3 PM.",
-                    ContentType="text",
-                    From=MessageFrom(
-                        UserID="user-456-def",
-                        DisplayName="Bob"
-                    ),
-                    CreatedDateTime="2024-01-01T11:00:00Z",
-                    ReplyCount=2,
-                ),
-            ],
-        }
+
+        # --- Users ---
         self.users = [
-            Member(
-                ID="user-123-abc",
-                UserID="user-123-abc",
-                DisplayName="Alice",
-                Role="owner",
-                Email="alice@example.com"
-            ),
-            Member(
-                ID="user-456-def",
-                UserID="user-456-def",
-                DisplayName="Bob",
-                Role="member",
-                Email="bob@example.com"
-            ),
+            Member(ID="user-123-abc", UserID="user-123-abc", DisplayName="Alice", Role="owner", Email="alice@example.com"),
+            Member(ID="user-456-def", UserID="user-456-def", DisplayName="Bob", Role="member", Email="bob@example.com"),
         ]
-        self.me = Member(
-            ID="user-me-001",
-            UserID="user-me-001",
-            DisplayName="Current User",
-            Role="member",
-            Email="me@example.com"
-        )
+        self.me = Member(ID="user-me-001", UserID="user-me-001", DisplayName="Current User", Role="member", Email="me@example.com")
+
+        # --- Chats & Chat Members/Messages ---
         self.group_chats = [
-            Chat(
-                ID="chat-123-abc",
-                Type=ChatType.GROUP,
-                IsHidden=False,
-                Topic="Project Discussion",
-            ),
-            Chat(
-                ID="chat-456-def",
-                Type=ChatType.GROUP,
-                IsHidden=True,
-                Topic="Secret Plans",
-            ),
+            Chat(ID="chat-123-abc", Type=ChatType.GROUP, IsHidden=False, Topic="Project Discussion"),
+            Chat(ID="chat-456-def", Type=ChatType.GROUP, IsHidden=True, Topic="Secret Plans"),
         ]
         self.oneonone_chats = [
-            Chat(
-                ID="chat-789-ghi",
-                Type=ChatType.ONEONONE,
-                IsHidden=False,
-                Topic="",
-            ),
+            Chat(ID="chat-789-ghi", Type=ChatType.ONEONONE, IsHidden=False, Topic=""),
         ]
+
+        self.group_chat_members = {
+            "chat-123-abc": [
+                Member(ID="user-123-abc", UserID="user-123-abc", DisplayName="Alice", Role="owner", Email="alice@example.com"),
+                Member(ID="user-456-def", UserID="user-456-def", DisplayName="Bob", Role="member", Email="bob@example.com"),
+            ],
+        }
+
+        self.chat_messages = {
+            "chat-123-abc": [
+                Message(ID="msg-001", Content="Hello, team!", ContentType="text", From=MessageFrom(UserID="user-123-abc", DisplayName="Alice"), CreatedDateTime="2024-01-01T10:00:00Z", ReplyCount=0),
+                Message(ID="msg-002", Content="Don't forget the meeting at 3 PM.", ContentType="text", From=MessageFrom(UserID="user-456-def", DisplayName="Bob"), CreatedDateTime="2024-01-01T11:00:00Z", ReplyCount=2),
+            ],
+        }
+
+        # --- State Variables ---
         self.newGroupID = "group-789-ghi"
         self.newTeamName = "New Team"
         self.newGroupMailNickname = "new-team-nickname"
         self.newTeamVisibility = "private"
-        self.potentialTeams = []
+
+        # Init Templates (re-assigning to ensure freshness if needed, though default_factory handles it)
         self.newChannelName = "New Channel"
         self.newChannelID = "19:newchannelid@thread.tacv2"
-        self.newMessageTemplate = Message(
-            ID="new-message-id",
-            Content="This is a new message.",
-            ContentType="text",
-            From=MessageFrom(
-                UserID="user-new-001",
-                DisplayName="New User"
-            ),
-            CreatedDateTime="2024-01-02T10:00:00Z",
-            ReplyCount=0,
-        )
-        self.newMemberTemplate = Member(
-            ID="user-new-002",
-            UserID="new-user-002",
-            DisplayName="New Member",
-            Role="owner",
-            Email="newmember@example.com"
-        )
-        self.newChatTemplate = Chat(
-            ID="new-chat-001",
-            Type=ChatType.GROUP,
-            IsHidden=False,
-            Topic="New Chat Topic"
-        )
         self.updatedGroupChatTopic = "Updated Chat Topic"
 
+        # Initialize templates manually to match original structure exactly if factories behave differently
+        self.newMessageTemplate = Message(
+            ID="new-message-id", Content="This is a new message.", ContentType="text",
+            From=MessageFrom(UserID="user-new-001", DisplayName="New User"),
+            CreatedDateTime="2024-01-02T10:00:00Z", ReplyCount=0
+        )
+        self.newMemberTemplate = Member(
+            ID="user-new-002", UserID="new-user-002", DisplayName="New Member",
+            Role="owner", Email="newmember@example.com"
+        )
+        self.newChatTemplate = Chat(
+            ID="new-chat-001", Type=ChatType.GROUP, IsHidden=False, Topic="New Chat Topic"
+        )
 
+    # --- Helpers ---
+    def _find_team(self, team_id: str) -> Optional[Team]:
+        return next((t for t in self.teams if t.ID == team_id), None)
 
+    def _find_channel(self, team_id: str, channel_id: str) -> Optional[Channel]:
+        return next((c for c in self.channels.get(team_id, []) if c.ID == channel_id), None)
+
+    # ==========================================
+    #               TEAMS & GROUPS
+    # ==========================================
 
     def get_myJoinedTeams_response(self) -> dict:
         return {
@@ -266,33 +179,20 @@ class FakeServerData:
             ],
         }
 
-    def get_listChannels_response(self, team_id: str) -> dict:
-        return {
-            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/channels",
-            "value": [
-                {
-                    "@odata.type": "#microsoft.graph.channel",
-                    "id": channel.ID,
-                    "displayName": channel.Name,
-                    "isGeneral": channel.IsGeneral,
-                    "membershipType": "standard",
-                    "email": ""
-                }
-                for channel in self.channels.get(team_id, [])
-            ],
-        }
-
-    def get_team_response(self, team_id: str) -> dict | None:
+    def get_team_response(self, team_id: str) -> Optional[dict]:
+        team = self._find_team(team_id)
+        if not team:
+            return None
         return {
             "id": team.ID,
             "displayName": team.DisplayName,
             "description": team.Description,
             "isArchived": team.IsArchived,
             "visibility": team.Visibility,
-        } if (team := next((t for t in self.teams if t.ID == team_id), None)) else None
+        }
 
-    def get_updateTeam_response(self, team_id: str, update_json: dict) -> dict | None:
-        team = next((t for t in self.teams if t.ID == team_id), None)
+    def get_updateTeam_response(self, team_id: str, update_json: dict) -> Optional[dict]:
+        team = self._find_team(team_id)
         if not team:
             return None
 
@@ -312,7 +212,7 @@ class FakeServerData:
         }
 
     def get_createGroup_response(self, request_json: dict) -> dict:
-        visibility = request_json.get("visibility").lower()
+        visibility = request_json.get("visibility", "").lower()
         if visibility not in ("private", "public"):
             visibility = "private"
 
@@ -364,31 +264,26 @@ class FakeServerData:
         )
         self.teams.append(new_team)
 
-        return {
-            "id": new_team_id,
-        }
+        return {"id": new_team_id}
 
     def get_archiveTeam_response(self, team_id: str) -> dict:
-        team = next((t for t in self.teams if t.ID == team_id), None)
+        team = self._find_team(team_id)
         if not team:
             return {"success": False}
-
         team.IsArchived = True
         return {"success": True}
 
     def get_unarchiveTeam_response(self, team_id: str) -> dict:
-        team = next((t for t in self.teams if t.ID == team_id), None)
+        team = self._find_team(team_id)
         if not team:
             return {"success": False}
-
         team.IsArchived = False
         return {"success": True}
 
     def get_deleteTeam_response(self, team_id: str) -> dict:
-        team = next((t for t in self.teams if t.ID == team_id), None)
+        team = self._find_team(team_id)
         if not team:
             return {"success": False}
-
         self.teams.remove(team)
         return {"success": True}
 
@@ -407,11 +302,30 @@ class FakeServerData:
             "mailNickname": self.newGroupMailNickname
         }
 
-    def get_channel_response(self, team_id: str, channel_id: str) -> dict | None:
-        channel = next((c for c in self.channels.get(team_id, []) if c.ID == channel_id), None)
+    # ==========================================
+    #                 CHANNELS
+    # ==========================================
+
+    def get_listChannels_response(self, team_id: str) -> dict:
+        return {
+            ODATA_CONTEXT: f"{GRAPH_URL}#teams('{team_id}')/channels",
+            "value": [
+                {
+                    ODATA_TYPE: "#microsoft.graph.channel",
+                    "id": channel.ID,
+                    "displayName": channel.Name,
+                    "isGeneral": channel.IsGeneral,
+                    "membershipType": "standard",
+                    "email": ""
+                }
+                for channel in self.channels.get(team_id, [])
+            ],
+        }
+
+    def get_channel_response(self, team_id: str, channel_id: str) -> Optional[dict]:
+        channel = self._find_channel(team_id, channel_id)
         if not channel:
             return None
-
         return {
             "id": channel.ID,
             "displayName": channel.Name,
@@ -430,7 +344,6 @@ class FakeServerData:
 
         if team_id not in self.channels:
             self.channels[team_id] = []
-
         self.channels[team_id].append(new_channel)
 
         return {
@@ -442,28 +355,15 @@ class FakeServerData:
         }
 
     def get_delete_channel_response(self, team_id: str, channel_id: str) -> dict:
-        channel = next((c for c in self.channels.get(team_id, []) if c.ID == channel_id), None)
+        channel = self._find_channel(team_id, channel_id)
         if not channel:
             return {"success": False}
-
         self.channels[team_id].remove(channel)
         return {"success": True}
 
-    def get_send_message_response(self, team_id: str, channel_id: str, request_json: dict) -> dict:
-        return {
-            "id": self.newMessageTemplate.ID,
-            "body": {
-                "content": request_json.get("body", {}).get("content"),
-                "contentType": request_json.get("body", {}).get("contentType"),
-            },
-            "from": {
-                "user": {
-                    "id": self.newMessageTemplate.From.UserID,
-                    "displayName": self.newMessageTemplate.From.DisplayName,
-                }
-            },
-            "createdDateTime": self.newMessageTemplate.CreatedDateTime,
-        }
+    # ==========================================
+    #             MESSAGES (CHANNEL)
+    # ==========================================
 
     def get_list_messages_response(self, team_id: str, channel_id: str) -> dict:
         return {
@@ -487,7 +387,7 @@ class FakeServerData:
             ],
         }
 
-    def get_message_response(self, team_id: str, channel_id: str, message_id: str) -> dict | None:
+    def get_message_response(self, team_id: str, channel_id: str, message_id: str) -> Optional[dict]:
         message = next((m for m in self.messages.get(channel_id, []) if m.ID == message_id), None)
         if not message:
             return None
@@ -506,6 +406,22 @@ class FakeServerData:
             },
             "createdDateTime": message.CreatedDateTime,
             "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
+        }
+
+    def get_send_message_response(self, team_id: str, channel_id: str, request_json: dict) -> dict:
+        return {
+            "id": self.newMessageTemplate.ID,
+            "body": {
+                "content": request_json.get("body", {}).get("content"),
+                "contentType": request_json.get("body", {}).get("contentType"),
+            },
+            "from": {
+                "user": {
+                    "id": self.newMessageTemplate.From.UserID,
+                    "displayName": self.newMessageTemplate.From.DisplayName,
+                }
+            },
+            "createdDateTime": self.newMessageTemplate.CreatedDateTime,
         }
 
     def get_list_replies_response(self, team_id: str, channel_id: str, message_id: str) -> dict:
@@ -529,11 +445,10 @@ class FakeServerData:
             ],
         }
 
-    def get_reply_response(self, team_id: str, channel_id: str, message_id: str, reply_id: str) -> dict | None:
+    def get_reply_response(self, team_id: str, channel_id: str, message_id: str, reply_id: str) -> Optional[dict]:
         reply = next((r for r in self.replies.get(message_id, []) if r.ID == reply_id), None)
         if not reply:
             return None
-
         return {
             "id": reply.ID,
             "body": {
@@ -549,48 +464,16 @@ class FakeServerData:
             "createdDateTime": reply.CreatedDateTime,
         }
 
-    def get_add_member_response(self, team_id: str, request_json: dict) -> dict:
-        roles = []
-        if self.newMemberTemplate.Role == "owner":
-            roles = ["owner"]
-
-        return {
-            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/members/$entity",
-            "@odata.type": "#microsoft.graph.aadUserConversationMember",
-
-            "id": self.newMemberTemplate.ID,
-            "roles": roles,
-            "displayName": self.newMemberTemplate.DisplayName,
-            "userId": self.newMemberTemplate.UserID,
-            "email": self.newMemberTemplate.Email,
-        }
-
-    def get_update_member_role_response(self, team_id: str, channel_id: str, member_id: str, request_json: dict) -> dict | None:
-        channel_members = self.members.get(team_id, {}).get(channel_id, [])
-
-        member = next((m for m in channel_members if m.ID == member_id), None)
-        if not member:
-            return None
-
-        if "roles" in request_json:
-            member.Role = "owner" if "owner" in request_json["roles"] else "member"
-
-        return {
-            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/channels('{channel_id}')/members/$entity",
-            "@odata.type": "#microsoft.graph.aadUserConversationMember",
-            "id": member.ID,
-            "userId": member.UserID,
-            "displayName": member.DisplayName,
-            "roles": [member.Role] if member.Role == "owner" else [],
-            "email": member.Email,
-        }
+    # ==========================================
+    #             MEMBERS (CHANNEL)
+    # ==========================================
 
     def get_list_members_response(self, team_id: str, channel_id: str) -> dict:
         return {
-            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#teams('{team_id}')/channels('{channel_id}')/members",
+            ODATA_CONTEXT: f"{GRAPH_URL}#teams('{team_id}')/channels('{channel_id}')/members",
             "value": [
                 {
-                    "@odata.type": "#microsoft.graph.aadUserConversationMember",
+                    ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
                     "id": member.ID,
                     "userId": member.UserID,
                     "displayName": member.DisplayName,
@@ -601,25 +484,54 @@ class FakeServerData:
             ],
         }
 
+    def get_add_member_response(self, team_id: str, request_json: dict) -> dict:
+        roles = ["owner"] if self.newMemberTemplate.Role == "owner" else []
+        return {
+            ODATA_CONTEXT: f"{GRAPH_URL}#teams('{team_id}')/members/$entity",
+            ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
+            "id": self.newMemberTemplate.ID,
+            "roles": roles,
+            "displayName": self.newMemberTemplate.DisplayName,
+            "userId": self.newMemberTemplate.UserID,
+            "email": self.newMemberTemplate.Email,
+        }
+
+    def get_update_member_role_response(self, team_id: str, channel_id: str, member_id: str, request_json: dict) -> Optional[dict]:
+        channel_members = self.members.get(team_id, {}).get(channel_id, [])
+        member = next((m for m in channel_members if m.ID == member_id), None)
+        if not member:
+            return None
+
+        if "roles" in request_json:
+            member.Role = "owner" if "owner" in request_json["roles"] else "member"
+
+        return {
+            ODATA_CONTEXT: f"{GRAPH_URL}#teams('{team_id}')/channels('{channel_id}')/members/$entity",
+            ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
+            "id": member.ID,
+            "userId": member.UserID,
+            "displayName": member.DisplayName,
+            "roles": [member.Role] if member.Role == "owner" else [],
+            "email": member.Email,
+        }
+
     def get_remove_member_response(self, team_id: str, channel_id: str, member_id: str) -> dict:
         channel_members = self.members.get(team_id, {}).get(channel_id, [])
-
         member = next((m for m in channel_members if m.ID == member_id), None)
         if not member:
             return {"success": False}
-
         channel_members.remove(member)
         return {"success": True}
 
-    def get_list_chats_response(self, chat_type: ChatType) -> dict:
-        if chat_type == ChatType.ONEONONE:
-            chats = self.oneonone_chats
-        else:
-            chats = self.group_chats
+    # ==========================================
+    #                 CHATS
+    # ==========================================
 
+    def get_list_chats_response(self, chat_type: ChatType) -> dict:
+        chats = self.oneonone_chats if chat_type == ChatType.ONEONONE else self.group_chats
         return {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats",
-            "@odata.count": len(chats),
+            ODATA_CONTEXT: f"{GRAPH_URL}#chats",
+            ODATA_COUNT: len(chats),
             "value": [
                 {
                     "id": chat.ID,
@@ -631,54 +543,41 @@ class FakeServerData:
             ],
         }
 
-    def get_me_response(self) -> dict:
-        return {
-            "id": self.me.ID,
-            "displayName": self.me.DisplayName,
-            "email": self.me.Email,
-        }
-
     def get_create_chat_response(self, request_json: dict) -> dict:
-        if request_json["chatType"] == "oneOnOne":
-            return {
-                "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats/$entity",
-                "id": self.newChatTemplate.ID,
-                "chatType": "oneOnOne",
-                "isHiddenForAllMembers": self.newChatTemplate.IsHidden,
-                "topic": None,
-            }
-        else:
-            return {
-                "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats/$entity",
-                "id": self.newChatTemplate.ID,
-                "chatType": "group",
-                "isHiddenForAllMembers": self.newChatTemplate.IsHidden,
-                "topic": self.newChatTemplate.Topic,
-            }
+        is_one_on_one = request_json["chatType"] == "oneOnOne"
+        response = {
+            ODATA_CONTEXT: f"{GRAPH_URL}#chats/$entity",
+            "id": self.newChatTemplate.ID,
+            "chatType": "oneOnOne" if is_one_on_one else "group",
+            "isHiddenForAllMembers": self.newChatTemplate.IsHidden,
+            "topic": None if is_one_on_one else self.newChatTemplate.Topic,
+        }
+        return response
 
+    def get_update_group_chat_topic_response(self, chat_id: str, request_json: dict) -> dict:
+        chat = next((c for c in self.group_chats if c.ID == chat_id), None)
+        if not chat:
+            return {}
 
-    def get_add_member_to_group_chat_response(self, chat_id: str, request_json: dict) -> dict:
+        chat.Topic = request_json.get("topic", chat.Topic)
         return {
-            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#chats('{chat_id}')/members/$entity",
-            "@odata.type": "#microsoft.graph.aadUserConversationMember",
-            "id": self.newMemberTemplate.ID,
-            "roles": [self.newMemberTemplate.Role] if self.newMemberTemplate.Role == "owner" else [],
-            "displayName": self.newMemberTemplate.DisplayName,
-            "userId": self.newMemberTemplate.UserID,
-            "email": self.newMemberTemplate.Email,
+            ODATA_CONTEXT: f"{GRAPH_URL}#chats('{chat_id}')",
+            "id": chat.ID,
+            "chatType": "group",
+            "isHiddenForAllMembers": chat.IsHidden,
+            "topic": chat.Topic,
         }
 
-    def get_remove_member_from_group_chat_response(self, chat_id: str, member_id: str) -> dict:
-        return {
-            "success": True
-        }
+    # ==========================================
+    #           CHAT MEMBERS
+    # ==========================================
 
     def get_list_group_chat_members_response(self, chat_id: str) -> dict:
         return {
-            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#chats('{chat_id}')/members",
+            ODATA_CONTEXT: f"{GRAPH_URL}#chats('{chat_id}')/members",
             "value": [
                 {
-                    "@odata.type": "#microsoft.graph.aadUserConversationMember",
+                    ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
                     "id": member.ID,
                     "userId": member.UserID,
                     "displayName": member.DisplayName,
@@ -689,20 +588,23 @@ class FakeServerData:
             ],
         }
 
-    def get_update_group_chat_topic_response(self, chat_id: str, request_json: dict) -> dict:
-        chat = next((c for c in self.group_chats if c.ID == chat_id), None)
-        if not chat:
-            return {}
-
-        chat.Topic = request_json.get("topic", chat.Topic)
-
+    def get_add_member_to_group_chat_response(self, chat_id: str, request_json: dict) -> dict:
         return {
-            "@odata.context": f"https://graph.microsoft.com/v1.0/$metadata#chats('{chat_id}')",
-            "id": chat.ID,
-            "chatType": "group",
-            "isHiddenForAllMembers": chat.IsHidden,
-            "topic": chat.Topic,
+            ODATA_CONTEXT: f"{GRAPH_URL}#chats('{chat_id}')/members/$entity",
+            ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
+            "id": self.newMemberTemplate.ID,
+            "roles": [self.newMemberTemplate.Role] if self.newMemberTemplate.Role == "owner" else [],
+            "displayName": self.newMemberTemplate.DisplayName,
+            "userId": self.newMemberTemplate.UserID,
+            "email": self.newMemberTemplate.Email,
         }
+
+    def get_remove_member_from_group_chat_response(self, chat_id: str, member_id: str) -> dict:
+        return {"success": True}
+
+    # ==========================================
+    #           CHAT MESSAGES
+    # ==========================================
 
     def get_list_messages_in_chat_response(self, chat_id: str) -> dict:
         return {
@@ -726,23 +628,7 @@ class FakeServerData:
             ],
         }
 
-    def get_send_message_in_chat_response(self, chat_id: str, request_json: dict) -> dict:
-        return {
-            "id": self.newMessageTemplate.ID,
-            "body": {
-                "content": request_json.get("body", {}).get("content"),
-                "contentType": request_json.get("body", {}).get("contentType"),
-            },
-            "from": {
-                "user": {
-                    "id": self.newMessageTemplate.From.UserID,
-                    "displayName": self.newMessageTemplate.From.DisplayName,
-                }
-            },
-            "createdDateTime": self.newMessageTemplate.CreatedDateTime,
-        }
-
-    def get_get_message_in_chat_response(self, chat_id: str, message_id: str) -> dict | None:
+    def get_get_message_in_chat_response(self, chat_id: str, message_id: str) -> Optional[dict]:
         message = next((m for m in self.chat_messages.get(chat_id, []) if m.ID == message_id), None)
         if not message:
             return None
@@ -763,17 +649,34 @@ class FakeServerData:
             "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
         }
 
-    def get_all_messeges_in_chats_response(self) -> dict:
+    def get_send_message_in_chat_response(self, chat_id: str, request_json: dict) -> dict:
         return {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(chatMessage)",
-            "@odata.count": len(self.chat_messages),
+            "id": self.newMessageTemplate.ID,
+            "body": {
+                "content": request_json.get("body", {}).get("content"),
+                "contentType": request_json.get("body", {}).get("contentType"),
+            },
+            "from": {
+                "user": {
+                    "id": self.newMessageTemplate.From.UserID,
+                    "displayName": self.newMessageTemplate.From.DisplayName,
+                }
+            },
+            "createdDateTime": self.newMessageTemplate.CreatedDateTime,
+        }
+
+    def get_all_messeges_in_chats_response(self) -> dict:
+        target_chat_id = self.group_chats[0].ID
+        return {
+            ODATA_CONTEXT: f"{GRAPH_URL}#Collection(chatMessage)",
+            ODATA_COUNT: len(self.chat_messages),
             "value": [
                 {
-                    "@odata.type": "#microsoft.graph.chatMessage",
+                    ODATA_TYPE: "#microsoft.graph.chatMessage",
                     "id": message.ID,
                     "etag": message.ID,
                     "messageType": "message",
-                    "chatId": self.group_chats[0].ID,
+                    "chatId": target_chat_id,
                     "body": {
                         "content": message.Content,
                         "contentType": message.ContentType,
@@ -787,7 +690,7 @@ class FakeServerData:
                     "createdDateTime": message.CreatedDateTime,
                     "lastModifiedDateTime": message.CreatedDateTime,
                 }
-                for message in self.chat_messages[self.group_chats[0].ID]
+                for message in self.chat_messages[target_chat_id]
             ],
         }
 
@@ -795,10 +698,20 @@ class FakeServerData:
         return {
             "value": [
                 {
-                    "@odata.type": "#microsoft.graph.pinnedChatMessageInfo",
+                    ODATA_TYPE: "#microsoft.graph.pinnedChatMessageInfo",
                     "id": message.ID,
                 }
                 for message in self.chat_messages.get(chat_id, [])
             ],
         }
 
+    # ==========================================
+    #                 USERS
+    # ==========================================
+
+    def get_me_response(self) -> dict:
+        return {
+            "id": self.me.ID,
+            "displayName": self.me.DisplayName,
+            "email": self.me.Email,
+        }

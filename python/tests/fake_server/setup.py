@@ -39,6 +39,10 @@ def setup_fake_server(httpserver) -> FakeServerData:
             status=status_code
         )
 
+    # ==========================================
+    #                 USERS
+    # ==========================================
+
     # GET /users/me/joinedTeams
     httpserver.expect_request(
         "/v1.0/users/me-token-to-replace/joinedTeams", method="GET"
@@ -46,7 +50,7 @@ def setup_fake_server(httpserver) -> FakeServerData:
         req, data.get_myJoinedTeams_response(), "List Joined Teams"
     ))
 
-    #GET /users/me/chats/getAllMessages()
+    # GET /users/me/chats/getAllMessages()
     httpserver.expect_request(
         "/v1.0/users/me-token-to-replace/chats/getAllMessages()",
         method="GET"
@@ -56,30 +60,22 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "List All Chat Messages"
     ))
 
-    #GET /chats/{chat_id}/pinnedMessages
+    # GET users/me/chats/{chat_id}/messages
     httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages"),
+        re.compile(r"^/v1.0/users/me-token-to-replace/chats/([^/]+)/messages"),
         method="GET"
     ).respond_with_handler(lambda req: make_log_response(
         req,
-        data.get_list_pinned_messages_in_chat_response(
-            re.search(r"/chats/([^/]+)/pinnedMessages", req.path).group(1)
+        data.get_list_messages_in_chat_response(
+            re.search(r"/users/me-token-to-replace/chats/([^/]+)/messages", req.path).group(1)
         ),
-        "List Pinned Chat Messages"
+        "List Chat Messages (me)"
     ))
 
-    # POST /chats/{chat_id}/pinnedMessages
+    # DELETE users/me/chats/{chat_id}/messages/{message_id}/softDelete
     httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages"),
+        re.compile(r"/v1.0/users/[^/]+/chats/[^/]+/messages/[^/]+/softDelete"),
         method="POST"
-    ).respond_with_response(
-        Response(status=204)
-    )
-
-    # DELETE /chats/{chat_id}/pinnedMessages/{message_id}
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages/([^/]+)"),
-        method="DELETE"
     ).respond_with_response(
         Response(status=204)
     )
@@ -103,46 +99,6 @@ def setup_fake_server(httpserver) -> FakeServerData:
             f"List Chats ({chat_type})"
         )
 
-
-
-
-    #GET /chats/{chat_id}/messages/{message_id}
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/messages/([^/]+)"),
-        method="GET"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_get_message_in_chat_response(
-            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(1),
-            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(2)
-        ),
-        "Get Chat Message"
-    ))
-
-    #GET /chats/{chat_id}/messages
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/messages"),
-        method="GET"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_list_messages_in_chat_response(
-            re.search(r"/chats/([^/]+)/messages", req.path).group(1)
-        ),
-        "List Chat Messages"
-    ))
-
-    #GET users/me/chats/{chat_id}/messages
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/users/me-token-to-replace/chats/([^/]+)/messages"),
-        method="GET"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_list_messages_in_chat_response(
-            re.search(r"/users/me-token-to-replace/chats/([^/]+)/messages", req.path).group(1)
-        ),
-        "List Chat Messages (me)"
-    ))
-
     # GET /users/me/chats
     httpserver.expect_request(
         "/v1.0/users/me-token-to-replace/chats",
@@ -159,90 +115,11 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Get Users"
     ))
 
-    #POST /chats
-    httpserver.expect_request(
-        "/v1.0/chats",
-        method="POST"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_create_chat_response(req.json),
-        "Create Chat"
-    ))
+    # ==========================================
+    #                 TEAMS
+    # ==========================================
 
-    #GET /chats/{chat_id}/members
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/members"),
-        method="GET"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_list_group_chat_members_response(
-            re.search(r"/chats/([^/]+)/members", req.path).group(1)
-        ),
-        "List Chat Members"
-    ))
-
-    #POST /chats/{chat_id}/members
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/members"),
-        method="POST"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_add_member_to_group_chat_response(
-            re.search(r"/chats/([^/]+)/members", req.path).group(1),
-            req.json
-        ),
-        "Add Chat Member"
-    ))
-
-    #DELETE /chats/{chat_id}/members/{member_id}
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/members/([^/]+)"),
-        method="DELETE"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_remove_member_from_group_chat_response(
-            re.search(r"/chats/([^/]+)/members/([^/]+)", req.path).group(1),
-            re.search(r"/chats/([^/]+)/members/([^/]+)", req.path).group(2)
-        ),
-        "Remove Chat Member"
-    ))
-
-    #PATCH /chats/{chat_id}
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)"),
-        method="PATCH"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_update_group_chat_topic_response(
-            re.search(r"/chats/([^/]+)", req.path).group(1),
-            req.json
-        ),
-        "Update Chat"
-    ))
-
-    #POST /chats/{chat_id}/messages
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/messages"),
-        method="POST"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_send_message_in_chat_response(
-            re.search(r"/chats/([^/]+)/messages", req.path).group(1),
-            req.json
-        ),
-        "Send Chat Message"
-    ))
-
-    #DELETE users/me/chats/{chat_id}/messages/{message_id}/softDelete
-    httpserver.expect_request(
-        re.compile(r"/v1.0/users/[^/]+/chats/[^/]+/messages/[^/]+/softDelete"),
-        method="POST"
-    ).respond_with_response(
-        Response(status=204)
-    )
-
-
-    #POST /teams/{team_id}/channels/{channel_id}/members
+    # POST /teams/{id}/channels/{channel_id}/members
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members"),
         method="POST"
@@ -254,7 +131,6 @@ def setup_fake_server(httpserver) -> FakeServerData:
         ),
         "Add member to channel"
     ))
-
 
     # PATCH /teams/{tid}/channels/{cid}/members/{mid}
     httpserver.expect_request(
@@ -285,7 +161,7 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Remove Member from Channel"
     ))
 
-    #GET /teams/{team_id}/channels/{channel_id}/members
+    # GET /teams/{team_id}/channels/{channel_id}/members
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/members"),
         method="GET"
@@ -297,22 +173,6 @@ def setup_fake_server(httpserver) -> FakeServerData:
         ),
         "List channel members"
     ))
-
-
-    #POST /teams/{team_id}/channels/{channel_id}/messages
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages"),
-        method="POST"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_send_message_response(
-            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(1),
-            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(2),
-            req.json
-        ),
-        "Create Channel Message"
-    ))
-
 
     # GET /teams/{team_id}/channels/{channel_id}/messages/{message_id}/replies/{reply_id}
     httpserver.expect_request(
@@ -357,6 +217,20 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Get Channel Message"
     ))
 
+    # POST /teams/{team_id}/channels/{channel_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_send_message_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(2),
+            req.json
+        ),
+        "Create Channel Message"
+    ))
+
     # GET /teams/{team_id}/channels/{channel_id}/messages
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)/messages"),
@@ -368,6 +242,19 @@ def setup_fake_server(httpserver) -> FakeServerData:
             re.search(r"/teams/([^/]+)/channels/([^/]+)/messages", req.path).group(2)
         ),
         "List Channel Messages"
+    ))
+
+    # DELETE /teams/{team_id}/channels/{channel_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)"),
+        method="DELETE"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_delete_channel_response(
+            re.search(r"/teams/([^/]+)/channels/([^/]+)", req.path).group(1),
+            re.search(r"/teams/([^/]+)/channels/([^/]+)", req.path).group(2)
+        ),
+        "Delete Channel (DELETE)"
     ))
 
     # GET /teams/{team_id}/channels/{channel_id}
@@ -383,6 +270,19 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Get Channel Details"
     ))
 
+    # POST /teams/{id}/channels
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)/channels"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_create_channel_response(
+            re.search(r"/teams/([^/]+)/channels", req.path).group(1),
+            req.json
+        ),
+        "Create Channel (POST)"
+    ))
+
     # GET /teams/{id}/channels
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)/channels"),
@@ -391,59 +291,6 @@ def setup_fake_server(httpserver) -> FakeServerData:
         req,
         data.get_listChannels_response(re.search(r"/teams/([^/]+)/channels", req.path).group(1)),
         "List Channels"
-    ))
-
-    # POST /groups
-    httpserver.expect_request(
-        "/v1.0/groups",
-        method="POST"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_createGroup_response(req.json),
-        "Create Group"
-    ))
-
-    # PUT /groups/{id}/team
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/groups/([^/]+)/team"),
-        method="PUT"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_createTeamViaGroup_response(re.search(r"/groups/([^/]+)/team", req.path).group(1)),
-        "Teamify Group (PUT)"
-    ))
-
-    # GET /teams/{id}
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/teams/([^/]+)(?:$|\?)"),
-        method="GET"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_team_response(re.search(r"/teams/([^/?]+)", req.path).group(1)),
-        "Get Team Details"
-    ))
-
-    # PATCH /teams/{id}
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/teams/([^/]+)"),
-        method="PATCH"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_updateTeam_response(
-            re.search(r"/teams/([^/]+)", req.path).group(1),
-            req.json
-        ),
-        "Update Team (PATCH)"
-    ))
-
-    # POST /teams
-    httpserver.expect_request(
-        "/v1.0/teams",
-        method="POST"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_createTeamFromTemplate_response(req.json),
-        "Create Team from Template (POST)"
     ))
 
     # POST /teams/{id}/archive
@@ -466,7 +313,54 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Unarchive Team (POST)"
     ))
 
-    # DELETE /teams/{id}/delete
+    # PATCH /teams/{id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)"),
+        method="PATCH"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_updateTeam_response(
+            re.search(r"/teams/([^/]+)", req.path).group(1),
+            req.json
+        ),
+        "Update Team (PATCH)"
+    ))
+
+    # GET /teams/{id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/teams/([^/]+)(?:$|\?)"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_team_response(re.search(r"/teams/([^/?]+)", req.path).group(1)),
+        "Get Team Details"
+    ))
+
+    # POST /teams
+    httpserver.expect_request(
+        "/v1.0/teams",
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_createTeamFromTemplate_response(req.json),
+        "Create Team from Template (POST)"
+    ))
+
+    # ==========================================
+    #                 GROUPS
+    # ==========================================
+
+    # PUT /groups/{id}/team
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/groups/([^/]+)/team"),
+        method="PUT"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_createTeamViaGroup_response(re.search(r"/groups/([^/]+)/team", req.path).group(1)),
+        "Teamify Group (PUT)"
+    ))
+
+    # DELETE /groups/{id} (Delete Team uses group endpoint)
     httpserver.expect_request(
         re.compile(r"^/v1.0/groups/([^/]+)"),
         method="DELETE"
@@ -476,7 +370,21 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Delete Team (DELETE)"
     ))
 
-    # POST /teams/{id}/restore
+    # POST /groups
+    httpserver.expect_request(
+        "/v1.0/groups",
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_createGroup_response(req.json),
+        "Create Group"
+    ))
+
+    # ==========================================
+    #             DIRECTORY / OTHER
+    # ==========================================
+
+    # POST /directory/deletedItems/{id}/restore
     httpserver.expect_request(
         re.compile(r"^/v1.0/directory/deletedItems/([^/]+)/restore"),
         method="POST"
@@ -486,33 +394,136 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Restore Deleted Team (POST)"
     ))
 
-    # POST /teams/{id}/channels
+    # ==========================================
+    #                 CHATS
+    # ==========================================
+
+    # DELETE /chats/{chat_id}/pinnedMessages/{message_id}
     httpserver.expect_request(
-        re.compile(r"^/v1.0/teams/([^/]+)/channels"),
+        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages/([^/]+)"),
+        method="DELETE"
+    ).respond_with_response(
+        Response(status=204)
+    )
+
+    # POST /chats/{chat_id}/pinnedMessages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages"),
         method="POST"
+    ).respond_with_response(
+        Response(status=204)
+    )
+
+    # GET /chats/{chat_id}/pinnedMessages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages"),
+        method="GET"
     ).respond_with_handler(lambda req: make_log_response(
         req,
-        data.get_create_channel_response(
-            re.search(r"/teams/([^/]+)/channels", req.path).group(1),
-            req.json
+        data.get_list_pinned_messages_in_chat_response(
+            re.search(r"/chats/([^/]+)/pinnedMessages", req.path).group(1)
         ),
-        "Create Channel (POST)"
+        "List Pinned Chat Messages"
     ))
 
-    # DELETE /teams/{team_id}/channels/{channel_id}
+    # DELETE /chats/{chat_id}/members/{member_id}
     httpserver.expect_request(
-        re.compile(r"^/v1.0/teams/([^/]+)/channels/([^/]+)"),
+        re.compile(r"^/v1.0/chats/([^/]+)/members/([^/]+)"),
         method="DELETE"
     ).respond_with_handler(lambda req: make_log_response(
         req,
-        data.get_delete_channel_response(
-            re.search(r"/teams/([^/]+)/channels/([^/]+)", req.path).group(1),
-            re.search(r"/teams/([^/]+)/channels/([^/]+)", req.path).group(2)
+        data.get_remove_member_from_group_chat_response(
+            re.search(r"/chats/([^/]+)/members/([^/]+)", req.path).group(1),
+            re.search(r"/chats/([^/]+)/members/([^/]+)", req.path).group(2)
         ),
-        "Delete Channel (DELETE)"
+        "Remove Chat Member"
     ))
 
+    # POST /chats/{chat_id}/members
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/members"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_add_member_to_group_chat_response(
+            re.search(r"/chats/([^/]+)/members", req.path).group(1),
+            req.json
+        ),
+        "Add Chat Member"
+    ))
 
+    # GET /chats/{chat_id}/members
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/members"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_group_chat_members_response(
+            re.search(r"/chats/([^/]+)/members", req.path).group(1)
+        ),
+        "List Chat Members"
+    ))
+
+    # GET /chats/{chat_id}/messages/{message_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/messages/([^/]+)"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_get_message_in_chat_response(
+            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(1),
+            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(2)
+        ),
+        "Get Chat Message"
+    ))
+
+    # POST /chats/{chat_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/messages"),
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_send_message_in_chat_response(
+            re.search(r"/chats/([^/]+)/messages", req.path).group(1),
+            req.json
+        ),
+        "Send Chat Message"
+    ))
+
+    # GET /chats/{chat_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/messages"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_messages_in_chat_response(
+            re.search(r"/chats/([^/]+)/messages", req.path).group(1)
+        ),
+        "List Chat Messages"
+    ))
+
+    # PATCH /chats/{chat_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)"),
+        method="PATCH"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_update_group_chat_topic_response(
+            re.search(r"/chats/([^/]+)", req.path).group(1),
+            req.json
+        ),
+        "Update Chat"
+    ))
+
+    # POST /chats
+    httpserver.expect_request(
+        "/v1.0/chats",
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_create_chat_response(req.json),
+        "Create Chat"
+    ))
 
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(
