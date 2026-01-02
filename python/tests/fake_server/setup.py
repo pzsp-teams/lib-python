@@ -4,6 +4,7 @@ import re
 import sys
 from werkzeug.wrappers import Response
 from teams_lib_pzsp2_z1.model.chat import ChatType
+import traceback
 
 def setup_fake_server(httpserver) -> FakeServerData:
     """
@@ -45,6 +46,16 @@ def setup_fake_server(httpserver) -> FakeServerData:
         req, data.get_myJoinedTeams_response(), "List Joined Teams"
     ))
 
+    #GET /users/me/chats/getAllMessages()
+    httpserver.expect_request(
+        "/v1.0/users/me-token-to-replace/chats/getAllMessages()",
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_all_messeges_in_chats_response(),
+        "List All Chat Messages"
+    ))
+
     def handle_chats_request(req):
         filter_param = req.args.get('$filter', '')
         chat_type = None
@@ -65,6 +76,8 @@ def setup_fake_server(httpserver) -> FakeServerData:
             data.get_list_chats_response(chat_type),
             f"List Chats ({chat_type})"
         )
+
+
 
 
     #GET /chats/{chat_id}/messages/{message_id}
