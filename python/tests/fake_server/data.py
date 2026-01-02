@@ -127,6 +127,29 @@ class FakeServerData:
                 ],
             }
         }
+        self.users = [
+            Member(
+                ID="user-123-abc",
+                UserID="user-123-abc",
+                DisplayName="Alice",
+                Role="owner",
+                Email="alice@example.com"
+            ),
+            Member(
+                ID="user-456-def",
+                UserID="user-456-def",
+                DisplayName="Bob",
+                Role="member",
+                Email="bob@example.com"
+            ),
+        ]
+        self.me = Member(
+            ID="user-me-001",
+            UserID="user-me-001",
+            DisplayName="Current User",
+            Role="member",
+            Email="me@example.com"
+        )
         self.group_chats = [
             Chat(
                 ID="chat-123-abc",
@@ -173,6 +196,12 @@ class FakeServerData:
             DisplayName="New Member",
             Role="owner",
             Email="newmember@example.com"
+        )
+        self.newChatTemplate = Chat(
+            ID="new-chat-001",
+            Type=ChatType.GROUP,
+            IsHidden=False,
+            Topic="New Chat Topic"
         )
 
 
@@ -559,5 +588,30 @@ class FakeServerData:
                 for chat in chats
             ],
         }
+
+    def get_me_response(self) -> dict:
+        return {
+            "id": self.me.ID,
+            "displayName": self.me.DisplayName,
+            "email": self.me.Email,
+        }
+
+    def get_create_chat_response(self, request_json: dict) -> dict:
+        if request_json["chatType"] == "oneOnOne":
+            return {
+                "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats/$entity",
+                "id": self.newChatTemplate.ID,
+                "chatType": "oneOnOne",
+                "isHiddenForAllMembers": self.newChatTemplate.IsHidden,
+                "topic": None,
+            }
+        else:
+            return {
+                "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats/$entity",
+                "id": self.newChatTemplate.ID,
+                "chatType": "group",
+                "isHiddenForAllMembers": self.newChatTemplate.IsHidden,
+                "topic": self.newChatTemplate.Topic,
+            }
 
 
