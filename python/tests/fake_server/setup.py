@@ -66,6 +66,30 @@ def setup_fake_server(httpserver) -> FakeServerData:
             f"List Chats ({chat_type})"
         )
 
+    #GET /chats/{chat_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)/messages"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_messages_in_chat_response(
+            re.search(r"/chats/([^/]+)/messages", req.path).group(1)
+        ),
+        "List Chat Messages"
+    ))
+
+    #GET users/me/chats/{chat_id}/messages
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/users/me-token-to-replace/chats/([^/]+)/messages"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_list_messages_in_chat_response(
+            re.search(r"/users/me-token-to-replace/chats/([^/]+)/messages", req.path).group(1)
+        ),
+        "List Chat Messages (me)"
+    ))
+
     # GET /users/me/chats
     httpserver.expect_request(
         "/v1.0/users/me-token-to-replace/chats",
@@ -143,17 +167,7 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Update Chat"
     ))
 
-    #GET /chats/{chat_id}/messages
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/messages"),
-        method="GET"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_list_messages_in_chat_response(
-            re.search(r"/chats/([^/]+)/messages", req.path).group(1)
-        ),
-        "List Chat Messages"
-    ))
+
 
     #POST /chats/{chat_id}/messages
     httpserver.expect_request(
@@ -168,18 +182,13 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Send Chat Message"
     ))
 
-    #DELETE /chats/{chat_id}/messages/{message_id}
+    #DELETE users/me/chats/{chat_id}/messages/{message_id}/softDelete
     httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)/messages/([^/]+)"),
-        method="DELETE"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_delete_message_in_chat_response(
-            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(1),
-            re.search(r"/chats/([^/]+)/messages/([^/]+)", req.path).group(2)
-        ),
-        "Delete Chat Message"
-    ))
+        re.compile(r"/v1.0/users/[^/]+/chats/[^/]+/messages/[^/]+/softDelete"),
+        method="POST"
+    ).respond_with_response(
+        Response(status=204)
+    )
 
     #POST /teams/{team_id}/channels/{channel_id}/members
     httpserver.expect_request(
