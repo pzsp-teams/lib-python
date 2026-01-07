@@ -10,6 +10,7 @@ from teams_lib_pzsp2_z1.model.mention import Mention
 from teams_lib_pzsp2_z1.model.message import (
     Message,
     MessageBody,
+    MessageCollection,
     MessageContentType,
     MessageFrom,
 )
@@ -194,11 +195,18 @@ class ChatsService(BaseService):
             Topic=response["Topic"],
         )
 
-    def list_messages(self, chat_ref: ChatRef) -> list[Message]:
+    def list_messages(
+        self,
+        chat_ref: ChatRef,
+        include_system_messages: bool = False,
+        next_link: str | None = None,
+    ) -> list[Message]:
         """Retrieves messages from a specific chat.
 
         Args:
             chat_ref (ChatRef): The chat reference object containing the ID/Name and ChatType.
+            include_system_messages (bool): If True, includes system-generated messages. Defaults to False.
+            next_link (str | None): A link for pagination to fetch the next set of messages. Defaults to None.
 
         Returns:
             list[Message]: A list of messages from the chat history.
@@ -211,23 +219,28 @@ class ChatsService(BaseService):
                     "ref": chat_ref.Ref,
                     "type": chat_ref.Type.value,
                 },
+                "includeSystem": include_system_messages,
+                "nextLink": next_link,
             },
         )
 
-        return [
-            Message(
-                ID=message["ID"],
-                Content=message["Content"],
-                ContentType=MessageContentType(message["ContentType"]),
-                From=MessageFrom(
-                    UserID=message["From"]["UserID"],
-                    DisplayName=message["From"]["DisplayName"],
-                ),
-                CreatedDateTime=message["CreatedDateTime"],
-                ReplyCount=message["ReplyCount"],
-            )
-            for message in messages
-        ]
+        return MessageCollection(
+            Messages=[
+                Message(
+                    ID=msg["ID"],
+                    Content=msg["Content"],
+                    ContentType=MessageContentType(msg["ContentType"]),
+                    CreatedDateTime=msg["CreatedDateTime"],
+                    From=MessageFrom(
+                        UserID=msg["From"]["UserID"],
+                        DisplayName=msg["From"]["DisplayName"],
+                    ),
+                    ReplyCount=msg["ReplyCount"],
+                )
+                for msg in messages["Messages"]
+            ],
+            NextLink=messages.get("NextLink"),
+        )
 
     def send_message(self, chat_ref: ChatRef, body: MessageBody) -> Message:
         """Sends a message to a chat.
