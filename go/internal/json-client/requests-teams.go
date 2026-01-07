@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pzsp-teams/lib-python/internal/json-client/decoders"
+	"github.com/pzsp-teams/lib/models"
 )
 
 type getTeamParams struct {
@@ -21,14 +22,17 @@ func (c *TeamsJSONClient) ListMyJoined() (interface{}, error) {
 }
 
 type updateTeamParams struct {
-	TeamRef   string                `json:"teamRef"`
-	TeamPatch decoders.TeamPatchDTO `json:"team"`
+	TeamRef    string                 `json:"teamRef"`
+	TeamUpdate decoders.UpdateTeamDTO `json:"team"`
 }
 
 func (c *TeamsJSONClient) UpdateTeam(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params updateTeamParams) (interface{}, error) {
-		msTeam := decoders.GetMSTeam(&params.TeamPatch)
-		return c.client.Teams.Update(context.TODO(), params.TeamRef, msTeam)
+		updateTeam, err := decoders.DecodeParams[models.TeamUpdate](&params.TeamUpdate)
+		if err != nil {
+			return nil, err
+		}
+		return c.client.Teams.UpdateTeam(context.TODO(), params.TeamRef, updateTeam)
 	})
 }
 
@@ -48,11 +52,14 @@ type createFromTemplateParams struct {
 	DisplayName string   `json:"displayName"`
 	Description string   `json:"description"`
 	Owners      []string `json:"owners"`
+	Members     []string `json:"members"`
+	Visibility  string   `json:"visibility"`
+	IncludeMe   bool     `json:"includeMe"`
 }
 
 func (c *TeamsJSONClient) CreateTeamFromTemplate(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params createFromTemplateParams) (interface{}, error) {
-		return c.client.Teams.CreateFromTemplate(context.TODO(), params.DisplayName, params.Description, params.Owners)
+		return c.client.Teams.CreateFromTemplate(context.TODO(), params.DisplayName, params.Description, params.Owners, params.Members, params.Visibility, params.IncludeMe)
 	})
 }
 

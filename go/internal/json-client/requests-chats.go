@@ -14,7 +14,7 @@ type createOneToOneChatParams struct {
 
 func (c *TeamsJSONClient) CreateOneToOneChat(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params createOneToOneChatParams) (interface{}, error) {
-		return c.client.Chats.CreateOneOneOne(context.TODO(), params.RecipientRef)
+		return c.client.Chats.CreateOneOnOne(context.TODO(), params.RecipientRef)
 	})
 }
 
@@ -69,17 +69,19 @@ func (c *TeamsJSONClient) UpdateGroupChatTopic(p map[string]interface{}) (interf
 	})
 }
 
-type baseChatParams struct {
-	ChatRef decoders.ChatRefDTO `json:"chatRef"`
+type listMessagesInChatParams struct {
+	ChatRef       decoders.ChatRefDTO `json:"chatRef"`
+	IncludeSystem bool                `json:"includeSystem"`
+	NextLink      string              `json:"nextLink"`
 }
 
 func (c *TeamsJSONClient) ListMessagesInChat(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params baseChatParams) (interface{}, error) {
+	return execute(p, func(params listMessagesInChatParams) (interface{}, error) {
 		chatRef, err := decoders.GetChatRef(params.ChatRef)
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Chats.ListMessages(context.TODO(), chatRef)
+		return c.client.Chats.ListMessages(context.TODO(), chatRef, params.IncludeSystem, &params.NextLink)
 	})
 }
 
@@ -145,7 +147,7 @@ func (c *TeamsJSONClient) ListMyChats(p map[string]interface{}) (interface{}, er
 type listChatMessagesParams struct {
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
-	Top       *int32    `json:"top"`
+	Top       *int32 `json:"top"`
 }
 
 func (c *TeamsJSONClient) ListMyChatMessages(p map[string]interface{}) (interface{}, error) {
@@ -156,6 +158,10 @@ func (c *TeamsJSONClient) ListMyChatMessages(p map[string]interface{}) (interfac
 		}
 		return c.client.Chats.ListAllMessages(context.TODO(), parsedStartTime, parsedEndTime, params.Top)
 	})
+}
+
+type baseChatParams struct {
+	ChatRef decoders.ChatRefDTO `json:"chatRef"`
 }
 
 func (c *TeamsJSONClient) ListPinnedMessagesInChat(p map[string]interface{}) (interface{}, error) {
