@@ -1,3 +1,7 @@
+"""
+This module contains the service for managing Microsoft Teams chats via the Go backend.
+"""
+
 from datetime import datetime
 
 from teams_lib_pzsp2_z1.model.chat import Chat, ChatRef, ChatType
@@ -13,7 +17,34 @@ from teams_lib_pzsp2_z1.services.base_service import BaseService
 
 
 class ChatsService(BaseService):
+    """Service for managing Microsoft Teams chats via the Go backend.
+
+    This class acts as a high-level wrapper, delegating operations to the
+    underlying Go library. It handles One-on-One chats, Group chats, messages,
+    and membership management.
+
+    **Concepts:**
+    * **Chat Types**: Chats are distinct entities, either **One-on-One** (between two users)
+      or **Group** (multiple users, has a topic).
+    * **References**:
+        * `recipient_ref` / `user_ref`: Can be a User ID (UUID) or an Email.
+        * `group_chat_ref`: Can be the Chat ID or the Group Topic (if unique).
+        * `chat_ref` (Object): A specific model `ChatRef` containing the ID/Name and the `ChatType`.
+    * **Permissions**: Some operations (like `list_all_messages`) require Application Permissions
+      and will not work in Delegated (user context) mode.
+    """
+
     def create_one_on_one(self, recipient_ref: str) -> Chat:
+        """Creates a One-on-One chat with a specific user.
+
+        The authenticated user is automatically added to the chat.
+
+        Args:
+            recipient_ref (str): The reference to the other user (User ID or Email).
+
+        Returns:
+            Chat: The created chat object.
+        """
         response = self.client.execute(
             cmd_type="request",
             method="createOneOnOneChat",
@@ -32,6 +63,16 @@ class ChatsService(BaseService):
     def create_group_chat(
         self, recipient_refs: list[str], topic: str, include_me: bool
     ) -> Chat:
+        """Creates a Group Chat with multiple participants.
+
+        Args:
+            recipient_refs (list[str]): A list of user references (IDs or Emails) to include.
+            topic (str): The subject/topic of the group chat.
+            include_me (bool): If True, the authenticated user is added to the group.
+
+        Returns:
+            Chat: The created group chat object.
+        """
         response = self.client.execute(
             cmd_type="request",
             method="createGroupChat",
@@ -50,6 +91,15 @@ class ChatsService(BaseService):
         )
 
     def add_member_to_group_chat(self, group_chat_ref: str, user_ref: str) -> Member:
+        """Adds a user to an existing Group Chat.
+
+        Args:
+            group_chat_ref (str): The reference to the group chat (ID or Topic).
+            user_ref (str): The user to add (User ID or Email).
+
+        Returns:
+            Member: The newly added member details.
+        """
         member = self.client.execute(
             cmd_type="request",
             method="addMemberToGroupChat",
@@ -70,6 +120,15 @@ class ChatsService(BaseService):
     def remove_member_from_group_chat(
         self, group_chat_ref: str, member_ref: str
     ) -> bool:
+        """Removes a member from a Group Chat.
+
+        Args:
+            group_chat_ref (str): The reference to the group chat (ID or Topic).
+            member_ref (str): The user reference to remove (User ID or Email).
+
+        Returns:
+            bool: True if the member was successfully removed.
+        """
         result = self.client.execute(
             cmd_type="request",
             method="removeMemberFromGroupChat",
@@ -82,6 +141,14 @@ class ChatsService(BaseService):
         return result == "removed"
 
     def list_group_chat_members(self, group_chat_ref: str) -> list[Member]:
+        """Lists all members of a Group Chat.
+
+        Args:
+            group_chat_ref (str): The reference to the group chat (ID or Topic).
+
+        Returns:
+            list[Member]: A list of members in the chat.
+        """
         members = self.client.execute(
             cmd_type="request",
             method="listMembersInGroupChat",
@@ -102,6 +169,15 @@ class ChatsService(BaseService):
         ]
 
     def update_group_chat_topic(self, group_chat_ref: str, new_topic: str) -> Chat:
+        """Updates the topic of a Group Chat.
+
+        Args:
+            group_chat_ref (str): The reference to the group chat (ID or old Topic).
+            new_topic (str): The new topic string.
+
+        Returns:
+            Chat: The updated chat object.
+        """
         response = self.client.execute(
             cmd_type="request",
             method="updateGroupChatTopic",
@@ -119,6 +195,14 @@ class ChatsService(BaseService):
         )
 
     def list_messages(self, chat_ref: ChatRef) -> list[Message]:
+        """Retrieves messages from a specific chat.
+
+        Args:
+            chat_ref (ChatRef): The chat reference object containing the ID/Name and ChatType.
+
+        Returns:
+            list[Message]: A list of messages from the chat history.
+        """
         messages = self.client.execute(
             cmd_type="request",
             method="listMessagesInChat",
@@ -146,6 +230,15 @@ class ChatsService(BaseService):
         ]
 
     def send_message(self, chat_ref: ChatRef, body: MessageBody) -> Message:
+        """Sends a message to a chat.
+
+        Args:
+            chat_ref (ChatRef): The chat reference object.
+            body (MessageBody): The message payload (content, type, mentions).
+
+        Returns:
+            Message: The created message object.
+        """
         message = self.client.execute(
             cmd_type="request",
             method="sendMessageInChat",
@@ -174,6 +267,17 @@ class ChatsService(BaseService):
         )
 
     def delete_message(self, chat_ref: ChatRef, message_id: str) -> bool:
+        """Soft-deletes a message from a chat.
+
+        This action is reversible via the Graph API (though not exposed here).
+
+        Args:
+            chat_ref (ChatRef): The chat reference object.
+            message_id (str): The unique identifier of the message to delete.
+
+        Returns:
+            bool: True if the message was successfully deleted.
+        """
         result = self.client.execute(
             cmd_type="request",
             method="deleteMessageInChat",
@@ -189,6 +293,15 @@ class ChatsService(BaseService):
         return result == "deleted"
 
     def get_message(self, chat_ref: ChatRef, message_id: str) -> Message:
+        """Retrieves a single message by its ID.
+
+        Args:
+            chat_ref (ChatRef): The chat reference object.
+            message_id (str): The unique identifier of the message.
+
+        Returns:
+            Message: The requested message object.
+        """
         message = self.client.execute(
             cmd_type="request",
             method="getMessageInChat",
@@ -214,6 +327,15 @@ class ChatsService(BaseService):
         )
 
     def list_my_joined(self, chat_type: ChatType | None = None) -> list[Chat]:
+        """Lists all chats the authenticated user is part of.
+
+        Args:
+            chat_type (ChatType | None, optional): Filter by chat type (e.g., only OneOnOne).
+                Defaults to None (return all).
+
+        Returns:
+            list[Chat]: A list of chat objects.
+        """
         params = {}
         if chat_type:
             params["chatType"] = chat_type.value
@@ -237,6 +359,20 @@ class ChatsService(BaseService):
     def list_all_messages(
         self, start_time: datetime, end_time: datetime, top: int
     ) -> list[Message]:
+        """Retrieves messages across ALL chats within a time range.
+
+        Note:
+            This operation typically requires **Application Permissions** and may not
+            work with standard Delegated (User) credentials depending on the organization's policy.
+
+        Args:
+            start_time (datetime): The start of the time range.
+            end_time (datetime): The end of the time range.
+            top (int): Maximum number of messages to retrieve.
+
+        Returns:
+            list[Message]: A list of messages from all chats.
+        """
         messages = self.client.execute(
             cmd_type="request",
             method="listMyChatMessages",
@@ -263,6 +399,14 @@ class ChatsService(BaseService):
         ]
 
     def list_pinned_messages(self, chat_ref: ChatRef) -> list[Message]:
+        """Lists all pinned messages in a specific chat.
+
+        Args:
+            chat_ref (ChatRef): The chat reference object.
+
+        Returns:
+            list[Message]: A list of pinned messages.
+        """
         messages = self.client.execute(
             cmd_type="request",
             method="listPinnedMessagesInChat",
@@ -290,6 +434,15 @@ class ChatsService(BaseService):
         ]
 
     def pin_message(self, chat_ref: ChatRef, message_id: str) -> bool:
+        """Pins a message in the chat.
+
+        Args:
+            chat_ref (ChatRef): The chat reference object.
+            message_id (str): The ID of the message to pin.
+
+        Returns:
+            bool: True if the message was successfully pinned.
+        """
         result = self.client.execute(
             cmd_type="request",
             method="pinMessageInChat",
@@ -305,6 +458,15 @@ class ChatsService(BaseService):
         return result == "pinned"
 
     def unpin_message(self, chat_ref: ChatRef, message_id: str) -> bool:
+        """Unpins a message in the chat.
+
+        Args:
+            chat_ref (ChatRef): The chat reference object.
+            message_id (str): The ID of the message to unpin.
+
+        Returns:
+            bool: True if the message was successfully unpinned.
+        """
         result = self.client.execute(
             cmd_type="request",
             method="unpinMessageInChat",
@@ -320,6 +482,20 @@ class ChatsService(BaseService):
         return result == "unpinned"
 
     def get_mentions(self, chat_ref: ChatRef, raw_mentions: list[str]) -> list[Mention]:
+        """Resolves raw mention strings into formal Mention objects.
+
+        This helps in processing @mentions within message content before sending.
+
+        Args:
+            chat_ref (ChatRef): The chat reference object.
+            raw_mentions (list[str]): A list of raw strings to resolve.
+                Supported formats:
+                * **Email/User ID**: Resolves to a specific user.
+                * **'Everyone'**: Mentions all members (Group Chats only).
+
+        Returns:
+            list[Mention]: A list of resolved Mention objects.
+        """
         mentions = self.client.execute(
             cmd_type="request",
             method="getMentionsInChat",
