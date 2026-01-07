@@ -113,13 +113,13 @@ def test_create_team_from_template_integration(httpserver):
     try:
         init_fake_client(client, httpserver.url_for(""))
 
-        msg = client.teams.create_from_template(
+        id = client.teams.create_from_template(
             display_name=data.newTeamName,
             description="A team created from a template",
             owners=["user-123-abc"],
         )
 
-        assert msg == "id will be given later (async)"
+        assert id == data.newTeamID
 
     finally:
         client.close()

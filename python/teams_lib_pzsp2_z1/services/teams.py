@@ -75,11 +75,14 @@ class TeamsService(BaseService):
             Visibility=response["Visibility"],
         )
 
-    def create_from_template(
+    def create_from_template(  # noqa: PLR0913
         self,
         display_name: str,
         description: str,
         owners: list[str],
+        members: list[str] | None = None,
+        visibility: str = "public",
+        include_me: bool = True,
     ) -> str:
         response = self.client.execute(
             cmd_type="request",
@@ -88,6 +91,9 @@ class TeamsService(BaseService):
                 "displayName": display_name,
                 "description": description,
                 "owners": owners,
+                "members": members,
+                "visibility": visibility,
+                "includeMe": include_me,
             },
         )
         return response
