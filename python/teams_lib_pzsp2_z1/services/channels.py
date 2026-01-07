@@ -8,6 +8,7 @@ from teams_lib_pzsp2_z1.model.mention import Mention
 from teams_lib_pzsp2_z1.model.message import (
     Message,
     MessageBody,
+    MessageCollection,
     MessageContentType,
     MessageFrom,
 )
@@ -200,13 +201,15 @@ class ChannelsService(BaseService):
             ReplyCount=response["ReplyCount"],
         )
 
-    def list_messages(
+    def list_messages(  # noqa: PLR0913
         self,
         team_ref: str,
         channel_ref: str,
         top: int | None = 10,
         expand_replies: bool = False,
-    ) -> list[Message]:
+        include_system_messages: bool = False,
+        next_link: str | None = None,
+    ) -> MessageCollection:
         """Retrieves messages from a channel.
 
         Args:
@@ -214,6 +217,8 @@ class ChannelsService(BaseService):
             channel_ref (str): The reference to the channel.
             top (Optional[int]): The maximum number of messages to retrieve. Defaults to 10.
             expand_replies (bool): If True, system fetches replies for each message. Defaults to False.
+            include_system_messages (bool): If True, includes system-generated messages. Defaults to False.
+            next_link (Optional[str]): A link for pagination to fetch the next set of messages.
 
         Returns:
             List[Message]: A list of messages from the channel.
@@ -227,24 +232,29 @@ class ChannelsService(BaseService):
                 "options": {
                     "top": top,
                     "expandReplies": expand_replies,
+                    "includeSystem": include_system_messages,
+                    "nextLink": next_link,
                 },
             },
         )
 
-        return [
-            Message(
-                ID=message["ID"],
-                Content=message["Content"],
-                ContentType=MessageContentType(message["ContentType"]),
-                CreatedDateTime=message["CreatedDateTime"],
-                From=MessageFrom(
-                    UserID=message["From"]["UserID"],
-                    DisplayName=message["From"]["DisplayName"],
-                ),
-                ReplyCount=message["ReplyCount"],
-            )
-            for message in response
-        ]
+        return MessageCollection(
+                Messages=[
+                Message(
+                    ID=message["ID"],
+                    Content=message["Content"],
+                    ContentType=MessageContentType(message["ContentType"]),
+                    CreatedDateTime=message["CreatedDateTime"],
+                    From=MessageFrom(
+                        UserID=message["From"]["UserID"],
+                        DisplayName=message["From"]["DisplayName"],
+                    ),
+                    ReplyCount=message["ReplyCount"],
+                )
+                for message in response
+            ],
+            NextLink=response["NextLink"],
+        )
 
     def get_message(self, team_ref: str, channel_ref: str, message_id: str) -> Message:
         """Retrieves a specific message by its ID.

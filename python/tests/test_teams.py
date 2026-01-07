@@ -1,4 +1,4 @@
-from teams_lib_pzsp2_z1.model.team import MSTeamsUpdate
+from teams_lib_pzsp2_z1.model.team import UpdateTeam
 from teams_lib_pzsp2_z1.client import TeamsClient
 from tests.init_fake_client import init_fake_client
 from tests.fake_server.setup import setup_fake_server
@@ -68,8 +68,8 @@ def test_update_team_integration(httpserver):
         updated_description = "Updated team description"
         team = client.teams.update(
             teamRef=data.teams[0].DisplayName,
-            update=MSTeamsUpdate(
-                Description=updated_description,
+            update=UpdateTeam(
+                description=updated_description,
             ),
         )
 

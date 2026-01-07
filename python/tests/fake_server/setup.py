@@ -326,6 +326,19 @@ def setup_fake_server(httpserver) -> FakeServerData:
         "Update Team (PATCH)"
     ))
 
+    # PATCH /groups/{id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/groups/([^/]+)"),
+        method="PATCH"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_updateTeam_response(
+            re.search(r"/groups/([^/]+)", req.path).group(1),
+            req.json
+        ),
+        "Update Team (PATCH)"
+    ))
+
     # GET /teams/{id}
     httpserver.expect_request(
         re.compile(r"^/v1.0/teams/([^/]+)(?:$|\?)"),
@@ -527,11 +540,15 @@ def setup_fake_server(httpserver) -> FakeServerData:
 
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(
-        lambda req: Response(
-            json.dumps({"error": f"Route not matched in Mock: {req.method} {req.path}"}),
-            status=404,
-            mimetype="application/json"
-        )
+        lambda req: (
+            print(f"[MOCK SERVER] ⚠️ UNMATCHED: {req.method} {req.path}", file=sys.stdout),
+            print(f"[MOCK SERVER]    Body: {req.get_data(as_text=True)}", file=sys.stdout),
+            Response(
+                json.dumps({"error": f"Route not matched in Mock: {req.method} {req.path}"}),
+                status=404,
+                mimetype="application/json"
+            )
+        )[-1]
     )
 
     return data
