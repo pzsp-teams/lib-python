@@ -47,3 +47,8 @@ class MessageBody:
 class ListMessagesOptions:
     Top: int | None = None
     ExpandReplies: bool = False
+
+@dataclass
+class MessageCollection:
+    Messages: list[Message]
+    NextLink: str | None = None
