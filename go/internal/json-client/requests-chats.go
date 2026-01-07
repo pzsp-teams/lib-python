@@ -70,9 +70,9 @@ func (c *TeamsJSONClient) UpdateGroupChatTopic(p map[string]interface{}) (interf
 }
 
 type listMessagesInChatParams struct {
-	ChatRef       decoders.ChatRefDTO `json:"chatRef"`
-	IncludeSystem bool                `json:"includeSystem"`
-	NextLink      string              `json:"nextLink"`
+	ChatRef       decoders.ChatRefDTO  `json:"chatRef"`
+	IncludeSystem bool                 `json:"includeSystem"`
+	NextLink      decoders.NextLinkDTO `json:"nextLink"`
 }
 
 func (c *TeamsJSONClient) ListMessagesInChat(p map[string]interface{}) (interface{}, error) {
@@ -81,7 +81,8 @@ func (c *TeamsJSONClient) ListMessagesInChat(p map[string]interface{}) (interfac
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Chats.ListMessages(context.TODO(), chatRef, params.IncludeSystem, &params.NextLink)
+		nextLink := decoders.GetNextLink(&params.NextLink)
+		return c.client.Chats.ListMessages(context.TODO(), chatRef, params.IncludeSystem, nextLink)
 	})
 }
 

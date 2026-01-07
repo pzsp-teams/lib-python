@@ -102,7 +102,7 @@ type listMessagesParams struct {
 	ChannelRef    string                 `json:"channelRef"`
 	Options       listMessagesOptionsDTO `json:"options"`
 	IncludeSystem bool                   `json:"includeSystem"`
-	NextLink      string                 `json:"nextLink"`
+	NextLink      decoders.NextLinkDTO   `json:"nextLink"`
 }
 
 func (c *TeamsJSONClient) ListMessagesInChannel(p map[string]interface{}) (interface{}, error) {
@@ -111,7 +111,8 @@ func (c *TeamsJSONClient) ListMessagesInChannel(p map[string]interface{}) (inter
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Channels.ListMessages(context.TODO(), params.TeamRef, params.ChannelRef, options, params.IncludeSystem, &params.NextLink)
+		nextLink := decoders.GetNextLink(&params.NextLink)
+		return c.client.Channels.ListMessages(context.TODO(), params.TeamRef, params.ChannelRef, options, params.IncludeSystem, nextLink)
 	})
 }
 
@@ -128,17 +129,18 @@ func (c *TeamsJSONClient) GetMessageInChannel(p map[string]interface{}) (interfa
 }
 
 type listRepliesParams struct {
-	TeamRef       string `json:"teamRef"`
-	ChannelRef    string `json:"channelRef"`
-	MessageID     string `json:"messageId"`
-	Top           *int32 `json:"top"`
-	IncludeSystem bool   `json:"includeSystem"`
-	NextLink      string `json:"nextLink"`
+	TeamRef       string               `json:"teamRef"`
+	ChannelRef    string               `json:"channelRef"`
+	MessageID     string               `json:"messageId"`
+	Top           *int32               `json:"top"`
+	IncludeSystem bool                 `json:"includeSystem"`
+	NextLink      decoders.NextLinkDTO `json:"nextLink"`
 }
 
 func (c *TeamsJSONClient) ListMessageRepliesInChannel(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params listRepliesParams) (interface{}, error) {
-		return c.client.Channels.ListReplies(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID, params.Top, params.IncludeSystem, &params.NextLink)
+		nextLink := decoders.GetNextLink(&params.NextLink)
+		return c.client.Channels.ListReplies(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID, params.Top, params.IncludeSystem, nextLink)
 	})
 }
 
