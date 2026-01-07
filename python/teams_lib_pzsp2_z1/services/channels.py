@@ -239,22 +239,23 @@ class ChannelsService(BaseService):
         )
 
         return MessageCollection(
-                Messages=[
+            Messages=[
                 Message(
-                    ID=message["ID"],
-                    Content=message["Content"],
-                    ContentType=MessageContentType(message["ContentType"]),
-                    CreatedDateTime=message["CreatedDateTime"],
+                    ID=msg["ID"],
+                    Content=msg["Content"],
+                    ContentType=MessageContentType(msg["ContentType"]),
+                    CreatedDateTime=msg["CreatedDateTime"],
                     From=MessageFrom(
-                        UserID=message["From"]["UserID"],
-                        DisplayName=message["From"]["DisplayName"],
+                        UserID=msg["From"]["UserID"],
+                        DisplayName=msg["From"]["DisplayName"],
                     ),
-                    ReplyCount=message["ReplyCount"],
+                    ReplyCount=msg["ReplyCount"],
                 )
-                for message in response
+                for msg in response["Messages"]
             ],
-            NextLink=response["NextLink"],
+            NextLink=response.get("NextLink"),
         )
+
 
     def get_message(self, team_ref: str, channel_ref: str, message_id: str) -> Message:
         """Retrieves a specific message by its ID.

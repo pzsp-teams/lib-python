@@ -160,7 +160,7 @@ def test_list_messages_integration(httpserver):
             channel_ref=data.channels[data.teams[0].ID][0].Name,
         )
 
-        assert len(collection) == len(data.messages[data.channels[data.teams[0].ID][0].ID])
+        assert len(collection.Messages) == len(data.messages[data.channels[data.teams[0].ID][0].ID])
         assert collection.Messages[0].ID == data.messages[data.channels[data.teams[0].ID][0].ID][0].ID
         assert collection.Messages[0].Content == data.messages[data.channels[data.teams[0].ID][0].ID][0].Content
         assert collection.Messages[0].ContentType == MessageContentType(data.messages[data.channels[data.teams[0].ID][0].ID][0].ContentType)
