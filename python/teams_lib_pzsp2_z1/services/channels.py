@@ -221,7 +221,7 @@ class ChannelsService(BaseService):
             next_link (Optional[str]): A link for pagination to fetch the next set of messages.
 
         Returns:
-            List[Message]: A list of messages from the channel.
+            MessageCollection: An object containing the list of messages and a next link for pagination.
         """
         response = self.client.execute(
             cmd_type="request",
@@ -256,7 +256,6 @@ class ChannelsService(BaseService):
             NextLink=response.get("NextLink"),
         )
 
-
     def get_message(self, team_ref: str, channel_ref: str, message_id: str) -> Message:
         """Retrieves a specific message by its ID.
 
@@ -290,13 +289,15 @@ class ChannelsService(BaseService):
             ReplyCount=response["ReplyCount"],
         )
 
-    def list_message_replies(
+    def list_message_replies(  # noqa: PLR0913
         self,
         team_ref: str,
         channel_ref: str,
         message_id: str,
         top: int | None = 10,
-    ) -> list[Message]:
+        include_system_messages: bool = False,
+        next_link: str | None = None,
+    ) -> MessageCollection:
         """Retrieves all replies to a specific message thread.
 
         Args:
@@ -304,9 +305,11 @@ class ChannelsService(BaseService):
             channel_ref (str): The reference to the channel.
             message_id (str): The ID of the parent message.
             top (Optional[int]): Max number of replies to fetch. Defaults to 10.
+            include_system_messages (bool): If True, includes system-generated messages. Defaults to False.
+            next_link (Optional[str]): A link for pagination to fetch the next set of replies.
 
         Returns:
-            List[Message]: A list of replies.
+            MessageCollection: An object containing the list of replies and a next link for pagination.
         """
         response = self.client.execute(
             cmd_type="request",
@@ -316,23 +319,28 @@ class ChannelsService(BaseService):
                 "channelRef": channel_ref,
                 "messageID": message_id,
                 "top": top,
+                "includeSystem": include_system_messages,
+                "nextLink": next_link,
             },
         )
 
-        return [
-            Message(
-                ID=message["ID"],
-                Content=message["Content"],
-                ContentType=MessageContentType(message["ContentType"]),
-                CreatedDateTime=message["CreatedDateTime"],
-                From=MessageFrom(
-                    UserID=message["From"]["UserID"],
-                    DisplayName=message["From"]["DisplayName"],
-                ),
-                ReplyCount=message["ReplyCount"],
-            )
-            for message in response
-        ]
+        return MessageCollection(
+            Messages=[
+                Message(
+                    ID=msg["ID"],
+                    Content=msg["Content"],
+                    ContentType=MessageContentType(msg["ContentType"]),
+                    CreatedDateTime=msg["CreatedDateTime"],
+                    From=MessageFrom(
+                        UserID=msg["From"]["UserID"],
+                        DisplayName=msg["From"]["DisplayName"],
+                    ),
+                    ReplyCount=msg["ReplyCount"],
+                )
+                for msg in response["Messages"]
+            ],
+            NextLink=response.get("NextLink"),
+        )
 
     def get_message_reply(
         self,

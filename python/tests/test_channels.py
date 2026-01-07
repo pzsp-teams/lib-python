@@ -220,20 +220,20 @@ def test_list_replies_integration(httpserver):
             message_id=data.messages[data.channels[data.teams[0].ID][0].ID][1].ID,
         )
 
-        assert len(replies) == len(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID])
-        assert replies[0].ID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ID
-        assert replies[0].Content == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].Content
-        assert replies[0].ContentType == MessageContentType(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ContentType)
-        assert replies[0].From.UserID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].From.UserID
-        assert replies[0].From.DisplayName == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].From.DisplayName
-        assert replies[0].CreatedDateTime == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].CreatedDateTime
+        assert len(replies.Messages) == len(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID])
+        assert replies.Messages[0].ID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ID
+        assert replies.Messages[0].Content == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].Content
+        assert replies.Messages[0].ContentType == MessageContentType(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ContentType)
+        assert replies.Messages[0].From.UserID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].From.UserID
+        assert replies.Messages[0].From.DisplayName == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].From.DisplayName
+        assert replies.Messages[0].CreatedDateTime == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].CreatedDateTime
 
-        assert replies[1].ID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].ID
-        assert replies[1].Content == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].Content
-        assert replies[1].ContentType == MessageContentType(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].ContentType)
-        assert replies[1].From.UserID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].From.UserID
-        assert replies[1].From.DisplayName == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].From.DisplayName
-        assert replies[1].CreatedDateTime == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].CreatedDateTime
+        assert replies.Messages[1].ID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].ID
+        assert replies.Messages[1].Content == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].Content
+        assert replies.Messages[1].ContentType == MessageContentType(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].ContentType)
+        assert replies.Messages[1].From.UserID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].From.UserID
+        assert replies.Messages[1].From.DisplayName == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].From.DisplayName
+        assert replies.Messages[1].CreatedDateTime == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][1].CreatedDateTime
 
     finally:
         client.close()
