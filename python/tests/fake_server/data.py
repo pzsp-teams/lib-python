@@ -134,6 +134,7 @@ class FakeServerData:
         self.newTeamName = "New Team"
         self.newGroupMailNickname = "new-team-nickname"
         self.newTeamVisibility = "private"
+        self.newTeamID = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 
         # Init Templates (re-assigning to ensure freshness if needed, though default_factory handles it)
         self.newChannelName = "New Channel"
@@ -254,9 +255,8 @@ class FakeServerData:
         }
 
     def get_createTeamFromTemplate_response(self, request_json: dict) -> dict:
-        new_team_id = "team-from-template-001"
         new_team = Team(
-            ID=new_team_id,
+            ID=self.newTeamID,
             DisplayName=request_json.get("displayName"),
             Description=request_json.get("description"),
             IsArchived=False,
@@ -264,7 +264,19 @@ class FakeServerData:
         )
         self.teams.append(new_team)
 
-        return {"id": new_team_id}
+        # self.newTeamID == "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+        op_id = "00000000-0000-0000-0000-000000000000"
+
+        return {
+            "status": 202,
+            "headers": {
+                "Location": f"/teams('{self.newTeamID}')/operations('{op_id}')",
+                "Content-Location": f"/teams('{self.newTeamID}')",
+                "Content-Type": "application/json",
+                "Content-Length": "0"
+            },
+            "body": ""
+        }
 
     def get_archiveTeam_response(self, team_id: str) -> dict:
         team = self._find_team(team_id)
