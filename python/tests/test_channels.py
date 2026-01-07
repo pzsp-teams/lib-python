@@ -42,8 +42,8 @@ def test_get_channel_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         channel = client.channels.get(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][1].Name,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][1].Name,
         )
 
         assert channel.Name == data.channels[data.teams[0].ID][1].Name
@@ -63,7 +63,7 @@ def test_create_standard_channel_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         channel = client.channels.create_standard(
-            teamRef=data.teams[0].DisplayName,
+            team_ref=data.teams[0].DisplayName,
             display_name=data.newChannelName,
         )
 
@@ -84,7 +84,7 @@ def test_create_private_channel_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         channel = client.channels.create_private(
-            teamRef=data.teams[0].DisplayName,
+            team_ref=data.teams[0].DisplayName,
             display_name=data.newChannelName,
             member_refs=[],
             owner_refs=[],
@@ -107,8 +107,8 @@ def test_delete_channel_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         success = client.channels.delete(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][1].Name,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][1].Name,
         )
 
         assert success is True
@@ -126,8 +126,8 @@ def test_send_message_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         message = client.channels.send_message(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][0].Name,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][0].Name,
             body=MessageBody(
                 Content=data.newMessageTemplate.Content,
                 ContentType=MessageContentType.TEXT,
@@ -156,8 +156,8 @@ def test_list_messages_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         messages = client.channels.list_messages(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][0].Name,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][0].Name,
         )
 
         assert len(messages) == len(data.messages[data.channels[data.teams[0].ID][0].ID])
@@ -190,9 +190,9 @@ def test_get_message_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         message = client.channels.get_message(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][0].Name,
-            messageID=data.messages[data.channels[data.teams[0].ID][0].ID][0].ID,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][0].Name,
+            message_id=data.messages[data.channels[data.teams[0].ID][0].ID][0].ID,
         )
 
         assert message.ID == data.messages[data.channels[data.teams[0].ID][0].ID][0].ID
@@ -216,9 +216,9 @@ def test_list_replies_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         replies = client.channels.list_message_replies(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][0].Name,
-            messageID=data.messages[data.channels[data.teams[0].ID][0].ID][1].ID,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][0].Name,
+            message_id=data.messages[data.channels[data.teams[0].ID][0].ID][1].ID,
         )
 
         assert len(replies) == len(data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID])
@@ -249,10 +249,10 @@ def test_get_reply_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         reply = client.channels.get_message_reply(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][0].Name,
-            messageID=data.messages[data.channels[data.teams[0].ID][0].ID][1].ID,
-            replyID=data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ID,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][0].Name,
+            message_id=data.messages[data.channels[data.teams[0].ID][0].ID][1].ID,
+            reply_id=data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ID,
         )
 
         assert reply.ID == data.replies[data.messages[data.channels[data.teams[0].ID][0].ID][1].ID][0].ID
@@ -278,8 +278,8 @@ def test_list_members_integration(httpserver):
         channel_id = channel.ID
 
         members = client.channels.list_members(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=channel.Name,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=channel.Name,
         )
 
         expected_members = data.members[team_id][channel_id]
@@ -313,10 +313,10 @@ def test_add_member_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         member = client.channels.add_member(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][1].Name,
-            userRef=data.newMemberTemplate.DisplayName,
-            isOwner=True if data.newMemberTemplate.Role == "owner" else False,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][1].Name,
+            user_ref=data.newMemberTemplate.DisplayName,
+            is_owner=True if data.newMemberTemplate.Role == "owner" else False,
         )
 
         assert member.UserID == data.newMemberTemplate.UserID
@@ -338,10 +338,10 @@ def test_update_member_role_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         member = client.channels.update_member_role(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][0].Name,
-            userRef=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].Email,
-            isOwner=True
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][0].Name,
+            user_ref=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].Email,
+            is_owner=True
         )
 
         assert member.UserID == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].UserID
@@ -362,9 +362,9 @@ def test_remove_member_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         success = client.channels.remove_member(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][0].Name,
-            userRef=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].Email,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][0].Name,
+            user_ref=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].ID][1].Email,
         )
 
         assert success is True
@@ -381,8 +381,8 @@ def test_get_mention_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         mention = client.channels.get_mentions(
-            teamRef=data.teams[0].DisplayName,
-            channelRef=data.channels[data.teams[0].ID][0].Name,
+            team_ref=data.teams[0].DisplayName,
+            channel_ref=data.channels[data.teams[0].ID][0].Name,
             raw_mentions=MentionKind.TEAM.value,
         )
 
