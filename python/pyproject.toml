@@ -23,6 +23,7 @@ fix = true
 show-fixes = true
 src = ["teams_lib_pzsp2_z1"]
 exclude = ["test_*.py", "tests/*"]
+ignore = ["E501"]
 
 
 [tool.ruff.lint]
