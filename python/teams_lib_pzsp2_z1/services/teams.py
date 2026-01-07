@@ -1,4 +1,4 @@
-from teams_lib_pzsp2_z1.model.team import MSTeamsUpdate, Team
+from teams_lib_pzsp2_z1.model.team import Team, UpdateTeam
 from teams_lib_pzsp2_z1.services.base_service import BaseService
 
 
@@ -37,7 +37,7 @@ class TeamsService(BaseService):
             for team in response
         ]
 
-    def update(self, teamRef: str, update: MSTeamsUpdate) -> Team:
+    def update(self, teamRef: str, update: UpdateTeam) -> Team:
         params = {"teamRef": teamRef}
         update_dict = {k: v for k, v in update.__dict__.items() if v is not None}
         params["team"] = update_dict

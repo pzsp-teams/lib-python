@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/pzsp-teams/lib-python/internal/json-client/decoders"
-	"github.com/pzsp-teams/lib/models"
 )
 
 type getTeamParams struct {
@@ -28,11 +27,8 @@ type updateTeamParams struct {
 
 func (c *TeamsJSONClient) UpdateTeam(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params updateTeamParams) (interface{}, error) {
-		updateTeam, err := decoders.DecodeParams[models.TeamUpdate](&params.TeamUpdate)
-		if err != nil {
-			return nil, err
-		}
-		return c.client.Teams.UpdateTeam(context.TODO(), params.TeamRef, updateTeam)
+		updateTeam := decoders.GetUpdateTeam(&params.TeamUpdate)
+		return c.client.Teams.UpdateTeam(context.TODO(), params.TeamRef, &updateTeam)
 	})
 }
 

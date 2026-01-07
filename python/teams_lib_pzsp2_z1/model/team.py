@@ -12,6 +12,6 @@ class Team:
 
 @dataclass
 class UpdateTeam:
-    DisplayName: str | None = None
-    Description: str | None = None
-    Visibility: str | None = None
+    displayName: str | None = None
+    description: str | None = None
+    visibility: str | None = None
