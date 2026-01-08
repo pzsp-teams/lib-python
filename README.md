@@ -119,3 +119,6 @@ client.close()
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/pzsp-teams/lib-python/blob/main/LICENSE) file for details.
+
+## Porst
+This lib is also available in [GO](https://github.com/pzsp-teams/lib)
