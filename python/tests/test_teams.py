@@ -67,7 +67,7 @@ def test_update_team_integration(httpserver):
 
         updated_description = "Updated team description"
         team = client.teams.update(
-            teamRef=data.teams[0].DisplayName,
+            team_ref=data.teams[0].DisplayName,
             update=UpdateTeam(
                 description=updated_description,
             ),
@@ -134,7 +134,7 @@ def test_archive_team_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         success = client.teams.archive(
-            teamRef=data.teams[0].DisplayName,
+            team_ref=data.teams[0].DisplayName,
             spo_read_only_from_members=True,
         )
 
@@ -153,7 +153,7 @@ def test_unarchive_team_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         success = client.teams.unarchive(
-            teamRef=data.teams[2].DisplayName,
+            team_ref=data.teams[2].DisplayName,
         )
 
         assert success is True
@@ -171,7 +171,7 @@ def test_delete_team_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         success = client.teams.delete(
-            teamRef=data.teams[0].DisplayName,
+            team_ref=data.teams[0].DisplayName,
         )
 
         assert success is True
