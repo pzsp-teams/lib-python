@@ -12,43 +12,44 @@ class MessageContentType(Enum):
 
 @dataclass
 class MessageFrom:
-    UserID: str
-    DisplayName: str
+    user_id: str
+    display_name: str
 
 
 @dataclass
 class Message:
-    ID: str
-    Content: str
-    ContentType: MessageContentType
-    CreatedDateTime: datetime
-    From: MessageFrom
-    ReplyCount: int
+    id: str
+    content: str
+    content_type: MessageContentType
+    created_date_time: datetime
+    sender: MessageFrom
+    reply_count: int
 
 
 @dataclass
 class MessageBody:
-    ContentType: MessageContentType
-    Content: str
-    Mentions: list[Mention]
+    content_type: MessageContentType
+    content: str
+    mentions: list[Mention]
 
     def __dict__(self):
         return {
-            "ContentType": self.ContentType.value,
-            "Content": self.Content,
+            "ContentType": self.content_type.value,
+            "Content": self.content,
         }
 
     def __iter__(self):
-        yield "ContentType", self.ContentType.value
-        yield "Content", self.Content
+        yield "ContentType", self.content_type.value
+        yield "Content", self.content
 
 
 @dataclass
 class ListMessagesOptions:
-    Top: int | None = None
-    ExpandReplies: bool = False
+    top: int | None = None
+    expand_replies: bool = False
+
 
 @dataclass
 class MessageCollection:
-    Messages: list[Message]
-    NextLink: str | None = None
+    messages: list[Message]
+    next_link: str | None = None

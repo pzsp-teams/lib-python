@@ -225,21 +225,21 @@ class ChatsService(BaseService):
         )
 
         return MessageCollection(
-            Messages=[
+            messages=[
                 Message(
-                    ID=msg["ID"],
-                    Content=msg["Content"],
-                    ContentType=MessageContentType(msg["ContentType"]),
-                    CreatedDateTime=msg["CreatedDateTime"],
-                    From=MessageFrom(
-                        UserID=msg["From"]["UserID"],
-                        DisplayName=msg["From"]["DisplayName"],
+                    id=msg["ID"],
+                    content=msg["Content"],
+                    content_type=MessageContentType(msg["ContentType"]),
+                    created_date_time=msg["CreatedDateTime"],
+                    sender=MessageFrom(
+                        user_id=msg["From"]["UserID"],
+                        display_name=msg["From"]["DisplayName"],
                     ),
-                    ReplyCount=msg["ReplyCount"],
+                    reply_count=msg["ReplyCount"],
                 )
                 for msg in messages["Messages"]
             ],
-            NextLink=messages.get("NextLink"),
+            next_link=messages.get("NextLink"),
         )
 
     def send_message(self, chat_ref: ChatRef, body: MessageBody) -> Message:
@@ -261,22 +261,22 @@ class ChatsService(BaseService):
                     "type": chat_ref.type.value,
                 },
                 "body": {
-                    "content": body.Content,
-                    "contentType": body.ContentType.value,
+                    "content": body.content,
+                    "contentType": body.content_type.value,
                 },
             },
         )
 
         return Message(
-            ID=message["ID"],
-            Content=message["Content"],
-            ContentType=MessageContentType(message["ContentType"]),
-            From=MessageFrom(
-                UserID=message["From"]["UserID"],
-                DisplayName=message["From"]["DisplayName"],
+            id=message["ID"],
+            content=message["Content"],
+            content_type=MessageContentType(message["ContentType"]),
+            sender=MessageFrom(
+                user_id=message["From"]["UserID"],
+                display_name=message["From"]["DisplayName"],
             ),
-            CreatedDateTime=message["CreatedDateTime"],
-            ReplyCount=message["ReplyCount"],
+            created_date_time=message["CreatedDateTime"],
+            reply_count=message["ReplyCount"],
         )
 
     def delete_message(self, chat_ref: ChatRef, message_id: str) -> bool:
@@ -328,15 +328,15 @@ class ChatsService(BaseService):
         )
 
         return Message(
-            ID=message["ID"],
-            Content=message["Content"],
-            ContentType=MessageContentType(message["ContentType"]),
-            From=MessageFrom(
-                UserID=message["From"]["UserID"],
-                DisplayName=message["From"]["DisplayName"],
+            id=message["ID"],
+            content=message["Content"],
+            content_type=MessageContentType(message["ContentType"]),
+            sender=MessageFrom(
+                user_id=message["From"]["UserID"],
+                display_name=message["From"]["DisplayName"],
             ),
-            CreatedDateTime=message["CreatedDateTime"],
-            ReplyCount=message["ReplyCount"],
+            created_date_time=message["CreatedDateTime"],
+            reply_count=message["ReplyCount"],
         )
 
     def list_my_joined(self, chat_type: ChatType | None = None) -> list[Chat]:
@@ -398,15 +398,15 @@ class ChatsService(BaseService):
 
         return [
             Message(
-                ID=message["ID"],
-                Content=message["Content"],
-                ContentType=MessageContentType(message["ContentType"]),
-                From=MessageFrom(
-                    UserID=message["From"]["UserID"],
-                    DisplayName=message["From"]["DisplayName"],
+                id=message["ID"],
+                content=message["Content"],
+                content_type=MessageContentType(message["ContentType"]),
+                sender=MessageFrom(
+                    user_id=message["From"]["UserID"],
+                    display_name=message["From"]["DisplayName"],
                 ),
-                CreatedDateTime=message["CreatedDateTime"],
-                ReplyCount=message["ReplyCount"],
+                created_date_time=message["CreatedDateTime"],
+                reply_count=message["ReplyCount"],
             )
             for message in messages
         ]
@@ -433,15 +433,15 @@ class ChatsService(BaseService):
 
         return [
             Message(
-                ID=message["ID"],
-                Content=message["Content"],
-                ContentType=MessageContentType(message["ContentType"]),
-                From=MessageFrom(
-                    UserID=message["From"]["UserID"],
-                    DisplayName=message["From"]["DisplayName"],
+                id=message["ID"],
+                content=message["Content"],
+                content_type=MessageContentType(message["ContentType"]),
+                sender=MessageFrom(
+                    user_id=message["From"]["UserID"],
+                    display_name=message["From"]["DisplayName"],
                 ),
-                CreatedDateTime=message["CreatedDateTime"],
-                ReplyCount=message["ReplyCount"],
+                created_date_time=message["CreatedDateTime"],
+                reply_count=message["ReplyCount"],
             )
             for message in messages
         ]

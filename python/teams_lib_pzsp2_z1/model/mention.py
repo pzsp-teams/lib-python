@@ -24,7 +24,7 @@ class Mention:
     """Represents a mention entity within a Microsoft Teams message.
 
     This object maps a specific entity (User, Channel, etc.) to a placeholder
-    in the message content.
+    in the message content. Can be obtained by get_mentions() method in the Chats and Channels service.
 
     Attributes:
         kind (MentionKind): The type of the mention.

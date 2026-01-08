@@ -4,7 +4,7 @@ This module provides the ChannelsService class for managing Microsoft Teams chan
 
 from teams_lib_pzsp2_z1.model.channel import Channel
 from teams_lib_pzsp2_z1.model.member import Member
-from teams_lib_pzsp2_z1.model.mention import Mention
+from teams_lib_pzsp2_z1.model.mention import Mention, MentionKind
 from teams_lib_pzsp2_z1.model.message import (
     Message,
     MessageBody,
@@ -190,15 +190,15 @@ class ChannelsService(BaseService):
         )
 
         return Message(
-            ID=response["ID"],
-            Content=response["Content"],
-            ContentType=MessageContentType(response["ContentType"]),
-            CreatedDateTime=response["CreatedDateTime"],
-            From=MessageFrom(
-                UserID=response["From"]["UserID"],
-                DisplayName=response["From"]["DisplayName"],
+            id=response["ID"],
+            content=response["Content"],
+            content_type=MessageContentType(response["ContentType"]),
+            created_date_time=response["CreatedDateTime"],
+            sender=MessageFrom(
+                user_id=response["From"]["UserID"],
+                display_name=response["From"]["DisplayName"],
             ),
-            ReplyCount=response["ReplyCount"],
+            reply_count=response["ReplyCount"],
         )
 
     def list_messages(  # noqa: PLR0913
@@ -239,21 +239,21 @@ class ChannelsService(BaseService):
         )
 
         return MessageCollection(
-            Messages=[
+            messages=[
                 Message(
-                    ID=msg["ID"],
-                    Content=msg["Content"],
-                    ContentType=MessageContentType(msg["ContentType"]),
-                    CreatedDateTime=msg["CreatedDateTime"],
-                    From=MessageFrom(
-                        UserID=msg["From"]["UserID"],
-                        DisplayName=msg["From"]["DisplayName"],
+                    id=msg["ID"],
+                    content=msg["Content"],
+                    content_type=MessageContentType(msg["ContentType"]),
+                    created_date_time=msg["CreatedDateTime"],
+                    sender=MessageFrom(
+                        user_id=msg["From"]["UserID"],
+                        display_name=msg["From"]["DisplayName"],
                     ),
-                    ReplyCount=msg["ReplyCount"],
+                    reply_count=msg["ReplyCount"],
                 )
                 for msg in response["Messages"]
             ],
-            NextLink=response.get("NextLink"),
+            next_link=response.get("NextLink"),
         )
 
     def get_message(self, team_ref: str, channel_ref: str, message_id: str) -> Message:
@@ -278,15 +278,15 @@ class ChannelsService(BaseService):
         )
 
         return Message(
-            ID=response["ID"],
-            Content=response["Content"],
-            ContentType=MessageContentType(response["ContentType"]),
-            CreatedDateTime=response["CreatedDateTime"],
-            From=MessageFrom(
-                UserID=response["From"]["UserID"],
-                DisplayName=response["From"]["DisplayName"],
+            id=response["ID"],
+            content=response["Content"],
+            content_type=MessageContentType(response["ContentType"]),
+            created_date_time=response["CreatedDateTime"],
+            sender=MessageFrom(
+                user_id=response["From"]["UserID"],
+                display_name=response["From"]["DisplayName"],
             ),
-            ReplyCount=response["ReplyCount"],
+            reply_count=response["ReplyCount"],
         )
 
     def list_message_replies(  # noqa: PLR0913
@@ -325,21 +325,21 @@ class ChannelsService(BaseService):
         )
 
         return MessageCollection(
-            Messages=[
+            messages=[
                 Message(
-                    ID=msg["ID"],
-                    Content=msg["Content"],
-                    ContentType=MessageContentType(msg["ContentType"]),
-                    CreatedDateTime=msg["CreatedDateTime"],
-                    From=MessageFrom(
-                        UserID=msg["From"]["UserID"],
-                        DisplayName=msg["From"]["DisplayName"],
+                    id=msg["ID"],
+                    content=msg["Content"],
+                    content_type=MessageContentType(msg["ContentType"]),
+                    created_date_time=msg["CreatedDateTime"],
+                    sender=MessageFrom(
+                        user_id=msg["From"]["UserID"],
+                        display_name=msg["From"]["DisplayName"],
                     ),
-                    ReplyCount=msg["ReplyCount"],
+                    reply_count=msg["ReplyCount"],
                 )
                 for msg in response["Messages"]
             ],
-            NextLink=response.get("NextLink"),
+            next_link=response.get("NextLink"),
         )
 
     def get_message_reply(
@@ -372,15 +372,15 @@ class ChannelsService(BaseService):
         )
 
         return Message(
-            ID=response["ID"],
-            Content=response["Content"],
-            ContentType=MessageContentType(response["ContentType"]),
-            CreatedDateTime=response["CreatedDateTime"],
-            From=MessageFrom(
-                UserID=response["From"]["UserID"],
-                DisplayName=response["From"]["DisplayName"],
+            id=response["ID"],
+            content=response["Content"],
+            content_type=MessageContentType(response["ContentType"]),
+            created_date_time=response["CreatedDateTime"],
+            sender=MessageFrom(
+                user_id=response["From"]["UserID"],
+                display_name=response["From"]["DisplayName"],
             ),
-            ReplyCount=response["ReplyCount"],
+            reply_count=response["ReplyCount"],
         )
 
     def list_members(self, team_ref: str, channel_ref: str) -> list[Member]:
@@ -401,7 +401,13 @@ class ChannelsService(BaseService):
                 "channelRef": channel_ref,
             },
         )
-        return [Member(**member) for member in response]
+        return [Member(
+            id=member["ID"],
+            user_id=member["UserID"],
+            display_name=member["DisplayName"],
+            role=member["Role"],
+            email=member["Email"],
+        ) for member in response]
 
     def add_member(
         self, team_ref: str, channel_ref: str, user_ref: str, is_owner: bool
@@ -427,7 +433,13 @@ class ChannelsService(BaseService):
                 "isOwner": is_owner,
             },
         )
-        return Member(**response)
+        return Member(
+            id=response["ID"],
+            user_id=response["UserID"],
+            display_name=response["DisplayName"],
+            role=response["Role"],
+            email=response["Email"],
+        )
 
     def update_member_role(
         self, team_ref: str, channel_ref: str, user_ref: str, is_owner: bool
@@ -453,7 +465,13 @@ class ChannelsService(BaseService):
                 "isOwner": is_owner,
             },
         )
-        return Member(**response)
+        return Member(
+            id=response["ID"],
+            user_id=response["UserID"],
+            display_name=response["DisplayName"],
+            role=response["Role"],
+            email=response["Email"],
+        )
 
     def remove_member(self, team_ref: str, channel_ref: str, user_ref: str) -> bool:
         """Removes a user from a channel.
@@ -505,4 +523,9 @@ class ChannelsService(BaseService):
                 "rawMentions": raw_mentions,
             },
         )
-        return [Mention(**mention) for mention in response]
+        return [Mention(
+            kind=MentionKind(mention["Kind"]),
+            at_id=mention["AtID"],
+            text=mention["Text"],
+            target_id=mention["TargetID"],
+        ) for mention in response]

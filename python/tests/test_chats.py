@@ -209,23 +209,23 @@ def test_list_messeges_in_chat_integration(httpserver):
             )
         )
 
-        assert len(collection.Messages) == len(data.chat_messages[data.group_chats[0].id])
+        assert len(collection.messages) == len(data.chat_messages[data.group_chats[0].id])
 
-        assert collection.Messages[0].ID == data.chat_messages[data.group_chats[0].id][0].ID
-        assert collection.Messages[0].Content == data.chat_messages[data.group_chats[0].id][0].Content
-        assert collection.Messages[0].ContentType == MessageContentType(data.chat_messages[data.group_chats[0].id][0].ContentType)
-        assert collection.Messages[0].From.UserID == data.chat_messages[data.group_chats[0].id][0].From.UserID
-        assert collection.Messages[0].From.DisplayName == data.chat_messages[data.group_chats[0].id][0].From.DisplayName
-        assert collection.Messages[0].ReplyCount == data.chat_messages[data.group_chats[0].id][0].ReplyCount
-        assert collection.Messages[0].CreatedDateTime == data.chat_messages[data.group_chats[0].id][0].CreatedDateTime
+        assert collection.messages[0].id == data.chat_messages[data.group_chats[0].id][0].id
+        assert collection.messages[0].content == data.chat_messages[data.group_chats[0].id][0].content
+        assert collection.messages[0].content_type == MessageContentType(data.chat_messages[data.group_chats[0].id][0].content_type)
+        assert collection.messages[0].sender.user_id == data.chat_messages[data.group_chats[0].id][0].sender.user_id
+        assert collection.messages[0].sender.display_name == data.chat_messages[data.group_chats[0].id][0].sender.display_name
+        assert collection.messages[0].reply_count == data.chat_messages[data.group_chats[0].id][0].reply_count
+        assert collection.messages[0].created_date_time == data.chat_messages[data.group_chats[0].id][0].created_date_time
 
-        assert collection.Messages[1].ID == data.chat_messages[data.group_chats[0].id][1].ID
-        assert collection.Messages[1].Content == data.chat_messages[data.group_chats[0].id][1].Content
-        assert collection.Messages[1].ContentType == MessageContentType(data.chat_messages[data.group_chats[0].id][1].ContentType)
-        assert collection.Messages[1].From.UserID == data.chat_messages[data.group_chats[0].id][1].From.UserID
-        assert collection.Messages[1].From.DisplayName == data.chat_messages[data.group_chats[0].id][1].From.DisplayName
-        assert collection.Messages[1].ReplyCount == data.chat_messages[data.group_chats[0].id][1].ReplyCount
-        assert collection.Messages[1].CreatedDateTime == data.chat_messages[data.group_chats[0].id][1].CreatedDateTime
+        assert collection.messages[1].id == data.chat_messages[data.group_chats[0].id][1].id
+        assert collection.messages[1].content == data.chat_messages[data.group_chats[0].id][1].content
+        assert collection.messages[1].content_type == MessageContentType(data.chat_messages[data.group_chats[0].id][1].content_type)
+        assert collection.messages[1].sender.user_id == data.chat_messages[data.group_chats[0].id][1].sender.user_id
+        assert collection.messages[1].sender.display_name == data.chat_messages[data.group_chats[0].id][1].sender.display_name
+        assert collection.messages[1].reply_count == data.chat_messages[data.group_chats[0].id][1].reply_count
+        assert collection.messages[1].created_date_time == data.chat_messages[data.group_chats[0].id][1].created_date_time
 
     finally:
         client.close()
@@ -244,19 +244,19 @@ def test_send_message_in_chat_integration(httpserver):
                 type=ChatType.GROUP,
             ),
             body=MessageBody(
-                Content=data.newMessageTemplate.Content,
-                ContentType=MessageContentType(data.newMessageTemplate.ContentType),
-                Mentions=[],
+                content=data.newMessageTemplate.content,
+                content_type=MessageContentType(data.newMessageTemplate.content_type),
+                mentions=[],
             )
         )
 
-        assert message.ID == data.newMessageTemplate.ID
-        assert message.Content == data.newMessageTemplate.Content
-        assert message.ContentType == MessageContentType(data.newMessageTemplate.ContentType)
-        assert message.From.UserID == data.newMessageTemplate.From.UserID
-        assert message.From.DisplayName == data.newMessageTemplate.From.DisplayName
-        assert message.ReplyCount == data.newMessageTemplate.ReplyCount
-        assert message.CreatedDateTime == data.newMessageTemplate.CreatedDateTime
+        assert message.id == data.newMessageTemplate.id
+        assert message.content == data.newMessageTemplate.content
+        assert message.content_type == MessageContentType(data.newMessageTemplate.content_type)
+        assert message.sender.user_id == data.newMessageTemplate.sender.user_id
+        assert message.sender.display_name == data.newMessageTemplate.sender.display_name
+        assert message.reply_count == data.newMessageTemplate.reply_count
+        assert message.created_date_time == data.newMessageTemplate.created_date_time
 
     finally:
         client.close()
@@ -274,7 +274,7 @@ def test_delete_message_in_chat_integration(httpserver):
                 ref=data.group_chats[0].topic,
                 type=ChatType.GROUP,
             ),
-            message_id=data.chat_messages[data.group_chats[0].id][0].ID,
+            message_id=data.chat_messages[data.group_chats[0].id][0].id,
         )
 
         assert result is True
@@ -295,16 +295,16 @@ def test_get_message_in_chat_integration(httpserver):
                 ref=data.group_chats[0].topic,
                 type=ChatType.GROUP,
             ),
-            message_id=data.chat_messages[data.group_chats[0].id][0].ID,
+            message_id=data.chat_messages[data.group_chats[0].id][0].id,
         )
 
-        assert message.ID == data.chat_messages[data.group_chats[0].id][0].ID
-        assert message.Content == data.chat_messages[data.group_chats[0].id][0].Content
-        assert message.ContentType == MessageContentType(data.chat_messages[data.group_chats[0].id][0].ContentType)
-        assert message.From.UserID == data.chat_messages[data.group_chats[0].id][0].From.UserID
-        assert message.From.DisplayName == data.chat_messages[data.group_chats[0].id][0].From.DisplayName
-        assert message.ReplyCount == data.chat_messages[data.group_chats[0].id][0].ReplyCount
-        assert message.CreatedDateTime == data.chat_messages[data.group_chats[0].id][0].CreatedDateTime
+        assert message.id == data.chat_messages[data.group_chats[0].id][0].id
+        assert message.content == data.chat_messages[data.group_chats[0].id][0].content
+        assert message.content_type == MessageContentType(data.chat_messages[data.group_chats[0].id][0].content_type)
+        assert message.sender.user_id == data.chat_messages[data.group_chats[0].id][0].sender.user_id
+        assert message.sender.display_name == data.chat_messages[data.group_chats[0].id][0].sender.display_name
+        assert message.reply_count == data.chat_messages[data.group_chats[0].id][0].reply_count
+        assert message.created_date_time == data.chat_messages[data.group_chats[0].id][0].created_date_time
     finally:
         client.close()
 
@@ -325,21 +325,21 @@ def test_get_all_messages_in_chat_integration(httpserver):
 
         assert len(messages) == len(data.chat_messages[data.group_chats[0].id])
 
-        assert messages[0].ID == data.chat_messages[data.group_chats[0].id][0].ID
-        assert messages[0].Content == data.chat_messages[data.group_chats[0].id][0].Content
-        assert messages[0].ContentType == MessageContentType(data.chat_messages[data.group_chats[0].id][0].ContentType)
-        assert messages[0].From.UserID == data.chat_messages[data.group_chats[0].id][0].From.UserID
-        assert messages[0].From.DisplayName == data.chat_messages[data.group_chats[0].id][0].From.DisplayName
-        assert messages[0].ReplyCount == 0
-        assert messages[0].CreatedDateTime == data.chat_messages[data.group_chats[0].id][0].CreatedDateTime
+        assert messages[0].id == data.chat_messages[data.group_chats[0].id][0].id
+        assert messages[0].content == data.chat_messages[data.group_chats[0].id][0].content
+        assert messages[0].content_type == MessageContentType(data.chat_messages[data.group_chats[0].id][0].content_type)
+        assert messages[0].sender.user_id == data.chat_messages[data.group_chats[0].id][0].sender.user_id
+        assert messages[0].sender.display_name == data.chat_messages[data.group_chats[0].id][0].sender.display_name
+        assert messages[0].reply_count == 0
+        assert messages[0].created_date_time == data.chat_messages[data.group_chats[0].id][0].created_date_time
 
-        assert messages[1].ID == data.chat_messages[data.group_chats[0].id][1].ID
-        assert messages[1].Content == data.chat_messages[data.group_chats[0].id][1].Content
-        assert messages[1].ContentType == MessageContentType(data.chat_messages[data.group_chats[0].id][1].ContentType)
-        assert messages[1].From.UserID == data.chat_messages[data.group_chats[0].id][1].From.UserID
-        assert messages[1].From.DisplayName == data.chat_messages[data.group_chats[0].id][1].From.DisplayName
-        assert messages[1].ReplyCount == 0
-        assert messages[1].CreatedDateTime == data.chat_messages[data.group_chats[0].id][1].CreatedDateTime
+        assert messages[1].id == data.chat_messages[data.group_chats[0].id][1].id
+        assert messages[1].content == data.chat_messages[data.group_chats[0].id][1].content
+        assert messages[1].content_type == MessageContentType(data.chat_messages[data.group_chats[0].id][1].content_type)
+        assert messages[1].sender.user_id == data.chat_messages[data.group_chats[0].id][1].sender.user_id
+        assert messages[1].sender.display_name == data.chat_messages[data.group_chats[0].id][1].sender.display_name
+        assert messages[1].reply_count == 0
+        assert messages[1].created_date_time == data.chat_messages[data.group_chats[0].id][1].created_date_time
 
     finally:
         client.close()
@@ -362,21 +362,21 @@ def test_list_pinned_messages_integration(httpserver):
 
         assert len(messages) == len(data.chat_messages[data.group_chats[0].id])
 
-        assert messages[0].ID == data.chat_messages[data.group_chats[0].id][0].ID
-        assert messages[0].Content == data.chat_messages[data.group_chats[0].id][0].Content
-        assert messages[0].ContentType == MessageContentType(data.chat_messages[data.group_chats[0].id][0].ContentType)
-        assert messages[0].From.UserID == data.chat_messages[data.group_chats[0].id][0].From.UserID
-        assert messages[0].From.DisplayName == data.chat_messages[data.group_chats[0].id][0].From.DisplayName
-        assert messages[0].ReplyCount == 0
-        assert messages[0].CreatedDateTime == data.chat_messages[data.group_chats[0].id][0].CreatedDateTime
+        assert messages[0].id == data.chat_messages[data.group_chats[0].id][0].id
+        assert messages[0].content == data.chat_messages[data.group_chats[0].id][0].content
+        assert messages[0].content_type == MessageContentType(data.chat_messages[data.group_chats[0].id][0].content_type)
+        assert messages[0].sender.user_id == data.chat_messages[data.group_chats[0].id][0].sender.user_id
+        assert messages[0].sender.display_name == data.chat_messages[data.group_chats[0].id][0].sender.display_name
+        assert messages[0].reply_count == 0
+        assert messages[0].created_date_time == data.chat_messages[data.group_chats[0].id][0].created_date_time
 
-        assert messages[1].ID == data.chat_messages[data.group_chats[0].id][1].ID
-        assert messages[1].Content == data.chat_messages[data.group_chats[0].id][1].Content
-        assert messages[1].ContentType == MessageContentType(data.chat_messages[data.group_chats[0].id][1].ContentType)
-        assert messages[1].From.UserID == data.chat_messages[data.group_chats[0].id][1].From.UserID
-        assert messages[1].From.DisplayName == data.chat_messages[data.group_chats[0].id][1].From.DisplayName
-        assert messages[1].ReplyCount == 0
-        assert messages[1].CreatedDateTime == data.chat_messages[data.group_chats[0].id][1].CreatedDateTime
+        assert messages[1].id == data.chat_messages[data.group_chats[0].id][1].id
+        assert messages[1].content == data.chat_messages[data.group_chats[0].id][1].content
+        assert messages[1].content_type == MessageContentType(data.chat_messages[data.group_chats[0].id][1].content_type)
+        assert messages[1].sender.user_id == data.chat_messages[data.group_chats[0].id][1].sender.user_id
+        assert messages[1].sender.display_name == data.chat_messages[data.group_chats[0].id][1].sender.display_name
+        assert messages[1].reply_count == 0
+        assert messages[1].created_date_time == data.chat_messages[data.group_chats[0].id][1].created_date_time
 
     finally:
         client.close()
@@ -395,7 +395,7 @@ def test_pin_message_in_chat_integration(httpserver):
                 ref=data.group_chats[0].topic,
                 type=ChatType.GROUP,
             ),
-            message_id=data.chat_messages[data.group_chats[0].id][0].ID,
+            message_id=data.chat_messages[data.group_chats[0].id][0].id,
         )
 
         assert result is True
@@ -417,7 +417,7 @@ def test_unpin_message_in_chat_integration(httpserver):
                 ref=data.group_chats[0].topic,
                 type=ChatType.GROUP,
             ),
-            message_id=data.chat_messages[data.group_chats[0].id][0].ID,
+            message_id=data.chat_messages[data.group_chats[0].id][0].id,
         )
 
         assert result is True
