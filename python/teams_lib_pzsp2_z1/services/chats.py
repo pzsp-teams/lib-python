@@ -111,11 +111,11 @@ class ChatsService(BaseService):
         )
 
         return Member(
-            ID=member["ID"],
-            DisplayName=member["DisplayName"],
-            UserID=member["UserID"],
-            Role=member["Role"],
-            Email=member["Email"],
+            id=member["ID"],
+            display_name=member["DisplayName"],
+            user_id=member["UserID"],
+            role=member["Role"],
+            email=member["Email"],
         )
 
     def remove_member_from_group_chat(
@@ -160,11 +160,11 @@ class ChatsService(BaseService):
 
         return [
             Member(
-                ID=member["ID"],
-                DisplayName=member["DisplayName"],
-                UserID=member["UserID"],
-                Role=member["Role"],
-                Email=member["Email"],
+                id=member["ID"],
+                display_name=member["DisplayName"],
+                user_id=member["UserID"],
+                role=member["Role"],
+                email=member["Email"],
             )
             for member in members
         ]
@@ -523,10 +523,10 @@ class ChatsService(BaseService):
 
         return [
             Mention(
-                Kind=mention["Kind"],
-                AtID=mention["AtID"],
-                Text=mention["Text"],
-                TargetID=mention["TargetID"],
+                kind=mention["Kind"],
+                at_id=mention["AtID"],
+                text=mention["Text"],
+                target_id=mention["TargetID"],
             )
             for mention in mentions
         ]
