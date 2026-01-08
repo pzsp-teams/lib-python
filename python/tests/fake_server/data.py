@@ -59,9 +59,9 @@ class FakeServerData:
     def __init__(self) -> None:
         # --- Teams ---
         self.teams = [
-            Team(ID="team-123-abc", DisplayName="Test Team", Description="A team for testing", IsArchived=False, Visibility="private"),
-            Team(ID="team-456-def", DisplayName="Another Team", Description="Another team for testing", IsArchived=False, Visibility="public"),
-            Team(ID="archived-team-789-ghi", DisplayName="Archived Team", Description="An archived team for testing", IsArchived=True, Visibility="private")
+            Team(id="team-123-abc", display_name="Test Team", description="A team for testing", is_archived=False, visibility="private"),
+            Team(id="team-456-def", display_name="Another Team", description="Another team for testing", is_archived=False, visibility="public"),
+            Team(id="archived-team-789-ghi", display_name="Archived Team", description="An archived team for testing", is_archived=True, visibility="private")
         ]
         self.potentialTeams = []
 
@@ -157,7 +157,7 @@ class FakeServerData:
 
     # --- Helpers ---
     def _find_team(self, team_id: str) -> Optional[Team]:
-        return next((t for t in self.teams if t.ID == team_id), None)
+        return next((t for t in self.teams if t.id == team_id), None)
 
     def _find_channel(self, team_id: str, channel_id: str) -> Optional[Channel]:
         return next((c for c in self.channels.get(team_id, []) if c.id == channel_id), None)
@@ -170,11 +170,11 @@ class FakeServerData:
         return {
             "value": [
                 {
-                    "id": team.ID,
-                    "displayName": team.DisplayName,
-                    "description": team.Description,
-                    "isArchived": team.IsArchived,
-                    "visibility": team.Visibility,
+                    "id": team.id,
+                    "displayName": team.display_name,
+                    "description": team.description,
+                    "isArchived": team.is_archived,
+                    "visibility": team.visibility,
                 }
                 for team in self.teams
             ],
@@ -185,11 +185,11 @@ class FakeServerData:
         if not team:
             return None
         return {
-            "id": team.ID,
-            "displayName": team.DisplayName,
-            "description": team.Description,
-            "isArchived": team.IsArchived,
-            "visibility": team.Visibility,
+            "id": team.id,
+            "displayName": team.display_name,
+            "description": team.description,
+            "isArchived": team.is_archived,
+            "visibility": team.visibility,
         }
 
     def get_updateTeam_response(self, team_id: str, update_json: dict) -> Optional[dict]:
@@ -198,18 +198,18 @@ class FakeServerData:
             return None
 
         if "displayName" in update_json:
-            team.DisplayName = update_json["displayName"]
+            team.display_name = update_json["displayName"]
         if "description" in update_json:
-            team.Description = update_json["description"]
+            team.description = update_json["description"]
         if "visibility" in update_json:
-            team.Visibility = update_json["visibility"]
+            team.visibility = update_json["visibility"]
 
         return {
-            "id": team.ID,
-            "displayName": team.DisplayName,
-            "description": team.Description,
-            "isArchived": team.IsArchived,
-            "visibility": team.Visibility,
+            "id": team.id,
+            "displayName": team.display_name,
+            "description": team.description,
+            "isArchived": team.is_archived,
+            "visibility": team.visibility,
         }
 
     def get_createGroup_response(self, request_json: dict) -> dict:
@@ -219,11 +219,11 @@ class FakeServerData:
 
         self.potentialTeams.append(
             Team(
-                ID=self.newGroupID,
-                DisplayName=request_json.get("displayName"),
-                Description=request_json.get("description"),
-                IsArchived=False,
-                Visibility=visibility,
+                id=self.newGroupID,
+                display_name=request_json.get("displayName"),
+                description=request_json.get("description"),
+                is_archived=False,
+                visibility=visibility,
             )
         )
 
@@ -240,27 +240,27 @@ class FakeServerData:
         }
 
     def get_createTeamViaGroup_response(self, group_id: str) -> dict:
-        team = next((t for t in self.potentialTeams if t.ID == group_id), None)
+        team = next((t for t in self.potentialTeams if t.id == group_id), None)
         if not team:
             return {}
 
         self.teams.append(team)
 
         return {
-            "id": team.ID,
-            "displayName": team.DisplayName,
-            "description": team.Description,
-            "isArchived": team.IsArchived,
-            "visibility": team.Visibility,
+            "id": team.id,
+            "displayName": team.display_name,
+            "description": team.description,
+            "isArchived": team.is_archived,
+            "visibility": team.visibility,
         }
 
     def get_createTeamFromTemplate_response(self, request_json: dict) -> dict:
         new_team = Team(
-            ID=self.newTeamID,
-            DisplayName=request_json.get("displayName"),
-            Description=request_json.get("description"),
-            IsArchived=False,
-            Visibility="private",
+            id=self.newTeamID,
+            display_name=request_json.get("displayName"),
+            description=request_json.get("description"),
+            is_archived=False,
+            visibility="private",
         )
         self.teams.append(new_team)
 
@@ -282,14 +282,14 @@ class FakeServerData:
         team = self._find_team(team_id)
         if not team:
             return {"success": False}
-        team.IsArchived = True
+        team.is_archived = True
         return {"success": True}
 
     def get_unarchiveTeam_response(self, team_id: str) -> dict:
         team = self._find_team(team_id)
         if not team:
             return {"success": False}
-        team.IsArchived = False
+        team.is_archived = False
         return {"success": True}
 
     def get_deleteTeam_response(self, team_id: str) -> dict:
@@ -300,17 +300,17 @@ class FakeServerData:
         return {"success": True}
 
     def get_restoreTeam_response(self, team_id: str) -> dict:
-        archived_team = next((t for t in self.teams if t.ID == team_id and t.IsArchived), None)
+        archived_team = next((t for t in self.teams if t.id == team_id and t.is_archived), None)
         if not archived_team:
             return {"success": False}
 
-        archived_team.IsArchived = False
+        archived_team.is_archived = False
         return {
-            "id": archived_team.ID,
-            "displayName": archived_team.DisplayName,
-            "description": archived_team.Description,
-            "isArchived": archived_team.IsArchived,
-            "visibility": archived_team.Visibility,
+            "id": archived_team.id,
+            "displayName": archived_team.display_name,
+            "description": archived_team.description,
+            "isArchived": archived_team.is_archived,
+            "visibility": archived_team.visibility,
             "mailNickname": self.newGroupMailNickname
         }
 

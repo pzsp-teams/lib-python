@@ -38,11 +38,11 @@ class TeamsService(BaseService):
         )
 
         return Team(
-            ID=response["ID"],
-            DisplayName=response["DisplayName"],
-            Description=response["Description"],
-            IsArchived=(True if response["IsArchived"] else False),
-            Visibility=response["Visibility"],
+            id=response["ID"],
+            display_name=response["DisplayName"],
+            description=response["Description"],
+            is_archived=(True if response["IsArchived"] else False),
+            visibility=response["Visibility"],
         )
 
     def list_my_joined(self) -> list[Team]:
@@ -58,11 +58,11 @@ class TeamsService(BaseService):
         )
         return [
             Team(
-                ID=team["ID"],
-                DisplayName=team["DisplayName"],
-                Description=team["Description"],
-                IsArchived=(True if team["IsArchived"] else False),
-                Visibility=team["Visibility"],
+                id=team["ID"],
+                display_name=team["DisplayName"],
+                description=team["Description"],
+                is_archived=(True if team["IsArchived"] else False),
+                visibility=team["Visibility"],
             )
             for team in response
         ]
@@ -90,11 +90,11 @@ class TeamsService(BaseService):
             params=params,
         )
         return Team(
-            ID=response["ID"],
-            DisplayName=response["DisplayName"],
-            Description=response["Description"],
-            IsArchived=(True if response["IsArchived"] else False),
-            Visibility=response["Visibility"],
+            id=response["ID"],
+            display_name=response["DisplayName"],
+            description=response["Description"],
+            is_archived=(True if response["IsArchived"] else False),
+            visibility=response["Visibility"],
         )
 
     def create_via_group(
@@ -120,11 +120,11 @@ class TeamsService(BaseService):
             },
         )
         return Team(
-            ID=response["ID"],
-            DisplayName=response["DisplayName"],
-            Description=response["Description"],
-            IsArchived=(True if response["IsArchived"] else False),
-            Visibility=response["Visibility"],
+            id=response["ID"],
+            display_name=response["DisplayName"],
+            description=response["Description"],
+            is_archived=(True if response["IsArchived"] else False),
+            visibility=response["Visibility"],
         )
 
     def create_from_template(  # noqa: PLR0913
