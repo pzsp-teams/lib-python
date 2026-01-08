@@ -31,6 +31,7 @@ class TeamsClient:
         chats (ChatsService): Service for managing chats and messages.
     """
 
+
     def __init__(
         self,
         auto_init: bool = True,
@@ -72,6 +73,8 @@ class TeamsClient:
         self.channels = ChannelsService(self)
         self.teams = TeamsService(self)
         self.chats = ChatsService(self)
+
+        self.is_cache_enabled = cache_mode != config.CacheMode.DISABLED
 
         if auto_init:
             self.init_client(cache_mode, cache_path)
@@ -224,9 +227,35 @@ class TeamsClient:
         return res.get("result")
 
     def close(self):
-        """
-        Terminates the underlying Go subprocess.
+        """Gracefully closes the Go backend, ensuring cache is synced.
 
-        Should be called when the client is no longer needed to free system resources.
+        Sends a 'close' command to the Go process, which triggers `lib.Close()`
+        to wait for background cache operations. Then terminates the process.
         """
-        self.proc.terminate()
+
+        if self.is_cache_enabled:
+            with self._lock:
+                if self.proc.poll() is None:
+                    try:
+                        payload = json.dumps({"type": "close"}) + "\n"
+                        self.proc.stdin.write(payload)
+                        self.proc.stdin.flush()
+                    except (BrokenPipeError, OSError):
+                        pass
+
+            try:
+                self.proc.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                self.proc.kill()
+                self.proc.wait()
+
+            try:
+                if self.proc.stdin:
+                    self.proc.stdin.close()
+                if self.proc.stdout:
+                    self.proc.stdout.close()
+            except (OSError, ValueError):
+                pass
+        else:
+            self.proc.terminate()
+            self.proc.wait()

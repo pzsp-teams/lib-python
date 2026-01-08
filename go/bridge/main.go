@@ -8,6 +8,7 @@ import (
 
 	jsonClientLib "github.com/pzsp-teams/lib-python/internal/json-client"
 	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
+	"github.com/pzsp-teams/lib"
 )
 
 var client *jsonClientLib.TeamsJSONClient
@@ -64,5 +65,11 @@ func main() {
 			respondResult(writer, result)
 			continue
 		}
+
+        if req.Type == "close" {
+			lib.Close()
+            respondResult(writer, "closed")
+            return
+        }
 	}
 }
