@@ -89,7 +89,7 @@ def setup_fake_server(httpserver) -> FakeServerData:
             chat_type = match.group(1)
 
         if chat_type == "oneOnOne":
-            chat_type = ChatType.ONEONONE
+            chat_type = ChatType.ONE_ON_ONE
         elif chat_type == "group":
             chat_type = ChatType.GROUP
 
