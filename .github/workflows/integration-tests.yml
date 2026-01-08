@@ -2,10 +2,10 @@ name: Python Integration Tests
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
     types: [review_requested, ready_for_review]
   push:
-    branches: [ main ]
+    branches: [main]
   repository_dispatch:
     types: [verify-new-go-lib-version]
 
@@ -237,6 +237,8 @@ jobs:
 
           # clean up unneeded files
           rm -rf python_release/tests
+          rm -rf python_release/docs
+          rm mkdocs.yml
           find python_release -type d -name "__pycache__" -exec rm -rf {} +
           rm -rf python_release/.venv
 
