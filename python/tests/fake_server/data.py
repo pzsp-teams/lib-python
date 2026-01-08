@@ -40,12 +40,12 @@ class FakeServerData:
     newChannelName: str = "New Channel"
     newChannelID: str = "19:newchannelid@thread.tacv2"
     newMessageTemplate: Message = field(default_factory=lambda: Message(
-        ID="new-message-id",
-        Content="This is a new message.",
-        ContentType="text",
-        From=MessageFrom(UserID="user-new-001", DisplayName="New User"),
-        CreatedDateTime="2024-01-02T10:00:00Z",
-        ReplyCount=0,
+        id="new-message-id",
+        content="This is a new message.",
+        content_type="text",
+        sender=MessageFrom(user_id="user-new-001", display_name="New User"),
+        created_date_time="2024-01-02T10:00:00Z",
+        reply_count=0,
     ))
     newMemberTemplate: Member = field(default_factory=lambda: Member(
         id="user-new-002", user_id="new-user-002", display_name="New Member",
@@ -76,16 +76,16 @@ class FakeServerData:
         # --- Messages (Channel) ---
         self.messages = {
             "19:123123@thread.tacv2": [
-                Message(ID="msg-001", Content="Hello, team!", ContentType="text", From=MessageFrom(UserID="user-123-abc", DisplayName="Alice"), CreatedDateTime="2024-01-01T10:00:00Z", ReplyCount=0),
-                Message(ID="msg-002", Content="Don't forget the meeting at 3 PM.", ContentType="text", From=MessageFrom(UserID="user-456-def", DisplayName="Bob"), CreatedDateTime="2024-01-01T11:00:00Z", ReplyCount=2),
+                Message(id="msg-001", content="Hello, team!", content_type="text", sender=MessageFrom(user_id="user-123-abc", display_name="Alice"), created_date_time="2024-01-01T10:00:00Z", reply_count=0),
+                Message(id="msg-002", content="Don't forget the meeting at 3 PM.", content_type="text", sender=MessageFrom(user_id="user-456-def", display_name="Bob"), created_date_time="2024-01-01T11:00:00Z", reply_count=2),
             ],
         }
 
         # --- Replies ---
         self.replies = {
             "msg-002": [
-                Message(ID="msg-002-reply-001", Content="Thanks for the reminder!", ContentType="text", From=MessageFrom(UserID="user-789-ghi", DisplayName="Charlie"), CreatedDateTime="2024-01-01T12:00:00Z", ReplyCount=0),
-                Message(ID="msg-002-reply-002", Content="I'll be there.", ContentType="text", From=MessageFrom(UserID="user-123-abc", DisplayName="Alice"), CreatedDateTime="2024-01-01T12:30:00Z", ReplyCount=0),
+                Message(id="msg-002-reply-001", content="Thanks for the reminder!", content_type="text", sender=MessageFrom(user_id="user-789-ghi", display_name="Charlie"), created_date_time="2024-01-01T12:00:00Z", reply_count=0),
+                Message(id="msg-002-reply-002", content="I'll be there.", content_type="text", sender=MessageFrom(user_id="user-123-abc", display_name="Alice"), created_date_time="2024-01-01T12:30:00Z", reply_count=0),
             ],
         }
 
@@ -124,8 +124,8 @@ class FakeServerData:
 
         self.chat_messages = {
             "chat-123-abc": [
-                Message(ID="msg-001", Content="Hello, team!", ContentType="text", From=MessageFrom(UserID="user-123-abc", DisplayName="Alice"), CreatedDateTime="2024-01-01T10:00:00Z", ReplyCount=0),
-                Message(ID="msg-002", Content="Don't forget the meeting at 3 PM.", ContentType="text", From=MessageFrom(UserID="user-456-def", DisplayName="Bob"), CreatedDateTime="2024-01-01T11:00:00Z", ReplyCount=2),
+                Message(id="msg-001", content="Hello, team!", content_type="text", sender=MessageFrom(user_id="user-123-abc", display_name="Alice"), created_date_time="2024-01-01T10:00:00Z", reply_count=0),
+                Message(id="msg-002", content="Don't forget the meeting at 3 PM.", content_type="text", sender=MessageFrom(user_id="user-456-def", display_name="Bob"), created_date_time="2024-01-01T11:00:00Z", reply_count=2),
             ],
         }
 
@@ -143,9 +143,9 @@ class FakeServerData:
 
         # Initialize templates manually to match original structure exactly if factories behave differently
         self.newMessageTemplate = Message(
-            ID="new-message-id", Content="This is a new message.", ContentType="text",
-            From=MessageFrom(UserID="user-new-001", DisplayName="New User"),
-            CreatedDateTime="2024-01-02T10:00:00Z", ReplyCount=0
+            id="new-message-id", content="This is a new message.", content_type="text",
+            sender=MessageFrom(user_id="user-new-001", display_name="New User"),
+            created_date_time="2024-01-02T10:00:00Z", reply_count=0
         )
         self.newMemberTemplate = Member(
             id="user-new-002", user_id="new-user-002", display_name="New Member",
@@ -381,99 +381,99 @@ class FakeServerData:
         return {
             "value": [
                 {
-                    "id": message.ID,
+                    "id": message.id,
                     "body": {
-                        "content": message.Content,
-                        "contentType": message.ContentType,
+                        "content": message.content,
+                        "contentType": message.content_type,
                     },
                     "from": {
                         "user": {
-                            "id": message.From.UserID,
-                            "displayName": message.From.DisplayName,
+                            "id": message.sender.user_id,
+                            "displayName": message.sender.display_name,
                         }
                     },
-                    "createdDateTime": message.CreatedDateTime,
-                    "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
+                    "createdDateTime": message.created_date_time,
+                    "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.reply_count)]
                 }
                 for message in self.messages.get(channel_id, [])
             ],
         }
 
     def get_message_response(self, team_id: str, channel_id: str, message_id: str) -> Optional[dict]:
-        message = next((m for m in self.messages.get(channel_id, []) if m.ID == message_id), None)
+        message = next((m for m in self.messages.get(channel_id, []) if m.id == message_id), None)
         if not message:
             return None
 
         return {
-            "id": message.ID,
+            "id": message.id,
             "body": {
-                "content": message.Content,
-                "contentType": message.ContentType,
+                "content": message.content,
+                "contentType": message.content_type,
             },
             "from": {
                 "user": {
-                    "id": message.From.UserID,
-                    "displayName": message.From.DisplayName,
+                    "id": message.sender.user_id,
+                    "displayName": message.sender.display_name,
                 }
             },
-            "createdDateTime": message.CreatedDateTime,
-            "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
+            "createdDateTime": message.created_date_time,
+            "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.reply_count)]
         }
 
     def get_send_message_response(self, team_id: str, channel_id: str, request_json: dict) -> dict:
         return {
-            "id": self.newMessageTemplate.ID,
+            "id": self.newMessageTemplate.id,
             "body": {
                 "content": request_json.get("body", {}).get("content"),
                 "contentType": request_json.get("body", {}).get("contentType"),
             },
             "from": {
                 "user": {
-                    "id": self.newMessageTemplate.From.UserID,
-                    "displayName": self.newMessageTemplate.From.DisplayName,
+                    "id": self.newMessageTemplate.sender.user_id,
+                    "displayName": self.newMessageTemplate.sender.display_name,
                 }
             },
-            "createdDateTime": self.newMessageTemplate.CreatedDateTime,
+            "createdDateTime": self.newMessageTemplate.created_date_time,
         }
 
     def get_list_replies_response(self, team_id: str, channel_id: str, message_id: str) -> dict:
         return {
             "value": [
                 {
-                    "id": reply.ID,
+                    "id": reply.id,
                     "body": {
-                        "content": reply.Content,
-                        "contentType": reply.ContentType,
+                        "content": reply.content,
+                        "contentType": reply.content_type,
                     },
                     "from": {
                         "user": {
-                            "id": reply.From.UserID,
-                            "displayName": reply.From.DisplayName,
+                            "id": reply.sender.user_id,
+                            "displayName": reply.sender.display_name,
                         }
                     },
-                    "createdDateTime": reply.CreatedDateTime,
+                    "createdDateTime": reply.created_date_time,
                 }
                 for reply in self.replies.get(message_id, [])
             ],
         }
 
     def get_reply_response(self, team_id: str, channel_id: str, message_id: str, reply_id: str) -> Optional[dict]:
-        reply = next((r for r in self.replies.get(message_id, []) if r.ID == reply_id), None)
+        reply = next((r for r in self.replies.get(message_id, []) if r.id == reply_id), None)
         if not reply:
             return None
         return {
-            "id": reply.ID,
+            "id": reply.id,
             "body": {
-                "content": reply.Content,
-                "contentType": reply.ContentType,
+                "content": reply.content,
+                "contentType": reply.content_type,
             },
             "from": {
                 "user": {
-                    "id": reply.From.UserID,
-                    "displayName": reply.From.DisplayName,
+                    "id": reply.sender.user_id,
+                    "displayName": reply.sender.display_name,
                 }
             },
-            "createdDateTime": reply.CreatedDateTime,
+            "createdDateTime": reply.created_date_time,
         }
 
     # ==========================================
@@ -622,59 +622,59 @@ class FakeServerData:
         return {
             "value": [
                 {
-                    "id": message.ID,
+                    "id": message.id,
                     "body": {
-                        "content": message.Content,
-                        "contentType": message.ContentType,
+                        "content": message.content,
+                        "contentType": message.content_type,
                     },
                     "from": {
                         "user": {
-                            "id": message.From.UserID,
-                            "displayName": message.From.DisplayName,
+                            "id": message.sender.user_id,
+                            "displayName": message.sender.display_name,
                         }
                     },
-                    "createdDateTime": message.CreatedDateTime,
-                    "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
+                    "createdDateTime": message.created_date_time,
+                    "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.reply_count)]
                 }
                 for message in self.chat_messages.get(chat_id, [])
             ],
         }
 
     def get_get_message_in_chat_response(self, chat_id: str, message_id: str) -> Optional[dict]:
-        message = next((m for m in self.chat_messages.get(chat_id, []) if m.ID == message_id), None)
+        message = next((m for m in self.chat_messages.get(chat_id, []) if m.id == message_id), None)
         if not message:
             return None
 
         return {
-            "id": message.ID,
+            "id": message.id,
             "body": {
-                "content": message.Content,
-                "contentType": message.ContentType,
+                "content": message.content,
+                "contentType": message.content_type,
             },
             "from": {
                 "user": {
-                    "id": message.From.UserID,
-                    "displayName": message.From.DisplayName,
+                    "id": message.sender.user_id,
+                    "displayName": message.sender.display_name,
                 }
             },
-            "createdDateTime": message.CreatedDateTime,
-            "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.ReplyCount)]
+            "createdDateTime": message.created_date_time,
+            "replies": [{"id": f"dummy-reply-{i}"} for i in range(message.reply_count)]
         }
 
     def get_send_message_in_chat_response(self, chat_id: str, request_json: dict) -> dict:
         return {
-            "id": self.newMessageTemplate.ID,
+            "id": self.newMessageTemplate.id,
             "body": {
                 "content": request_json.get("body", {}).get("content"),
                 "contentType": request_json.get("body", {}).get("contentType"),
             },
             "from": {
                 "user": {
-                    "id": self.newMessageTemplate.From.UserID,
-                    "displayName": self.newMessageTemplate.From.DisplayName,
+                    "id": self.newMessageTemplate.sender.user_id,
+                    "displayName": self.newMessageTemplate.sender.display_name,
                 }
             },
-            "createdDateTime": self.newMessageTemplate.CreatedDateTime,
+            "createdDateTime": self.newMessageTemplate.created_date_time,
         }
 
     def get_all_messeges_in_chats_response(self) -> dict:
@@ -685,22 +685,22 @@ class FakeServerData:
             "value": [
                 {
                     ODATA_TYPE: "#microsoft.graph.chatMessage",
-                    "id": message.ID,
-                    "etag": message.ID,
+                    "id": message.id,
+                    "etag": message.id,
                     "messageType": "message",
                     "chatId": target_chat_id,
                     "body": {
-                        "content": message.Content,
-                        "contentType": message.ContentType,
+                        "content": message.content,
+                        "contentType": message.content_type,
                     },
                     "from": {
                         "user": {
-                            "id": message.From.UserID,
-                            "displayName": message.From.DisplayName,
+                            "id": message.sender.user_id,
+                            "displayName": message.sender.display_name,
                         }
                     },
-                    "createdDateTime": message.CreatedDateTime,
-                    "lastModifiedDateTime": message.CreatedDateTime,
+                    "createdDateTime": message.created_date_time,
+                    "lastModifiedDateTime": message.created_date_time,
                 }
                 for message in self.chat_messages[target_chat_id]
             ],
@@ -711,7 +711,7 @@ class FakeServerData:
             "value": [
                 {
                     ODATA_TYPE: "#microsoft.graph.pinnedChatMessageInfo",
-                    "id": message.ID,
+                    "id": message.id,
                 }
                 for message in self.chat_messages.get(chat_id, [])
             ],
