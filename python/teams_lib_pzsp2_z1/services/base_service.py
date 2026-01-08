@@ -6,5 +6,7 @@ if TYPE_CHECKING:
     from teams_lib_pzsp2_z1.client import TeamsClient
 
 class BaseService:
+    """Base class for all service classes in the Teams library."""
+
     def __init__(self, client: TeamsClient):
         self.client = client
