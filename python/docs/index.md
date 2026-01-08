@@ -102,3 +102,28 @@ The library relies on a compiled Go backend to handle performance-critical tasks
     - The Go process executes the request against the **Microsoft Graph API**.
     - The JSON response is read from **stdout** and mapped back to native **Python objects**.
 
+### Process Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Py as Python Client
+    participant Go as Go Subprocess
+    participant MS as Microsoft Graph
+
+    rect rgba(230, 240, 255, 0.7)
+        note right of Py: Phase 1: Initialization
+        Py->>Py: Detect OS & Spawn Process
+        Py->>Go: Send {"type": "init", ...}
+        Go->>Go: Setup MSAL & Cache
+        Go-->>Py: {"result": "initialized"}
+    end
+
+    rect rgba(240, 255, 240, 0.7)
+        note right of Py: Phase 2: Normal Operation Loop
+        Py->>Go: Send {"type": "request", "method": "getTeam", ...}
+        Go->>MS: GET /v1.0/teams/{id}
+        MS-->>Go: HTTP 200 OK (JSON)
+        Go-->>Py: {"result": {...}}
+        Py->>Py: Map JSON to Python DataClass
+    end
+```
