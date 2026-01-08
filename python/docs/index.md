@@ -33,7 +33,7 @@ It acts as a wrapper around a Go binary (`teamsClientLib`), communicating via a 
 Library is available fully via pip
 
 ```bash
-pip install pzsp2z1teams
+pip install teams_lib_pzsp2_z1
 ```
 
 ## Quick start
