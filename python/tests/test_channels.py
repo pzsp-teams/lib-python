@@ -285,19 +285,19 @@ def test_list_members_integration(httpserver):
 
         assert len(members) == len(expected_members)
 
-        assert members[0].UserID == expected_members[0].UserID
-        assert members[0].DisplayName == expected_members[0].DisplayName
-        expected_role_0 = "owner" if expected_members[0].Role == "owner" else ""
-        assert members[0].Role == expected_role_0
-        assert members[0].Email == expected_members[0].Email
-        assert members[0].ID == expected_members[0].ID
+        assert members[0].user_id == expected_members[0].user_id
+        assert members[0].display_name == expected_members[0].display_name
+        expected_role_0 = "owner" if expected_members[0].role == "owner" else ""
+        assert members[0].role == expected_role_0
+        assert members[0].email == expected_members[0].email
+        assert members[0].id == expected_members[0].id
 
-        assert members[1].UserID == expected_members[1].UserID
-        assert members[1].DisplayName == expected_members[1].DisplayName
-        expected_role_1 = "owner" if expected_members[1].Role == "owner" else ""
-        assert members[1].Role == expected_role_1
-        assert members[1].Email == expected_members[1].Email
-        assert members[1].ID == expected_members[1].ID
+        assert members[1].user_id == expected_members[1].user_id
+        assert members[1].display_name == expected_members[1].display_name
+        expected_role_1 = "owner" if expected_members[1].role == "owner" else ""
+        assert members[1].role == expected_role_1
+        assert members[1].email == expected_members[1].email
+        assert members[1].id == expected_members[1].id
 
     finally:
         client.close()
@@ -314,15 +314,15 @@ def test_add_member_integration(httpserver):
         member = client.channels.add_member(
             team_ref=data.teams[0].DisplayName,
             channel_ref=data.channels[data.teams[0].ID][1].name,
-            user_ref=data.newMemberTemplate.DisplayName,
-            is_owner=True if data.newMemberTemplate.Role == "owner" else False,
+            user_ref=data.newMemberTemplate.display_name,
+            is_owner=True if data.newMemberTemplate.role == "owner" else False,
         )
 
-        assert member.UserID == data.newMemberTemplate.UserID
-        assert member.DisplayName == data.newMemberTemplate.DisplayName
-        assert member.Role == data.newMemberTemplate.Role
-        assert member.Email == data.newMemberTemplate.Email
-        assert member.ID == data.newMemberTemplate.ID
+        assert member.user_id == data.newMemberTemplate.user_id
+        assert member.display_name == data.newMemberTemplate.display_name
+        assert member.role == data.newMemberTemplate.role
+        assert member.email == data.newMemberTemplate.email
+        assert member.id == data.newMemberTemplate.id
 
     finally:
         client.close()
@@ -339,15 +339,15 @@ def test_update_member_role_integration(httpserver):
         member = client.channels.update_member_role(
             team_ref=data.teams[0].DisplayName,
             channel_ref=data.channels[data.teams[0].ID][0].name,
-            user_ref=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].Email,
+            user_ref=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].email,
             is_owner=True
         )
 
-        assert member.UserID == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].UserID
-        assert member.DisplayName == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].DisplayName
-        assert member.Role == "owner"
-        assert member.Email == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].Email
-        assert member.ID == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].ID
+        assert member.user_id == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].user_id
+        assert member.display_name == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].display_name
+        assert member.role == "owner"
+        assert member.email == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].email
+        assert member.id == data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].id
     finally:
         client.close()
 
@@ -363,7 +363,7 @@ def test_remove_member_integration(httpserver):
         success = client.channels.remove_member(
             team_ref=data.teams[0].DisplayName,
             channel_ref=data.channels[data.teams[0].ID][0].name,
-            user_ref=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].Email,
+            user_ref=data.members[data.teams[0].ID][data.channels[data.teams[0].ID][0].id][1].email,
         )
 
         assert success is True
@@ -385,10 +385,10 @@ def test_get_mention_integration(httpserver):
             raw_mentions=MentionKind.TEAM.value,
         )
 
-        assert mention[0].Kind == MentionKind.TEAM.value
-        assert mention[0].AtID == 0
-        assert mention[0].Text == data.teams[0].DisplayName
-        assert mention[0].TargetID == data.teams[0].ID
+        assert mention[0].kind == MentionKind.TEAM.value
+        assert mention[0].at_id == 0
+        assert mention[0].text == data.teams[0].DisplayName
+        assert mention[0].target_id == data.teams[0].ID
 
     finally:
         client.close()

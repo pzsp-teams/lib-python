@@ -48,8 +48,8 @@ class FakeServerData:
         ReplyCount=0,
     ))
     newMemberTemplate: Member = field(default_factory=lambda: Member(
-        ID="user-new-002", UserID="new-user-002", DisplayName="New Member",
-        Role="owner", Email="newmember@example.com"
+        id="user-new-002", user_id="new-user-002", display_name="New Member",
+        role="owner", email="newmember@example.com"
     ))
     newChatTemplate: Chat = field(default_factory=lambda: Chat(
         id="new-chat-001", type=ChatType.GROUP, is_hidden=False, topic="New Chat Topic"
@@ -93,18 +93,18 @@ class FakeServerData:
         self.members = {
             "team-123-abc": {
                 "19:123123@thread.tacv2": [
-                    Member(ID="user-123-abc", UserID="user-123-abc", DisplayName="Alice", Role="owner", Email="alice@example.com"),
-                    Member(ID="user-456-def", UserID="user-456-def", DisplayName="Bob", Role="member", Email="bob@example.com"),
+                    Member(id="user-123-abc", user_id="user-123-abc", display_name="Alice", role="owner", email="alice@example.com"),
+                    Member(id="user-456-def", user_id="user-456-def", display_name="Bob", role="member", email="bob@example.com"),
                 ],
             }
         }
 
         # --- Users ---
         self.users = [
-            Member(ID="user-123-abc", UserID="user-123-abc", DisplayName="Alice", Role="owner", Email="alice@example.com"),
-            Member(ID="user-456-def", UserID="user-456-def", DisplayName="Bob", Role="member", Email="bob@example.com"),
+            Member(id="user-123-abc", user_id="user-123-abc", display_name="Alice", role="owner", email="alice@example.com"),
+            Member(id="user-456-def", user_id="user-456-def", display_name="Bob", role="member", email="bob@example.com"),
         ]
-        self.me = Member(ID="user-me-001", UserID="user-me-001", DisplayName="Current User", Role="member", Email="me@example.com")
+        self.me = Member(id="user-me-001", user_id="user-me-001", display_name="Current User", role="member", email="me@example.com")
 
         # --- Chats & Chat Members/Messages ---
         self.group_chats = [
@@ -117,8 +117,8 @@ class FakeServerData:
 
         self.group_chat_members = {
             "chat-123-abc": [
-                Member(ID="user-123-abc", UserID="user-123-abc", DisplayName="Alice", Role="owner", Email="alice@example.com"),
-                Member(ID="user-456-def", UserID="user-456-def", DisplayName="Bob", Role="member", Email="bob@example.com"),
+                Member(id="user-123-abc", user_id="user-123-abc", display_name="Alice", role="owner", email="alice@example.com"),
+                Member(id="user-456-def", user_id="user-456-def", display_name="Bob", role="member", email="bob@example.com"),
             ],
         }
 
@@ -148,8 +148,8 @@ class FakeServerData:
             CreatedDateTime="2024-01-02T10:00:00Z", ReplyCount=0
         )
         self.newMemberTemplate = Member(
-            ID="user-new-002", UserID="new-user-002", DisplayName="New Member",
-            Role="owner", Email="newmember@example.com"
+            id="user-new-002", user_id="new-user-002", display_name="New Member",
+            role="owner", email="newmember@example.com"
         )
         self.newChatTemplate = Chat(
             id="new-chat-001", type=ChatType.GROUP, is_hidden=False, topic="New Chat Topic"
@@ -486,50 +486,50 @@ class FakeServerData:
             "value": [
                 {
                     ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
-                    "id": member.ID,
-                    "userId": member.UserID,
-                    "displayName": member.DisplayName,
-                    "roles": [member.Role] if member.Role == "owner" else [],
-                    "email": member.Email,
+                    "id": member.id,
+                    "userId": member.user_id,
+                    "displayName": member.display_name,
+                    "roles": [member.role] if member.role == "owner" else [],
+                    "email": member.email,
                 }
                 for member in self.members.get(team_id, {}).get(channel_id, [])
             ],
         }
 
     def get_add_member_response(self, team_id: str, request_json: dict) -> dict:
-        roles = ["owner"] if self.newMemberTemplate.Role == "owner" else []
+        roles = ["owner"] if self.newMemberTemplate.role == "owner" else []
         return {
             ODATA_CONTEXT: f"{GRAPH_URL}#teams('{team_id}')/members/$entity",
             ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
-            "id": self.newMemberTemplate.ID,
+            "id": self.newMemberTemplate.id,
             "roles": roles,
-            "displayName": self.newMemberTemplate.DisplayName,
-            "userId": self.newMemberTemplate.UserID,
-            "email": self.newMemberTemplate.Email,
+            "displayName": self.newMemberTemplate.display_name,
+            "userId": self.newMemberTemplate.user_id,
+            "email": self.newMemberTemplate.email,
         }
 
     def get_update_member_role_response(self, team_id: str, channel_id: str, member_id: str, request_json: dict) -> Optional[dict]:
         channel_members = self.members.get(team_id, {}).get(channel_id, [])
-        member = next((m for m in channel_members if m.ID == member_id), None)
+        member = next((m for m in channel_members if m.id == member_id), None)
         if not member:
             return None
 
         if "roles" in request_json:
-            member.Role = "owner" if "owner" in request_json["roles"] else "member"
+            member.role = "owner" if "owner" in request_json["roles"] else "member"
 
         return {
             ODATA_CONTEXT: f"{GRAPH_URL}#teams('{team_id}')/channels('{channel_id}')/members/$entity",
             ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
-            "id": member.ID,
-            "userId": member.UserID,
-            "displayName": member.DisplayName,
-            "roles": [member.Role] if member.Role == "owner" else [],
-            "email": member.Email,
+            "id": member.id,
+            "userId": member.user_id,
+            "displayName": member.display_name,
+            "roles": [member.role] if member.role == "owner" else [],
+            "email": member.email,
         }
 
     def get_remove_member_response(self, team_id: str, channel_id: str, member_id: str) -> dict:
         channel_members = self.members.get(team_id, {}).get(channel_id, [])
-        member = next((m for m in channel_members if m.ID == member_id), None)
+        member = next((m for m in channel_members if m.id == member_id), None)
         if not member:
             return {"success": False}
         channel_members.remove(member)
@@ -590,11 +590,11 @@ class FakeServerData:
             "value": [
                 {
                     ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
-                    "id": member.ID,
-                    "userId": member.UserID,
-                    "displayName": member.DisplayName,
-                    "roles": [member.Role] if member.Role == "owner" else [],
-                    "email": member.Email,
+                    "id": member.id,
+                    "userId": member.user_id,
+                    "displayName": member.display_name,
+                    "roles": [member.role] if member.role == "owner" else [],
+                    "email": member.email,
                 }
                 for member in self.group_chat_members.get(chat_id, [])
             ],
@@ -604,11 +604,11 @@ class FakeServerData:
         return {
             ODATA_CONTEXT: f"{GRAPH_URL}#chats('{chat_id}')/members/$entity",
             ODATA_TYPE: "#microsoft.graph.aadUserConversationMember",
-            "id": self.newMemberTemplate.ID,
-            "roles": [self.newMemberTemplate.Role] if self.newMemberTemplate.Role == "owner" else [],
-            "displayName": self.newMemberTemplate.DisplayName,
-            "userId": self.newMemberTemplate.UserID,
-            "email": self.newMemberTemplate.Email,
+            "id": self.newMemberTemplate.id,
+            "roles": [self.newMemberTemplate.role] if self.newMemberTemplate.role == "owner" else [],
+            "displayName": self.newMemberTemplate.display_name,
+            "userId": self.newMemberTemplate.user_id,
+            "email": self.newMemberTemplate.email,
         }
 
     def get_remove_member_from_group_chat_response(self, chat_id: str, member_id: str) -> dict:
@@ -723,7 +723,7 @@ class FakeServerData:
 
     def get_me_response(self) -> dict:
         return {
-            "id": self.me.ID,
-            "displayName": self.me.DisplayName,
-            "email": self.me.Email,
+            "id": self.me.id,
+            "displayName": self.me.display_name,
+            "email": self.me.email,
         }

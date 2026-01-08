@@ -66,8 +66,8 @@ def test_create_group_chat_integration(httpserver):
         chat = client.chats.create_group_chat(
             topic=data.newChatTemplate.topic,
             recipient_refs=[
-                data.users[0].Email,
-                data.users[1].Email,
+                data.users[0].email,
+                data.users[1].email,
             ],
             include_me=True,
         )
@@ -89,7 +89,7 @@ def test_create_one_on_one_chat_integration(httpserver):
         init_fake_client(client, httpserver.url_for(""))
 
         chat = client.chats.create_one_on_one(
-            recipient_ref=data.users[0].Email,
+            recipient_ref=data.users[0].email,
         )
 
         assert chat.id == data.newChatTemplate.id
@@ -113,19 +113,19 @@ def test_list_group_chat_members_integration(httpserver):
 
         assert len(members) == len(data.group_chat_members[data.group_chats[0].id])
 
-        assert members[0].ID == data.group_chat_members[data.group_chats[0].id][0].ID
-        assert members[0].UserID == data.group_chat_members[data.group_chats[0].id][0].UserID
-        assert members[0].DisplayName == data.group_chat_members[data.group_chats[0].id][0].DisplayName
-        if data.group_chat_members[data.group_chats[0].id][0].Role == "owner":
-            assert members[0].Role == "owner"
-        assert members[0].Email == data.group_chat_members[data.group_chats[0].id][0].Email
+        assert members[0].id == data.group_chat_members[data.group_chats[0].id][0].id
+        assert members[0].user_id == data.group_chat_members[data.group_chats[0].id][0].user_id
+        assert members[0].display_name == data.group_chat_members[data.group_chats[0].id][0].display_name
+        if data.group_chat_members[data.group_chats[0].id][0].role == "owner":
+            assert members[0].role == "owner"
+        assert members[0].email == data.group_chat_members[data.group_chats[0].id][0].email
 
-        assert members[1].ID == data.group_chat_members[data.group_chats[0].id][1].ID
-        assert members[1].UserID == data.group_chat_members[data.group_chats[0].id][1].UserID
-        assert members[1].DisplayName == data.group_chat_members[data.group_chats[0].id][1].DisplayName
-        if data.group_chat_members[data.group_chats[0].id][1].Role == "owner":
-            assert members[1].Role == "owner"
-        assert members[1].Email == data.group_chat_members[data.group_chats[0].id][1].Email
+        assert members[1].id == data.group_chat_members[data.group_chats[0].id][1].id
+        assert members[1].user_id == data.group_chat_members[data.group_chats[0].id][1].user_id
+        assert members[1].display_name == data.group_chat_members[data.group_chats[0].id][1].display_name
+        if data.group_chat_members[data.group_chats[0].id][1].role == "owner":
+            assert members[1].role == "owner"
+        assert members[1].email == data.group_chat_members[data.group_chats[0].id][1].email
 
     finally:
         client.close()
@@ -141,14 +141,14 @@ def test_add_group_chat_member_integration(httpserver):
 
         member = client.chats.add_member_to_group_chat(
             group_chat_ref=data.group_chats[0].topic,
-            user_ref=data.newMemberTemplate.Email,
+            user_ref=data.newMemberTemplate.email,
         )
 
-        assert member.ID == data.newMemberTemplate.ID
-        assert member.UserID == data.newMemberTemplate.UserID
-        assert member.DisplayName == data.newMemberTemplate.DisplayName
-        assert member.Role == data.newMemberTemplate.Role
-        assert member.Email == data.newMemberTemplate.Email
+        assert member.id == data.newMemberTemplate.id
+        assert member.user_id == data.newMemberTemplate.user_id
+        assert member.display_name == data.newMemberTemplate.display_name
+        assert member.role == data.newMemberTemplate.role
+        assert member.email == data.newMemberTemplate.email
     finally:
         client.close()
 
@@ -163,7 +163,7 @@ def test_remove_group_chat_member_integration(httpserver):
 
         result = client.chats.remove_member_from_group_chat(
             group_chat_ref=data.group_chats[0].topic,
-            member_ref=data.group_chat_members[data.group_chats[0].id][0].Email,
+            member_ref=data.group_chat_members[data.group_chats[0].id][0].email,
         )
 
         assert result is True
@@ -442,10 +442,10 @@ def test_get_mention_integration(httpserver):
             raw_mentions=MentionKind.EVERYONE.value,
         )
 
-        assert mention[0].Kind == MentionKind.EVERYONE.value
-        assert mention[0].AtID == 0
-        assert mention[0].Text == "Everyone"
-        assert mention[0].TargetID == data.group_chats[0].id
+        assert mention[0].kind == MentionKind.EVERYONE.value
+        assert mention[0].at_id == 0
+        assert mention[0].text == "Everyone"
+        assert mention[0].target_id == data.group_chats[0].id
 
     finally:
         client.close()
