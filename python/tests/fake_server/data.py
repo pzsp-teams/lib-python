@@ -52,7 +52,7 @@ class FakeServerData:
         Role="owner", Email="newmember@example.com"
     ))
     newChatTemplate: Chat = field(default_factory=lambda: Chat(
-        ID="new-chat-001", Type=ChatType.GROUP, IsHidden=False, Topic="New Chat Topic"
+        id="new-chat-001", type=ChatType.GROUP, is_hidden=False, topic="New Chat Topic"
     ))
     updatedGroupChatTopic: str = "Updated Chat Topic"
 
@@ -68,8 +68,8 @@ class FakeServerData:
         # --- Channels ---
         self.channels = {
             "team-123-abc": [
-                Channel(ID="19:123123@thread.tacv2", Name="Something", IsGeneral=False),
-                Channel(ID="19:999999@thread.tacv2", Name="Development", IsGeneral=False),
+                Channel(id="19:123123@thread.tacv2", name="Something", is_general=False),
+                Channel(id="19:999999@thread.tacv2", name="Development", is_general=False),
             ],
         }
 
@@ -108,11 +108,11 @@ class FakeServerData:
 
         # --- Chats & Chat Members/Messages ---
         self.group_chats = [
-            Chat(ID="chat-123-abc", Type=ChatType.GROUP, IsHidden=False, Topic="Project Discussion"),
-            Chat(ID="chat-456-def", Type=ChatType.GROUP, IsHidden=True, Topic="Secret Plans"),
+            Chat(id="chat-123-abc", type=ChatType.GROUP, is_hidden=False, topic="Project Discussion"),
+            Chat(id="chat-456-def", type=ChatType.GROUP, is_hidden=True, topic="Secret Plans"),
         ]
         self.oneonone_chats = [
-            Chat(ID="chat-789-ghi", Type=ChatType.ONEONONE, IsHidden=False, Topic=""),
+            Chat(id="chat-789-ghi", type=ChatType.ONE_ON_ONE, is_hidden=False, topic=""),
         ]
 
         self.group_chat_members = {
@@ -152,7 +152,7 @@ class FakeServerData:
             Role="owner", Email="newmember@example.com"
         )
         self.newChatTemplate = Chat(
-            ID="new-chat-001", Type=ChatType.GROUP, IsHidden=False, Topic="New Chat Topic"
+            id="new-chat-001", type=ChatType.GROUP, is_hidden=False, topic="New Chat Topic"
         )
 
     # --- Helpers ---
@@ -160,7 +160,7 @@ class FakeServerData:
         return next((t for t in self.teams if t.ID == team_id), None)
 
     def _find_channel(self, team_id: str, channel_id: str) -> Optional[Channel]:
-        return next((c for c in self.channels.get(team_id, []) if c.ID == channel_id), None)
+        return next((c for c in self.channels.get(team_id, []) if c.id == channel_id), None)
 
     # ==========================================
     #               TEAMS & GROUPS
@@ -324,9 +324,9 @@ class FakeServerData:
             "value": [
                 {
                     ODATA_TYPE: "#microsoft.graph.channel",
-                    "id": channel.ID,
-                    "displayName": channel.Name,
-                    "isGeneral": channel.IsGeneral,
+                    "id": channel.id,
+                    "displayName": channel.name,
+                    "isGeneral": channel.is_general,
                     "membershipType": "standard",
                     "email": ""
                 }
@@ -339,9 +339,9 @@ class FakeServerData:
         if not channel:
             return None
         return {
-            "id": channel.ID,
-            "displayName": channel.Name,
-            "isGeneral": channel.IsGeneral,
+            "id": channel.id,
+            "displayName": channel.name,
+            "isGeneral": channel.is_general,
         }
 
     def get_create_channel_response(self, team_id: str, request_json: dict) -> dict:
@@ -349,9 +349,9 @@ class FakeServerData:
         description = request_json.get("description", display_name)
 
         new_channel = Channel(
-            ID=self.newChannelID,
-            Name=display_name,
-            IsGeneral=False,
+            id=self.newChannelID,
+            name=display_name,
+            is_general=False,
         )
 
         if team_id not in self.channels:
@@ -359,10 +359,10 @@ class FakeServerData:
         self.channels[team_id].append(new_channel)
 
         return {
-            "id": new_channel.ID,
-            "displayName": new_channel.Name,
+            "id": new_channel.id,
+            "displayName": new_channel.name,
             "description": description,
-            "isGeneral": new_channel.IsGeneral,
+            "isGeneral": new_channel.is_general,
             "membershipType": "standard"
         }
 
@@ -540,16 +540,16 @@ class FakeServerData:
     # ==========================================
 
     def get_list_chats_response(self, chat_type: ChatType) -> dict:
-        chats = self.oneonone_chats if chat_type == ChatType.ONEONONE else self.group_chats
+        chats = self.oneonone_chats if chat_type == ChatType.ONE_ON_ONE else self.group_chats
         return {
             ODATA_CONTEXT: f"{GRAPH_URL}#chats",
             ODATA_COUNT: len(chats),
             "value": [
                 {
-                    "id": chat.ID,
-                    "chatType": "oneOnOne" if chat.Type == ChatType.ONEONONE else "group",
-                    "isHiddenForAllMembers": chat.IsHidden,
-                    "topic": chat.Topic,
+                    "id": chat.id,
+                    "chatType": "oneOnOne" if chat.type == ChatType.ONE_ON_ONE else "group",
+                    "isHiddenForAllMembers": chat.is_hidden,
+                    "topic": chat.topic,
                 }
                 for chat in chats
             ],
@@ -559,25 +559,25 @@ class FakeServerData:
         is_one_on_one = request_json["chatType"] == "oneOnOne"
         response = {
             ODATA_CONTEXT: f"{GRAPH_URL}#chats/$entity",
-            "id": self.newChatTemplate.ID,
+            "id": self.newChatTemplate.id,
             "chatType": "oneOnOne" if is_one_on_one else "group",
-            "isHiddenForAllMembers": self.newChatTemplate.IsHidden,
-            "topic": None if is_one_on_one else self.newChatTemplate.Topic,
+            "isHiddenForAllMembers": self.newChatTemplate.is_hidden,
+            "topic": None if is_one_on_one else self.newChatTemplate.topic,
         }
         return response
 
     def get_update_group_chat_topic_response(self, chat_id: str, request_json: dict) -> dict:
-        chat = next((c for c in self.group_chats if c.ID == chat_id), None)
+        chat = next((c for c in self.group_chats if c.id == chat_id), None)
         if not chat:
             return {}
 
-        chat.Topic = request_json.get("topic", chat.Topic)
+        chat.topic = request_json.get("topic", chat.topic)
         return {
             ODATA_CONTEXT: f"{GRAPH_URL}#chats('{chat_id}')",
-            "id": chat.ID,
+            "id": chat.id,
             "chatType": "group",
-            "isHiddenForAllMembers": chat.IsHidden,
-            "topic": chat.Topic,
+            "isHiddenForAllMembers": chat.is_hidden,
+            "topic": chat.topic,
         }
 
     # ==========================================
@@ -678,7 +678,7 @@ class FakeServerData:
         }
 
     def get_all_messeges_in_chats_response(self) -> dict:
-        target_chat_id = self.group_chats[0].ID
+        target_chat_id = self.group_chats[0].id
         return {
             ODATA_CONTEXT: f"{GRAPH_URL}#Collection(chatMessage)",
             ODATA_COUNT: len(self.chat_messages),

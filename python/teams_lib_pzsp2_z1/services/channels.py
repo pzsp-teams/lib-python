@@ -49,9 +49,9 @@ class ChannelsService(BaseService):
         )
         return [
             Channel(
-                ID=channel["ID"],
-                Name=channel["Name"],
-                IsGeneral=(True if channel["IsGeneral"] else False),
+                id=channel["ID"],
+                name=channel["Name"],
+                is_general=(True if channel["IsGeneral"] else False),
             )
             for channel in response
         ]
@@ -79,9 +79,9 @@ class ChannelsService(BaseService):
         )
 
         return Channel(
-            ID=response["ID"],
-            Name=response["Name"],
-            IsGeneral=(True if response["IsGeneral"] else False),
+            id=response["ID"],
+            name=response["Name"],
+            is_general=(True if response["IsGeneral"] else False),
         )
 
     def create_standard(self, team_ref: str, display_name: str) -> Channel:
@@ -104,9 +104,9 @@ class ChannelsService(BaseService):
         )
 
         return Channel(
-            ID=response["ID"],
-            Name=response["Name"],
-            IsGeneral=(True if response["IsGeneral"] else False),
+            id=response["ID"],
+            name=response["Name"],
+            is_general=(True if response["IsGeneral"] else False),
         )
 
     def create_private(
@@ -140,9 +140,9 @@ class ChannelsService(BaseService):
         )
 
         return Channel(
-            ID=response["ID"],
-            Name=response["Name"],
-            IsGeneral=(True if response["IsGeneral"] else False),
+            id=response["ID"],
+            name=response["Name"],
+            is_general=(True if response["IsGeneral"] else False),
         )
 
     def delete(self, team_ref: str, channel_ref: str) -> bool:

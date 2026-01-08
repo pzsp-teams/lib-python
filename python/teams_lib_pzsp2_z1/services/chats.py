@@ -55,10 +55,10 @@ class ChatsService(BaseService):
         )
 
         return Chat(
-            ID=response["ID"],
-            Type=ChatType(response["Type"]),
-            IsHidden=(True if response["IsHidden"] else False),
-            Topic=response["Topic"],
+            id=response["ID"],
+            type=ChatType(response["Type"]),
+            is_hidden=(True if response["IsHidden"] else False),
+            topic=response["Topic"],
         )
 
     def create_group_chat(
@@ -85,10 +85,10 @@ class ChatsService(BaseService):
         )
 
         return Chat(
-            ID=response["ID"],
-            Type=ChatType(response["Type"]),
-            IsHidden=(True if response["IsHidden"] else False),
-            Topic=response["Topic"],
+            id=response["ID"],
+            type=ChatType(response["Type"]),
+            is_hidden=(True if response["IsHidden"] else False),
+            topic=response["Topic"],
         )
 
     def add_member_to_group_chat(self, group_chat_ref: str, user_ref: str) -> Member:
@@ -189,10 +189,10 @@ class ChatsService(BaseService):
         )
 
         return Chat(
-            ID=response["ID"],
-            Type=ChatType(response["Type"]),
-            IsHidden=(True if response["IsHidden"] else False),
-            Topic=response["Topic"],
+            id=response["ID"],
+            type=ChatType(response["Type"]),
+            is_hidden=(True if response["IsHidden"] else False),
+            topic=response["Topic"],
         )
 
     def list_messages(
@@ -216,8 +216,8 @@ class ChatsService(BaseService):
             method="listMessagesInChat",
             params={
                 "chatRef": {
-                    "ref": chat_ref.Ref,
-                    "type": chat_ref.Type.value,
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
                 },
                 "includeSystem": include_system_messages,
                 "nextLink": next_link,
@@ -257,8 +257,8 @@ class ChatsService(BaseService):
             method="sendMessageInChat",
             params={
                 "chatRef": {
-                    "ref": chat_ref.Ref,
-                    "type": chat_ref.Type.value,
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
                 },
                 "body": {
                     "content": body.Content,
@@ -296,8 +296,8 @@ class ChatsService(BaseService):
             method="deleteMessageInChat",
             params={
                 "chatRef": {
-                    "ref": chat_ref.Ref,
-                    "type": chat_ref.Type.value,
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
                 },
                 "messageID": message_id,
             },
@@ -320,8 +320,8 @@ class ChatsService(BaseService):
             method="getMessageInChat",
             params={
                 "chatRef": {
-                    "ref": chat_ref.Ref,
-                    "type": chat_ref.Type.value,
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
                 },
                 "messageID": message_id,
             },
@@ -361,10 +361,10 @@ class ChatsService(BaseService):
 
         return [
             Chat(
-                ID=chat["ID"],
-                Type=ChatType(chat["Type"]),
-                IsHidden=(True if chat["IsHidden"] else False),
-                Topic=chat["Topic"],
+                id=chat["ID"],
+                type=ChatType(chat["Type"]),
+                is_hidden=(True if chat["IsHidden"] else False),
+                topic=chat["Topic"],
             )
             for chat in chats
         ]
@@ -425,8 +425,8 @@ class ChatsService(BaseService):
             method="listPinnedMessagesInChat",
             params={
                 "chatRef": {
-                    "ref": chat_ref.Ref,
-                    "type": chat_ref.Type.value,
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
                 },
             },
         )
@@ -461,8 +461,8 @@ class ChatsService(BaseService):
             method="pinMessageInChat",
             params={
                 "chatRef": {
-                    "ref": chat_ref.Ref,
-                    "type": chat_ref.Type.value,
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
                 },
                 "messageID": message_id,
             },
@@ -485,8 +485,8 @@ class ChatsService(BaseService):
             method="unpinMessageInChat",
             params={
                 "chatRef": {
-                    "ref": chat_ref.Ref,
-                    "type": chat_ref.Type.value,
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
                 },
                 "messageID": message_id,
             },
@@ -514,8 +514,8 @@ class ChatsService(BaseService):
             method="getMentionsInChat",
             params={
                 "chatRef": {
-                    "ref": chat_ref.Ref,
-                    "type": chat_ref.Type.value,
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
                 },
                 "rawMentions": raw_mentions,
             },
