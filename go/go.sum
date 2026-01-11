@@ -71,6 +71,8 @@ github.com/pzsp-teams/lib v0.0.0-20260107201101-e9e6f48e39e8 h1:1ifLBNVdw8TCLPzH
 github.com/pzsp-teams/lib v0.0.0-20260107201101-e9e6f48e39e8/go.mod h1:BQwULf+u8TtbKR0U23MlZXgm2CVcLBJn2cS5gmR7L8M=
 github.com/pzsp-teams/lib v0.0.0-20260107211439-3d301706e02c h1:ZtUkM66y/jg5g5kEQhteQeACuwKl+cOkRuGPlX1mkGg=
 github.com/pzsp-teams/lib v0.0.0-20260107211439-3d301706e02c/go.mod h1:BQwULf+u8TtbKR0U23MlZXgm2CVcLBJn2cS5gmR7L8M=
+github.com/pzsp-teams/lib v0.0.0-20260111170324-f66ca4f5d369 h1:TNB4hQ6u8aH0cekG1xbITdkAxgrY4FmwSWgzfI1e21Q=
+github.com/pzsp-teams/lib v0.0.0-20260111170324-f66ca4f5d369/go.mod h1:bpgptBb8PaJV03buetvHnq6plkQHpF0WnY1K5iU31U8=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/std-uritemplate/std-uritemplate/go/v2 v2.0.8 h1:gMBdYMTHt2mmTdXW8YfvRjRUZ0GhyGV+IqSH9H15bGw=
@@ -93,6 +95,8 @@ go.uber.org/mock v0.6.0 h1:hyF9dfmbgIX5EfOdasqLsWD6xqpNZlXblLB/Dbnwv3Y=
 go.uber.org/mock v0.6.0/go.mod h1:KiVJ4BqZJaMj4svdfmHM0AUx4NJYO8ZNpPnZn1Z+BBU=
 golang.org/x/net v0.48.0 h1:zyQRTTrjc33Lhh0fBgT/H3oZq9WuvRR5gPC70xpDiQU=
 golang.org/x/net v0.48.0/go.mod h1:+ndRgGjkh8FGtu1w1FGbEC31if4VrNVMuKTgcAAnQRY=
+golang.org/x/sync v0.19.0 h1:vV+1eWNmZ5geRlYjzm2adRgW2/mcpevXNg50YZtPCE4=
+golang.org/x/sync v0.19.0/go.mod h1:9KTHXmSnoGruLpwFjVSX0lNNA75CykiMECbovNTZqGI=
 golang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.39.0 h1:CvCKL8MeisomCi6qNZ+wbb0DN9E5AATixKsvNtMoMFk=
 golang.org/x/sys v0.39.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=

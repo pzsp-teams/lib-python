@@ -707,11 +707,29 @@ class FakeServerData:
         }
 
     def get_list_pinned_messages_in_chat_response(self, chat_id: str) -> dict:
+        print("get_list_pinned_messages_in_chat_response called for chat_id:", chat_id)  # Debug print
         return {
             "value": [
                 {
-                    ODATA_TYPE: "#microsoft.graph.pinnedChatMessageInfo",
                     "id": message.id,
+                    "message": {
+                    "id": message.id,
+                    "etag": message.id,
+                    "messageType": "message",
+                    "chatId": chat_id,
+                    "body": {
+                        "content": message.content,
+                        "contentType": message.content_type,
+                    },
+                    "from": {
+                        "user": {
+                            "id": message.sender.user_id,
+                            "displayName": message.sender.display_name,
+                        }
+                    },
+                    "createdDateTime": message.created_date_time,
+                    "lastModifiedDateTime": message.created_date_time,
+                    }
                 }
                 for message in self.chat_messages.get(chat_id, [])
             ],

@@ -6,7 +6,7 @@ require (
 	github.com/microsoft/kiota-abstractions-go v1.9.3
 	github.com/microsoftgraph/msgraph-sdk-go v1.93.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/pzsp-teams/lib v0.0.0-20260107211439-3d301706e02c
+	github.com/pzsp-teams/lib v0.0.0-20260111170324-f66ca4f5d369
 )
 
 require (
@@ -39,6 +39,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.39.0 // indirect
 	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
 )
