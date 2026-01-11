@@ -353,11 +353,7 @@ def setup_fake_server(httpserver) -> FakeServerData:
     httpserver.expect_request(
         "/v1.0/teams",
         method="POST"
-    ).respond_with_handler(lambda req: Response(
-        response=data.get_createTeamFromTemplate_response(req.json)["body"],
-        status=data.get_createTeamFromTemplate_response(req.json)["status"],
-        headers=data.get_createTeamFromTemplate_response(req.json)["headers"]
-    ))
+    ).respond_with_handler(data.get_createTeamFromTemplate_response)
 
     # POST /teams/{team_id}/members
     httpserver.expect_request(
