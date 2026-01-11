@@ -1,5 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
+from unittest import result
+from urllib import request
+
+from werkzeug import Response
 
 from teams_lib_pzsp2_z1.model.team import Team
 from teams_lib_pzsp2_z1.model.chat import Chat, ChatType
@@ -254,7 +258,8 @@ class FakeServerData:
             "visibility": team.visibility,
         }
 
-    def get_createTeamFromTemplate_response(self, request_json: dict) -> dict:
+    def get_createTeamFromTemplate_response(self, request: request.Request) -> Response:
+        request_json = request.json
         new_team = Team(
             id=self.newTeamID,
             display_name=request_json.get("displayName"),
@@ -267,16 +272,34 @@ class FakeServerData:
         # self.newTeamID == "f47ac10b-58cc-4372-a567-0e02b2c3d479"
         op_id = "00000000-0000-0000-0000-000000000000"
 
-        return {
-            "status": 202,
-            "headers": {
+        return Response(
+            status= 202,
+            headers= {
                 "Location": f"/teams('{self.newTeamID}')/operations('{op_id}')",
                 "Content-Location": f"/teams('{self.newTeamID}')",
                 "Content-Type": "application/json",
                 "Content-Length": "0"
             },
-            "body": ""
-        }
+            response= ""
+        )
+
+    # def create_team_handler(self, req):
+    #     result = self.get_createTeamFromTemplate_response(req.json)
+
+    #     base_url = "https://graph.microsoft.com/v1.0"
+    #     loc_header = f"/teams/{TEAM_ID}/operations/{OP_ID}"
+    #     content_loc_header = f"/teams/{TEAM_ID}"
+
+    #     return Response(
+    #         response=result["body"],
+    #         status=result["status"],
+    #         headers={
+    #             "Location": full_location,
+    #             "Content-Location": full_content_loc,
+    #             "Content-Type": result["headers"]["Content-Type"],
+    #             "Content-Length": result["headers"]["Content-Length"]
+    #         }
+    #     )
 
     def get_archiveTeam_response(self, team_id: str) -> dict:
         team = self._find_team(team_id)
@@ -707,7 +730,6 @@ class FakeServerData:
         }
 
     def get_list_pinned_messages_in_chat_response(self, chat_id: str) -> dict:
-        print("get_list_pinned_messages_in_chat_response called for chat_id:", chat_id)  # Debug print
         return {
             "value": [
                 {
