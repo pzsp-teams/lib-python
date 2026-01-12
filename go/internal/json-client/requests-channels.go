@@ -5,6 +5,7 @@ import (
 
 	"github.com/pzsp-teams/lib-python/internal/json-client/decoders"
 	"github.com/pzsp-teams/lib/models"
+	"github.com/pzsp-teams/lib/search"
 )
 
 type listChannelsParams struct {
@@ -204,5 +205,23 @@ type getMentionsInChannelParams struct {
 func (c *TeamsJSONClient) GetMentionsInChannel(p map[string]interface{}) (interface{}, error) {
 	return execute(p, func(params getMentionsInChannelParams) (interface{}, error) {
 		return c.client.Channels.GetMentions(context.TODO(), params.TeamRef, params.ChannelRef, params.RawMentions)
+	})
+}
+
+type searchMessagesInChannelParams struct {
+	TeamRef       string                           `json:"teamRef"`
+	ChannelRef    string                           `json:"channelRef"`
+	SearchOptions decoders.SearchMessageOptionsDTO `json:"searchMessagesOptions"`
+	SearchConfig  decoders.SearchConfigDTO         `json:"searchConfig"`
+}
+
+func (c *TeamsJSONClient) SearchMessagesInChannel(p map[string]interface{}) (interface{}, error) {
+	return execute(p, func(params searchMessagesInChannelParams) (interface{}, error) {
+		searchOptions := decoders.DecodeSearchMessageOptions(&params.SearchOptions)
+		searchConfig, err := decoders.DecodeParams[search.SearchConfig](&params.SearchConfig)
+		if err != nil {
+			return nil, err
+		}
+		return c.client.Channels.SearchMessages(context.TODO(), &params.TeamRef, &params.ChannelRef, searchOptions, searchConfig)
 	})
 }

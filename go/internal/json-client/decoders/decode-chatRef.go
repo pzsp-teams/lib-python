@@ -1,8 +1,6 @@
 package decoders
 
 import (
-	"fmt"
-
 	"github.com/pzsp-teams/lib/chats"
 )
 
@@ -16,14 +14,14 @@ const (
 	ChatTypeOneOnOne = "oneOnOne"
 )
 
-func GetChatRef(dto ChatRefDTO) (chats.ChatRef, error) {
+func GetChatRef(dto ChatRefDTO) chats.ChatRef {
 	switch dto.Type {
 	case ChatTypeGroup:
-		return chats.GroupChatRef{Ref: dto.Ref}, nil
+		return chats.GroupChatRef{Ref: dto.Ref}
 	case ChatTypeOneOnOne:
-		return chats.OneOnOneChatRef{Ref: dto.Ref}, nil
+		return chats.OneOnOneChatRef{Ref: dto.Ref}
 	default:
-		return nil, fmt.Errorf("unknown chat type: %s", dto.Type)
+		return nil
 	}
 }
 

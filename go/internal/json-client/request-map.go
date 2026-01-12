@@ -106,6 +106,10 @@ var Handlers = map[string]HandlerFunc{
 		return c.GetMentionsInChannel(p)
 	},
 
+	"searchMessagesInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.SearchMessagesInChannel(p)
+	},
+
 	// CHATS
 	"createOneOnOneChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
 		return c.CreateOneToOneChat(p)
@@ -113,6 +117,10 @@ var Handlers = map[string]HandlerFunc{
 
 	"createGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
 		return c.CreateGroupChat(p)
+	},
+
+	"getChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.GetChat(p)
 	},
 
 	"addMemberToGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
@@ -169,5 +177,9 @@ var Handlers = map[string]HandlerFunc{
 
 	"getMentionsInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
 		return c.GetMentionsInChat(p)
+	},
+
+	"searchMessagesInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+		return c.SearchMessagesInChat(p)
 	},
 }
