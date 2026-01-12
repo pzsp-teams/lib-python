@@ -91,6 +91,34 @@ class ChatsService(BaseService):
             topic=response["Topic"],
         )
 
+    def get_chat(self, chat_ref: ChatRef) -> Chat:
+        """
+        Retrieves a chat by its reference.
+
+        Args:
+            chat_ref (ChatRef): The chat reference object containing the ID/Name and ChatType.
+
+        Returns:
+            Chat: The requested chat object.
+        """
+        response = self.client.execute(
+            cmd_type="request",
+            method="getChat",
+            params={
+                "chatRef": {
+                    "ref": chat_ref.ref,
+                    "type": chat_ref.type.value,
+                },
+            },
+        )
+
+        return Chat(
+            id=response["ID"],
+            type=ChatType(response["Type"]),
+            is_hidden=(True if response["IsHidden"] else False),
+            topic=response["Topic"],
+        )
+
     def add_member_to_group_chat(self, group_chat_ref: str, user_ref: str) -> Member:
         """Adds a user to an existing Group Chat.
 

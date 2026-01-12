@@ -40,22 +40,45 @@ func DecodeSearchMessageOptions(dto *SearchMessageOptionsDTO) *search.SearchMess
 
 	interval := search.TimeInterval(dto.Interval)
 
-	options := &search.SearchMessagesOptions{
-		Query:       &dto.Query,
-		SearchPage:  DecodeSearchPage(&dto.SearchPage),
-		From:        dto.From,
-		NotFrom:     dto.NotFrom,
-		IsRead:      &dto.IsRead,
-		IsMentioned: &dto.IsMentioned,
-		To:          dto.To,
-		NotTo:       dto.NotTo,
-		StartTime:   &dto.StartTime,
-		EndTime:     &dto.EndTime,
-		Interval:    &interval,
-		NotFromMe:   dto.NotFromMe,
-		NotToMe:     dto.NotToMe,
-		FromMe:      dto.FromMe,
-		ToMe:        dto.ToMe,
+	options := &search.SearchMessagesOptions{}
+	if dto.Query != "" {
+		options.Query = &dto.Query
+	}
+	options.SearchPage = DecodeSearchPage(&dto.SearchPage)
+	if len(dto.From) > 0 {
+		options.From = dto.From
+	}
+	if len(dto.NotFrom) > 0 {
+		options.NotFrom = dto.NotFrom
+	}
+	options.IsRead = &dto.IsRead
+	options.IsMentioned = &dto.IsMentioned
+	if len(dto.To) > 0 {
+		options.To = dto.To
+	}
+	if len(dto.NotTo) > 0 {
+		options.NotTo = dto.NotTo
+	}
+	if !dto.StartTime.IsZero() {
+		options.StartTime = &dto.StartTime
+	}
+	if !dto.EndTime.IsZero() {
+		options.EndTime = &dto.EndTime
+	}
+	if dto.Interval != "" {
+		options.Interval = &interval
+	}
+	if dto.NotFromMe {
+		options.NotFromMe = dto.NotFromMe
+	}
+	if dto.NotToMe {
+		options.NotToMe = dto.NotToMe
+	}
+	if dto.FromMe {
+		options.FromMe = dto.FromMe
+	}
+	if dto.ToMe {
+		options.ToMe = dto.ToMe
 	}
 	return options
 }
