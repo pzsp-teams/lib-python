@@ -15,6 +15,10 @@ class SearchConfig:
 
     max_workers: int = 8
 
+    def __dict__(self):
+        """Serializes the object keys to camelCase for the Go backend."""
+        return {"maxWorkers": self.max_workers}
+
 
 @dataclass
 class SearchPage:
@@ -28,6 +32,10 @@ class SearchPage:
 
     from_: int = 0
     size: int = 25
+
+    def __dict__(self):
+        """Serializes the object keys to camelCase for the Go backend."""
+        return {"from": self.from_, "size": self.size}
 
 
 class TimeInterval(Enum):
@@ -103,6 +111,28 @@ class TimeInterval(Enum):
                 self.to = []
             if self.not_to is None:
                 self.not_to = []
+
+        def __dict__(self):
+            """Serializes the object keys to camelCase for the Go backend."""
+
+            result = {
+                "query": self.query,
+                "searchPage": self.search_page,
+                "from": self.from_,
+                "notFrom": self.not_from,
+                "isRead": self.is_read,
+                "isMentioned": self.is_mentioned,
+                "to": self.to,
+                "notTo": self.not_to,
+                "startTime": self.start_time,
+                "endTime": self.end_time,
+                "interval": self.interval.value if self.interval else None,
+                "notFromMe": self.not_from_me,
+                "notToMe": self.not_to_me,
+                "fromMe": self.from_me,
+                "toMe": self.to_me,
+            }
+            return {k: v for k, v in result.items() if v is not None}
 
 @dataclass
 class SearchResult:

@@ -12,6 +12,12 @@ from teams_lib_pzsp2_z1.model.message import (
     MessageContentType,
     MessageFrom,
 )
+from teams_lib_pzsp2_z1.model.search import (
+    SearchConfig,
+    SearchMessagesOptions,
+    SearchResult,
+    SearchResults,
+)
 from teams_lib_pzsp2_z1.services.base_service import BaseService
 
 
@@ -529,3 +535,49 @@ class ChannelsService(BaseService):
             text=mention["Text"],
             target_id=mention["TargetID"],
         ) for mention in response]
+
+    def search_messages(self, team_ref: str, channel_ref: str, options: SearchMessagesOptions, config: SearchConfig) -> SearchResults:
+        """Searches for messages in a channel based on various criteria.
+
+        Args:
+            team_ref (str): The reference to the team.
+            channel_ref (str): The reference to the channel.
+            options (SearchMessagesOptions): The search options and filters.
+            config (SearchConfig): Configuration for the search operation.
+
+        Returns:
+            SearchResults: The results of the search operation.
+        """
+        response = self.client.execute(
+            cmd_type="request",
+            method="searchMessagesInChat",
+            params={
+                "teamRef": team_ref,
+                "channelRef": channel_ref,
+                "searchMessagesOptions": options.__dict__(),
+                "searchConfig": config.__dict__(),
+            },
+        )
+
+        return SearchResults(
+            messages=[
+                SearchResult(
+                    message=Message(
+                        id=msg["Message"]["ID"],
+                        content=msg["Message"]["Content"],
+                        content_type=MessageContentType(msg["Message"]["ContentType"]),
+                        created_date_time=msg["Message"]["CreatedDateTime"],
+                        sender=MessageFrom(
+                            user_id=msg["Message"]["From"]["UserID"],
+                            display_name=msg["Message"]["From"]["DisplayName"],
+                        ),
+                        reply_count=msg["Message"]["ReplyCount"],
+                    ),
+                    channel_id=msg.get("ChannelID"),
+                    team_id=msg.get("TeamID"),
+                    chat_id=msg.get("ChatID"),
+                )
+                for msg in response["Messages"]
+            ],
+            next_from=response.get("NextFrom"),
+        )
