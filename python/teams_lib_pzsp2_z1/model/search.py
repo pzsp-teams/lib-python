@@ -59,8 +59,9 @@ class TimeInterval(Enum):
     THIS_YEAR = "this year"
     LAST_YEAR = "last year"
 
-    @dataclass
-    class SearchMessagesOptions:
+
+@dataclass
+class SearchMessagesOptions:
         """
         Configuration options for searching messages.
 
@@ -133,6 +134,7 @@ class TimeInterval(Enum):
                 "toMe": self.to_me,
             }
             return {k: v for k, v in result.items() if v is not None}
+
 
 @dataclass
 class SearchResult:

@@ -562,6 +562,19 @@ class FakeServerData:
     #                 CHATS
     # ==========================================
 
+    def get_chat_responses(self, chat_id: str) -> dict:
+        chat = next((c for c in self.group_chats + self.oneonone_chats if c.id == chat_id), None)
+        if not chat:
+            return {}
+
+        return {
+            ODATA_CONTEXT: "https://graph.microsoft.com/v1.0/$metadata#chats/$entity",
+            "id": chat.id,
+            "chatType": "oneOnOne" if chat.type == ChatType.ONE_ON_ONE else "group",
+            "isHiddenForAllMembers": chat.is_hidden,
+            "topic": chat.topic,
+        }
+
     def get_list_chats_response(self, chat_type: ChatType) -> dict:
         chats = self.oneonone_chats if chat_type == ChatType.ONE_ON_ONE else self.group_chats
         return {
@@ -640,6 +653,7 @@ class FakeServerData:
     # ==========================================
     #           CHAT MESSAGES
     # ==========================================
+
 
     def get_list_messages_in_chat_response(self, chat_id: str) -> dict:
         return {
