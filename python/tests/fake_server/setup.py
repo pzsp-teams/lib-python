@@ -420,6 +420,16 @@ def setup_fake_server(httpserver) -> FakeServerData:
     #                 CHATS
     # ==========================================
 
+    # GET /chats/{chat_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_chat_responses(re.search(r"/chats/([^/]+)", req.path).group(1)),
+        "Get Chat"
+    ))
+
     # DELETE /chats/{chat_id}/pinnedMessages/{message_id}
     httpserver.expect_request(
         re.compile(r"^/v1.0/chats/([^/]+)/pinnedMessages/([^/]+)"),

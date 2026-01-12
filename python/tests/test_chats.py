@@ -100,6 +100,29 @@ def test_create_one_on_one_chat_integration(httpserver):
     finally:
         client.close()
 
+def test_get_chat_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        chat = client.chats.get_chat(
+            chat_ref=ChatRef(
+                ref=data.group_chats[1].topic,
+                type=ChatType.GROUP,
+            )
+        )
+
+        assert chat.id == data.group_chats[1].id
+        assert chat.type == data.group_chats[1].type
+        assert chat.topic == data.group_chats[1].topic
+        assert chat.is_hidden == data.group_chats[1].is_hidden
+
+    finally:
+        client.close()
+
 
 def test_list_group_chat_members_integration(httpserver):
 
