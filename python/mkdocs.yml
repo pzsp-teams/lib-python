@@ -57,3 +57,4 @@ nav:
           - Message: reference/models/message.md
           - Member: reference/models/member.md
           - Chat: reference/models/chat.md
+          - Search: reference/models/search.md
