@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+import re
+import traceback
 from typing import Optional, List, Dict, Any
 from unittest import result
 from urllib import request
@@ -28,6 +30,7 @@ class FakeServerData:
     newGroupMailNickname: str
     newTeamVisibility: str
     potentialTeams: List[Team] = field(default_factory=list)
+    search_results: List[Message] = field(default_factory=list)
 
     # Initial data containers
     messages: Dict[str, List[Message]] = field(default_factory=dict)
@@ -128,8 +131,8 @@ class FakeServerData:
 
         self.chat_messages = {
             "chat-123-abc": [
-                Message(id="msg-001", content="Hello, team!", content_type="text", sender=MessageFrom(user_id="user-123-abc", display_name="Alice"), created_date_time="2024-01-01T10:00:00Z", reply_count=0),
-                Message(id="msg-002", content="Don't forget the meeting at 3 PM.", content_type="text", sender=MessageFrom(user_id="user-456-def", display_name="Bob"), created_date_time="2024-01-01T11:00:00Z", reply_count=2),
+                Message(id="AAMkAGIwMDA5MmY0LWY5ZTgtNGY5YS04NzczLWNhNjc0ZGIyZDBjYgBGAAAAAADm35sgHbzESapJ8_BjBlhEBwDAYtphe7dsRbDrOT-HAHoKAACmqNsoAADAYtphe7dsRbDrOT-HAHoKAAFsBhyEAAA=", content="Hello, team!", content_type="text", sender=MessageFrom(user_id="user-123-abc", display_name="Alice"), created_date_time="2024-01-01T10:00:00Z", reply_count=0),
+                Message(id="BAMkAGIwMDA5MmY0LWY5ZTgtNGY5YS04NzczLWNhNjc0ZGIyZDBjYgBGAAAAAADm35sgHbzESapJ8_BjBlhEBwDAYtphe7dsRbDrOT-HAHoKAACmqNsoAADAYtphe7dsRbDrOT-HAHoKAAFsBhyEAAA=", content="Don't forget the meeting at 3 PM.", content_type="text", sender=MessageFrom(user_id="user-456-def", display_name="Bob"), created_date_time="2024-01-01T11:00:00Z", reply_count=2),
             ],
         }
 
@@ -749,22 +752,22 @@ class FakeServerData:
                 {
                     "id": message.id,
                     "message": {
-                    "id": message.id,
-                    "etag": message.id,
-                    "messageType": "message",
-                    "chatId": chat_id,
-                    "body": {
-                        "content": message.content,
-                        "contentType": message.content_type,
-                    },
-                    "from": {
-                        "user": {
-                            "id": message.sender.user_id,
-                            "displayName": message.sender.display_name,
-                        }
-                    },
-                    "createdDateTime": message.created_date_time,
-                    "lastModifiedDateTime": message.created_date_time,
+                        "id": message.id,
+                        "etag": message.id,
+                        "messageType": "message",
+                        "chatId": chat_id,
+                        "body": {
+                            "content": message.content,
+                            "contentType": message.content_type,
+                        },
+                        "from": {
+                            "user": {
+                                "id": message.sender.user_id,
+                                "displayName": message.sender.display_name,
+                            }
+                        },
+                        "createdDateTime": message.created_date_time,
+                        "lastModifiedDateTime": message.created_date_time,
                     }
                 }
                 for message in self.chat_messages.get(chat_id, [])
@@ -781,3 +784,94 @@ class FakeServerData:
             "displayName": self.me.display_name,
             "email": self.me.email,
         }
+
+    # ==========================================
+    #                 SEARCH
+    # ==========================================
+
+    def get_search_messages_response(self, request_body) -> dict:
+        hits = []
+        rank = 1
+        messages = []
+
+        # 1. Wyciągamy surowy KQL (to już wiesz że działa)
+        raw_query = ""
+        try:
+            if isinstance(request_body, dict):
+                req_list = request_body.get('requests', [])
+                if req_list:
+                    raw_query = req_list[0].get('query', {}).get('queryString', "")
+        except Exception:
+            raw_query = ""
+
+        # 2. CZYSZCZENIE (To jest to, czego Ci brakuje)
+        # Wywalamy wszystko co wygląda jak Klucz:"Wartość"
+        # Zamieniamy 'Hello IsRead:"false"...' -> 'Hello   ...'
+        search_term = re.sub(r'\w+:"[^"]+"', '', raw_query)
+
+        # Usuwamy spacje z brzegów -> zostaje samo "Hello"
+        search_term = search_term.strip()
+
+
+        # 3. Pętla szukająca
+        try:
+            for chat_id, messages in self.chat_messages.items():
+                for message in messages:
+                    if not message.content:
+                        continue
+
+                    # Teraz szukamy samego "Hello" w treści wiadomości
+                    if search_term and search_term.lower() in message.content.lower():
+
+                        # (Bezpieczne pobieranie sendera)
+                        sender_id = getattr(message.sender, 'user_id', 'unknown') if message.sender else 'unknown'
+                        sender_name = getattr(message.sender, 'display_name', 'Unknown') if message.sender else 'Unknown'
+                        created_dt = getattr(message, 'created_date_time', "2024-01-01T12:00:00Z")
+
+                        hits.append({
+                            "hitId": message.id,
+                            "rank": rank,
+                            "summary": message.content[:200],
+                            "resource": {
+                                "id": message.id,
+                                "chatId": chat_id,
+                                "body": {
+                                    "content": message.content,
+                                    "contentType": message.content_type,
+                                },
+                                "from": {
+                                    "user": {
+                                        "id": message.sender.user_id,
+                                        "displayName": message.sender.display_name,
+                                    }
+                                },
+                                "createdDateTime": message.created_date_time,
+                                "lastModifiedDateTime": message.created_date_time,
+                                }
+                            },
+                        )
+                        rank += 1
+
+        except Exception:
+            traceback.print_exc()
+
+        response = {
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.searchResponse)",
+            "value": [
+                {
+                    "searchTerms": [search_term],
+                    "hitsContainers": [
+                        {
+                            "hits": hits,
+                            "total": len(hits),
+                            "moreResultsAvailable": False,
+                        }
+                    ],
+                }
+            ]
+        }
+
+        # self.search_results = messages
+
+
+        return response

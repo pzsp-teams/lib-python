@@ -20,17 +20,17 @@ type SearchMessageOptionsDTO struct {
 	SearchPage  SearchPageDTO `json:"searchPage"`
 	From        []string      `json:"from"`
 	NotFrom     []string      `json:"notFrom"`
-	IsRead      bool          `json:"isRead"`
-	IsMentioned bool          `json:"isMentioned"`
+	IsRead      *bool          `json:"isRead"`
+	IsMentioned *bool          `json:"isMentioned"`
 	To          []string      `json:"to"`
 	NotTo       []string      `json:"notTo"`
 	StartTime   time.Time     `json:"startTime"`
 	EndTime     time.Time     `json:"endTime"`
 	Interval    string        `json:"interval"`
-	NotFromMe   bool          `json:"notFromMe"`
-	NotToMe     bool          `json:"notToMe"`
-	FromMe      bool          `json:"fromMe"`
-	ToMe        bool          `json:"toMe"`
+	NotFromMe   *bool          `json:"notFromMe"`
+	NotToMe     *bool          `json:"notToMe"`
+	FromMe      *bool          `json:"fromMe"`
+	ToMe        *bool          `json:"toMe"`
 }
 
 func DecodeSearchMessageOptions(dto *SearchMessageOptionsDTO) *search.SearchMessagesOptions {
@@ -51,8 +51,8 @@ func DecodeSearchMessageOptions(dto *SearchMessageOptionsDTO) *search.SearchMess
 	if len(dto.NotFrom) > 0 {
 		options.NotFrom = dto.NotFrom
 	}
-	options.IsRead = &dto.IsRead
-	options.IsMentioned = &dto.IsMentioned
+	options.IsRead = dto.IsRead
+	options.IsMentioned = dto.IsMentioned
 	if len(dto.To) > 0 {
 		options.To = dto.To
 	}
@@ -68,18 +68,19 @@ func DecodeSearchMessageOptions(dto *SearchMessageOptionsDTO) *search.SearchMess
 	if dto.Interval != "" {
 		options.Interval = &interval
 	}
-	if dto.NotFromMe {
-		options.NotFromMe = dto.NotFromMe
-	}
-	if dto.NotToMe {
-		options.NotToMe = dto.NotToMe
-	}
-	if dto.FromMe {
-		options.FromMe = dto.FromMe
-	}
-	if dto.ToMe {
-		options.ToMe = dto.ToMe
-	}
+	if dto.NotFromMe != nil {
+        options.NotFromMe = *dto.NotFromMe
+    }
+    if dto.NotToMe != nil {
+        options.NotToMe = *dto.NotToMe
+    }
+    if dto.FromMe != nil {
+        options.FromMe = *dto.FromMe
+    }
+    if dto.ToMe != nil {
+        options.ToMe = *dto.ToMe
+    }
+
 	return options
 }
 
