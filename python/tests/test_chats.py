@@ -4,7 +4,7 @@ from tests.fake_server.setup import setup_fake_server
 from teams_lib_pzsp2_z1.model.chat import ChatType, ChatRef
 from teams_lib_pzsp2_z1.model.message import MessageContentType, MessageBody
 from teams_lib_pzsp2_z1.model.mention import MentionKind
-from teams_lib_pzsp2_z1.model.search import SearchConfig, SearchMessagesOptions, TimeInterval
+from teams_lib_pzsp2_z1.model.search import SearchConfig, SearchMessagesOptions
 from datetime import datetime
 
 

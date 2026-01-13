@@ -550,7 +550,7 @@ class ChannelsService(BaseService):
         """
         response = self.client.execute(
             cmd_type="request",
-            method="searchMessagesInChat",
+            method="searchMessagesInChannel",
             params={
                 "teamRef": team_ref,
                 "channelRef": channel_ref,
