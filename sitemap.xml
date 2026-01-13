@@ -2,46 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://pzsp2z1teams.com/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/client/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/config/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/models/channel/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/models/chat/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/models/member/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/models/message/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
+    </url>
+    <url>
+         <loc>https://pzsp2z1teams.com/reference/models/search/</loc>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/models/team/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/services/channels/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/services/chats/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
     <url>
          <loc>https://pzsp2z1teams.com/reference/services/teams/</loc>
-         <lastmod>2026-01-08</lastmod>
+         <lastmod>2026-01-13</lastmod>
     </url>
 </urlset>

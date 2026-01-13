@@ -851,6 +851,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1528,11 +1556,11 @@ returns the results.</p>
                 <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_payload</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-                <span class="c1"># print(&quot;Sent to Go process:&quot;, json_payload)  # Debug print</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sent to Go process:&quot;</span><span class="p">,</span> <span class="n">json_payload</span><span class="p">)</span>  <span class="c1"># Debug print</span>
 
                 <span class="n">raw_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
-                <span class="c1"># print(&quot;Received from Go process:&quot;, raw_response.strip())  # Debug print</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Received from Go process:&quot;</span><span class="p">,</span> <span class="n">raw_response</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>  <span class="c1"># Debug print</span>
             <span class="k">except</span> <span class="ne">BrokenPipeError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Go process crashed or closed connection&quot;</span><span class="p">)</span>  <span class="c1"># noqa: B904</span>
 
@@ -2157,11 +2185,11 @@ or explicitly reports an error in the "error" field.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_payload</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-            <span class="c1"># print(&quot;Sent to Go process:&quot;, json_payload)  # Debug print</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sent to Go process:&quot;</span><span class="p">,</span> <span class="n">json_payload</span><span class="p">)</span>  <span class="c1"># Debug print</span>
 
             <span class="n">raw_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
-            <span class="c1"># print(&quot;Received from Go process:&quot;, raw_response.strip())  # Debug print</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Received from Go process:&quot;</span><span class="p">,</span> <span class="n">raw_response</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>  <span class="c1"># Debug print</span>
         <span class="k">except</span> <span class="ne">BrokenPipeError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Go process crashed or closed connection&quot;</span><span class="p">)</span>  <span class="c1"># noqa: B904</span>
 
