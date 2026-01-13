@@ -50,8 +50,7 @@ SCOPES=User.Read,Team.ReadBasic.All,Channel.ReadBasic.All
 AUTH_METHOD=DEVICE_CODE [or INTERACTIVE]
 ```
 
-Scopes needed by all functions could be found in .env.template.
-**//TODO add url to template**
+Scopes needed by all functions could be found in [.env.template](https://github.com/pzsp-teams/lib-python/tree/main/.env.template).
 
 ### 2. Basic usage
 
