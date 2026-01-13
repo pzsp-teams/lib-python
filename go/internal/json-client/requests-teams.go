@@ -10,14 +10,14 @@ type getTeamParams struct {
 	TeamRef string `json:"teamRef"`
 }
 
-func (c *TeamsJSONClient) GetTeam(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) GetTeam(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params getTeamParams) (any, error) {
-		return c.client.Teams.Get(context.TODO(), params.TeamRef)
+		return c.client.Teams.Get(ctx, params.TeamRef)
 	})
 }
 
-func (c *TeamsJSONClient) ListMyJoined() (any, error) {
-	return c.client.Teams.ListMyJoined(context.TODO())
+func (c *TeamsJSONClient) ListMyJoined(ctx context.Context) (any, error) {
+	return c.client.Teams.ListMyJoined(ctx)
 }
 
 type updateTeamParams struct {
@@ -25,10 +25,10 @@ type updateTeamParams struct {
 	TeamUpdate decoders.UpdateTeamDTO `json:"team"`
 }
 
-func (c *TeamsJSONClient) UpdateTeam(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) UpdateTeam(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params updateTeamParams) (any, error) {
 		updateTeam := decoders.GetUpdateTeam(&params.TeamUpdate)
-		return c.client.Teams.UpdateTeam(context.TODO(), params.TeamRef, &updateTeam)
+		return c.client.Teams.UpdateTeam(ctx, params.TeamRef, &updateTeam)
 	})
 }
 
@@ -38,9 +38,9 @@ type createViaGroupParams struct {
 	Visibility   string `json:"visibility"`
 }
 
-func (c *TeamsJSONClient) CreateTeamViaGroup(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) CreateTeamViaGroup(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params createViaGroupParams) (any, error) {
-		return c.client.Teams.CreateViaGroup(context.TODO(), params.DisplayName, params.MailNickname, params.Visibility)
+		return c.client.Teams.CreateViaGroup(ctx, params.DisplayName, params.MailNickname, params.Visibility)
 	})
 }
 
@@ -53,9 +53,9 @@ type createFromTemplateParams struct {
 	IncludeMe   bool     `json:"includeMe"`
 }
 
-func (c *TeamsJSONClient) CreateTeamFromTemplate(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) CreateTeamFromTemplate(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params createFromTemplateParams) (any, error) {
-		return c.client.Teams.CreateFromTemplate(context.TODO(), params.DisplayName, params.Description, params.Owners, params.Members, params.Visibility, params.IncludeMe)
+		return c.client.Teams.CreateFromTemplate(ctx, params.DisplayName, params.Description, params.Owners, params.Members, params.Visibility, params.IncludeMe)
 	})
 }
 
@@ -64,9 +64,9 @@ type archiveTeamParams struct {
 	SpoReadOnlyFromMembers *bool  `json:"spoReadOnlyFromMembers,omitempty"`
 }
 
-func (c *TeamsJSONClient) ArchiveTeam(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ArchiveTeam(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params archiveTeamParams) (any, error) {
-		err := c.client.Teams.Archive(context.TODO(), params.TeamRef, params.SpoReadOnlyFromMembers)
+		err := c.client.Teams.Archive(ctx, params.TeamRef, params.SpoReadOnlyFromMembers)
 		return "archived", err
 	})
 }
@@ -75,9 +75,9 @@ type unarchiveTeamParams struct {
 	TeamRef string `json:"teamRef"`
 }
 
-func (c *TeamsJSONClient) UnarchiveTeam(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) UnarchiveTeam(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params unarchiveTeamParams) (any, error) {
-		err := c.client.Teams.Unarchive(context.TODO(), params.TeamRef)
+		err := c.client.Teams.Unarchive(ctx, params.TeamRef)
 		return "unarchived", err
 	})
 }
@@ -86,9 +86,9 @@ type deleteTeamParams struct {
 	TeamRef string `json:"teamRef"`
 }
 
-func (c *TeamsJSONClient) DeleteTeam(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) DeleteTeam(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params deleteTeamParams) (any, error) {
-		err := c.client.Teams.Delete(context.TODO(), params.TeamRef)
+		err := c.client.Teams.Delete(ctx, params.TeamRef)
 		return "deleted", err
 	})
 }
@@ -97,8 +97,8 @@ type restoreTeamParams struct {
 	DeletedGroupID string `json:"deletedGroupId"`
 }
 
-func (c *TeamsJSONClient) RestoreDeletedTeam(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) RestoreDeletedTeam(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params restoreTeamParams) (any, error) {
-		return c.client.Teams.RestoreDeleted(context.TODO(), params.DeletedGroupID)
+		return c.client.Teams.RestoreDeleted(ctx, params.DeletedGroupID)
 	})
 }
