@@ -30,7 +30,7 @@ class FakeServerData:
     newGroupMailNickname: str
     newTeamVisibility: str
     potentialTeams: List[Team] = field(default_factory=list)
-    search_results: List[Message] = field(default_factory=list)
+    searching: str = "chats"
 
     # Initial data containers
     messages: Dict[str, List[Message]] = field(default_factory=dict)
@@ -85,6 +85,7 @@ class FakeServerData:
             "19:123123@thread.tacv2": [
                 Message(id="msg-001", content="Hello, team!", content_type="text", sender=MessageFrom(user_id="user-123-abc", display_name="Alice"), created_date_time="2024-01-01T10:00:00Z", reply_count=0),
                 Message(id="msg-002", content="Don't forget the meeting at 3 PM.", content_type="text", sender=MessageFrom(user_id="user-456-def", display_name="Bob"), created_date_time="2024-01-01T11:00:00Z", reply_count=2),
+                Message(id="AAMkAGIwMDA5MmY0LWY5ZTgtNGY5YS04NzczLWNhNjc0ZGIyZDBjYgBGAAAAAADm35sgHbzESapJ8_BjBlhEBwDAYtphe7dsRbDrOT-HAHoKAACmqNsoAADAYtphe7dsRbDrOT-HAHoKAAFsBhyEAAA=", content="Hello, team!", content_type="text", sender=MessageFrom(user_id="user-123-abc", display_name="Alice"), created_date_time="2024-01-01T10:00:00Z", reply_count=0),
             ],
         }
 
@@ -828,28 +829,57 @@ class FakeServerData:
                         sender_name = getattr(message.sender, 'display_name', 'Unknown') if message.sender else 'Unknown'
                         created_dt = getattr(message, 'created_date_time', "2024-01-01T12:00:00Z")
 
-                        hits.append({
-                            "hitId": message.id,
-                            "rank": rank,
-                            "summary": message.content[:200],
-                            "resource": {
-                                "id": message.id,
-                                "chatId": chat_id,
-                                "body": {
-                                    "content": message.content,
-                                    "contentType": message.content_type,
-                                },
-                                "from": {
-                                    "user": {
-                                        "id": message.sender.user_id,
-                                        "displayName": message.sender.display_name,
-                                    }
-                                },
-                                "createdDateTime": message.created_date_time,
-                                "lastModifiedDateTime": message.created_date_time,
+                        if self.searching == "chats":
+                            hits.append({
+                                "hitId": message.id,
+                                "rank": rank,
+                                "summary": message.content[:200],
+                                "resource": {
+                                    "id": message.id,
+                                    "chatId": chat_id,
+                                    "body": {
+                                        "content": message.content,
+                                        "contentType": message.content_type,
+                                    },
+                                    "from": {
+                                        "user": {
+                                            "id": sender_id,
+                                            "displayName": sender_name,
+                                        }
+                                    },
+                                    "createdDateTime": created_dt,
+                                    "lastModifiedDateTime": created_dt,
                                 }
                             },
-                        )
+                            )
+                        elif self.searching == "channels":
+                            hits.append({
+                                "hitId": message.id,
+                                "rank": rank,
+                                "summary": message.content[:200],
+                                "resource": {
+                                    "id": message.id,
+                                    "channelIdentity": {
+                                        "teamId": self.teams[0].id,
+                                        "channelId": self.channels[self.teams[0].id][0].id,
+                                    },
+                                    "teamId": self.teams[0].id,
+                                    "channelId": self.channels[self.teams[0].id][0].id,
+                                    "body": {
+                                        "content": message.content,
+                                        "contentType": message.content_type,
+                                    },
+                                    "from": {
+                                        "user": {
+                                            "id": sender_id,
+                                            "displayName": sender_name,
+                                        }
+                                    },
+                                    "createdDateTime": created_dt,
+                                    "lastModifiedDateTime": created_dt,
+                                }
+                            },
+                            )
                         rank += 1
 
         except Exception:

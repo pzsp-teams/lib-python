@@ -3,6 +3,7 @@ from tests.init_fake_client import init_fake_client
 from tests.fake_server.setup import setup_fake_server
 from teams_lib_pzsp2_z1.model.message import MessageContentType, MessageBody
 from teams_lib_pzsp2_z1.model.mention import MentionKind
+from teams_lib_pzsp2_z1.model.search import SearchConfig, SearchMessagesOptions
 
 
 def test_list_channels_integration(httpserver):
@@ -389,6 +390,44 @@ def test_get_mention_integration(httpserver):
         assert mention[0].at_id == 0
         assert mention[0].text == data.teams[0].display_name
         assert mention[0].target_id == data.teams[0].id
+
+    finally:
+        client.close()
+
+
+def test_search_messages_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+    data.searching = "channels"
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        results = client.channels.search_messages(
+            team_ref=data.teams[0].display_name,
+            channel_ref=data.channels[data.teams[0].id][0].name,
+            options=SearchMessagesOptions(
+                query="Hello",
+            ),
+            config=SearchConfig(
+                max_workers=4,
+            )
+        )
+
+        assert len(results.messages) == 1
+
+        assert results.messages[0].team_id == data.teams[0].id
+        assert results.messages[0].channel_id == data.channels[data.teams[0].id][0].id
+        assert results.messages[0].chat_id is None
+
+        assert results.messages[0].message.id == data.messages[results.messages[0].channel_id][2].id
+        assert results.messages[0].message.content == data.messages[results.messages[0].channel_id][2].content
+        assert results.messages[0].message.content_type == MessageContentType(data.messages[results.messages[0].channel_id][2].content_type)
+        assert results.messages[0].message.sender.user_id == data.messages[results.messages[0].channel_id][2].sender.user_id
+        assert results.messages[0].message.sender.display_name == data.messages[results.messages[0].channel_id][2].sender.display_name
+        assert results.messages[0].message.reply_count == data.messages[results.messages[0].channel_id][2].reply_count
+        assert results.messages[0].message.created_date_time == data.messages[results.messages[0].channel_id][0].created_date_time
 
     finally:
         client.close()
