@@ -1,185 +1,185 @@
 package jsonclient
 
-type HandlerFunc func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error)
+type HandlerFunc func(c *TeamsJSONClient, p map[string]any) (any, error)
 
 var Handlers = map[string]HandlerFunc{
 
 	// TEAMS
-	"getTeam": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"getTeam": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.GetTeam(p)
 	},
 
-	"updateTeam": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"updateTeam": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.UpdateTeam(p)
 	},
 
-	"listMyJoined": func(c *TeamsJSONClient, _ map[string]interface{}) (interface{}, error) {
+	"listMyJoined": func(c *TeamsJSONClient, _ map[string]any) (any, error) {
 		return c.ListMyJoined()
 	},
 
-	"createTeamViaGroup": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"createTeamViaGroup": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.CreateTeamViaGroup(p)
 	},
 
-	"createTeamFromTemplate": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"createTeamFromTemplate": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.CreateTeamFromTemplate(p)
 	},
 
-	"archiveTeam": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"archiveTeam": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ArchiveTeam(p)
 	},
 
-	"unarchiveTeam": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"unarchiveTeam": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.UnarchiveTeam(p)
 	},
 
-	"deleteTeam": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"deleteTeam": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.DeleteTeam(p)
 	},
 
-	"restoreDeletedTeam": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"restoreDeletedTeam": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.RestoreDeletedTeam(p)
 	},
 
 	// CHANNELS
-	"listChannels": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listChannels": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListChannels(p)
 	},
 
-	"getChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"getChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.GetChannel(p)
 	},
 
-	"createStandardChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"createStandardChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.CreateStandardChannel(p)
 	},
 
-	"createPrivateChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"createPrivateChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.CreatePrivateChannel(p)
 	},
 
-	"deleteChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"deleteChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.DeleteChannel(p)
 	},
 
-	"sendMessageToChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"sendMessageToChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.SendMessageToChannel(p)
 	},
 
-	"sendReplyToChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"sendReplyToChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.SendReplyToChannel(p)
 	},
 
-	"listMessagesInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listMessagesInChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListMessagesInChannel(p)
 	},
 
-	"getMessageInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"getMessageInChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.GetMessageInChannel(p)
 	},
 
-	"listMessageRepliesInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listMessageRepliesInChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListMessageRepliesInChannel(p)
 	},
 
-	"getMessageReplyInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"getMessageReplyInChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.GetMessageReplyInChannel(p)
 	},
 
-	"listChannelMembers": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listChannelMembers": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListChannelMembers(p)
 	},
 
-	"addMemberToChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"addMemberToChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.AddMemberToChannel(p)
 	},
 
-	"removeMemberFromChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"removeMemberFromChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.RemoveMemberFromChannel(p)
 	},
 
-	"updateMemberRoleInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"updateMemberRoleInChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.UpdateMemberInChannel(p)
 	},
 
-	"getMentionsInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"getMentionsInChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.GetMentionsInChannel(p)
 	},
 
-	"searchMessagesInChannel": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"searchMessagesInChannel": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.SearchMessagesInChannel(p)
 	},
 
 	// CHATS
-	"createOneOnOneChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"createOneOnOneChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.CreateOneToOneChat(p)
 	},
 
-	"createGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"createGroupChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.CreateGroupChat(p)
 	},
 
-	"getChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"getChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.GetChat(p)
 	},
 
-	"addMemberToGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"addMemberToGroupChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.AddMemberToGroupChat(p)
 	},
 
-	"removeMemberFromGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"removeMemberFromGroupChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.RemoveMemberFromGroupChat(p)
 	},
 
-	"listMembersInGroupChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listMembersInGroupChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListGroupChatMembers(p)
 	},
 
-	"updateGroupChatTopic": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"updateGroupChatTopic": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.UpdateGroupChatTopic(p)
 	},
 
-	"listMessagesInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listMessagesInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListMessagesInChat(p)
 	},
 
-	"sendMessageInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"sendMessageInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.SendMessageInChat(p)
 	},
 
-	"deleteMessageInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"deleteMessageInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.DeleteMessageInChat(p)
 	},
 
-	"getMessageInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"getMessageInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.GetMessageInChat(p)
 	},
 
-	"listMyChats": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listMyChats": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListMyChats(p)
 	},
 
-	"listMyChatMessages": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listMyChatMessages": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListMyChatMessages(p)
 	},
 
-	"listPinnedMessagesInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"listPinnedMessagesInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.ListPinnedMessagesInChat(p)
 	},
 
-	"pinMessageInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"pinMessageInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.PinMessageInChat(p)
 	},
 
-	"unpinMessageInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"unpinMessageInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.UnpinMessageInChat(p)
 	},
 
-	"getMentionsInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"getMentionsInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.GetMentionsInChat(p)
 	},
 
-	"searchMessagesInChat": func(c *TeamsJSONClient, p map[string]interface{}) (interface{}, error) {
+	"searchMessagesInChat": func(c *TeamsJSONClient, p map[string]any) (any, error) {
 		return c.SearchMessagesInChat(p)
 	},
 }

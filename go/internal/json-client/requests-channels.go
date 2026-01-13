@@ -12,8 +12,8 @@ type listChannelsParams struct {
 	TeamRef string `json:"teamRef"`
 }
 
-func (c *TeamsJSONClient) ListChannels(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params listChannelsParams) (interface{}, error) {
+func (c *TeamsJSONClient) ListChannels(p map[string]any) (any, error) {
+	return execute(p, func(params listChannelsParams) (any, error) {
 		return c.client.Channels.ListChannels(context.TODO(), params.TeamRef)
 	})
 }
@@ -23,8 +23,8 @@ type baseChannelParams struct {
 	ChannelRef string `json:"channelRef"`
 }
 
-func (c *TeamsJSONClient) GetChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params baseChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) GetChannel(p map[string]any) (any, error) {
+	return execute(p, func(params baseChannelParams) (any, error) {
 		return c.client.Channels.Get(context.TODO(), params.TeamRef, params.ChannelRef)
 	})
 }
@@ -34,8 +34,8 @@ type createChannelParams struct {
 	Name    string `json:"name"`
 }
 
-func (c *TeamsJSONClient) CreateStandardChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params createChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) CreateStandardChannel(p map[string]any) (any, error) {
+	return execute(p, func(params createChannelParams) (any, error) {
 		return c.client.Channels.CreateStandardChannel(context.TODO(), params.TeamRef, params.Name)
 	})
 }
@@ -47,14 +47,14 @@ type createPrivateChannelParams struct {
 	OwnerRefs  []string `json:"ownerRefs"`
 }
 
-func (c *TeamsJSONClient) CreatePrivateChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params createPrivateChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) CreatePrivateChannel(p map[string]any) (any, error) {
+	return execute(p, func(params createPrivateChannelParams) (any, error) {
 		return c.client.Channels.CreatePrivateChannel(context.TODO(), params.TeamRef, params.Name, params.MemberRefs, params.OwnerRefs)
 	})
 }
 
-func (c *TeamsJSONClient) DeleteChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params baseChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) DeleteChannel(p map[string]any) (any, error) {
+	return execute(p, func(params baseChannelParams) (any, error) {
 		err := c.client.Channels.Delete(context.TODO(), params.TeamRef, params.ChannelRef)
 		return "deleted", err
 	})
@@ -66,8 +66,8 @@ type sendMessageToChannelParams struct {
 	Body       decoders.MessageBodyDTO `json:"body"`
 }
 
-func (c *TeamsJSONClient) SendMessageToChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params sendMessageToChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) SendMessageToChannel(p map[string]any) (any, error) {
+	return execute(p, func(params sendMessageToChannelParams) (any, error) {
 		body, err := decoders.DecodeParams[models.MessageBody](&params.Body)
 		if err != nil {
 			return nil, err
@@ -83,8 +83,8 @@ type sendReplyToChannelParams struct {
 	Body       decoders.MessageBodyDTO `json:"body"`
 }
 
-func (c *TeamsJSONClient) SendReplyToChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params sendReplyToChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) SendReplyToChannel(p map[string]any) (any, error) {
+	return execute(p, func(params sendReplyToChannelParams) (any, error) {
 		body, err := decoders.DecodeParams[models.MessageBody](&params.Body)
 		if err != nil {
 			return nil, err
@@ -106,8 +106,8 @@ type listMessagesParams struct {
 	NextLink      decoders.NextLinkDTO   `json:"nextLink"`
 }
 
-func (c *TeamsJSONClient) ListMessagesInChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params listMessagesParams) (interface{}, error) {
+func (c *TeamsJSONClient) ListMessagesInChannel(p map[string]any) (any, error) {
+	return execute(p, func(params listMessagesParams) (any, error) {
 		options, err := decoders.DecodeParams[models.ListMessagesOptions](params.Options)
 		if err != nil {
 			return nil, err
@@ -123,8 +123,8 @@ type getMessageParams struct {
 	MessageID  string `json:"messageId"`
 }
 
-func (c *TeamsJSONClient) GetMessageInChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params getMessageParams) (interface{}, error) {
+func (c *TeamsJSONClient) GetMessageInChannel(p map[string]any) (any, error) {
+	return execute(p, func(params getMessageParams) (any, error) {
 		return c.client.Channels.GetMessage(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID)
 	})
 }
@@ -138,8 +138,8 @@ type listRepliesParams struct {
 	NextLink      decoders.NextLinkDTO `json:"nextLink"`
 }
 
-func (c *TeamsJSONClient) ListMessageRepliesInChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params listRepliesParams) (interface{}, error) {
+func (c *TeamsJSONClient) ListMessageRepliesInChannel(p map[string]any) (any, error) {
+	return execute(p, func(params listRepliesParams) (any, error) {
 		nextLink := decoders.GetNextLink(&params.NextLink)
 		return c.client.Channels.ListReplies(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID, params.Top, params.IncludeSystem, nextLink)
 	})
@@ -152,14 +152,14 @@ type getReplyParams struct {
 	ReplyID    string `json:"replyId"`
 }
 
-func (c *TeamsJSONClient) GetMessageReplyInChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params getReplyParams) (interface{}, error) {
+func (c *TeamsJSONClient) GetMessageReplyInChannel(p map[string]any) (any, error) {
+	return execute(p, func(params getReplyParams) (any, error) {
 		return c.client.Channels.GetReply(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID, params.ReplyID)
 	})
 }
 
-func (c *TeamsJSONClient) ListChannelMembers(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params baseChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) ListChannelMembers(p map[string]any) (any, error) {
+	return execute(p, func(params baseChannelParams) (any, error) {
 		return c.client.Channels.ListMembers(context.TODO(), params.TeamRef, params.ChannelRef)
 	})
 }
@@ -171,14 +171,14 @@ type addOrUpdateMemberToChannelParams struct {
 	IsOwner    bool   `json:"isOwner"`
 }
 
-func (c *TeamsJSONClient) AddMemberToChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params addOrUpdateMemberToChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) AddMemberToChannel(p map[string]any) (any, error) {
+	return execute(p, func(params addOrUpdateMemberToChannelParams) (any, error) {
 		return c.client.Channels.AddMember(context.TODO(), params.TeamRef, params.ChannelRef, params.UserRef, params.IsOwner)
 	})
 }
 
-func (c *TeamsJSONClient) UpdateMemberInChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params addOrUpdateMemberToChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) UpdateMemberInChannel(p map[string]any) (any, error) {
+	return execute(p, func(params addOrUpdateMemberToChannelParams) (any, error) {
 		return c.client.Channels.UpdateMemberRoles(context.TODO(), params.TeamRef, params.ChannelRef, params.UserRef, params.IsOwner)
 	})
 }
@@ -189,8 +189,8 @@ type removeMemberFromChannelParams struct {
 	UserRef    string `json:"userRef"`
 }
 
-func (c *TeamsJSONClient) RemoveMemberFromChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params removeMemberFromChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) RemoveMemberFromChannel(p map[string]any) (any, error) {
+	return execute(p, func(params removeMemberFromChannelParams) (any, error) {
 		err := c.client.Channels.RemoveMember(context.TODO(), params.TeamRef, params.ChannelRef, params.UserRef)
 		return "removed", err
 	})
@@ -202,8 +202,8 @@ type getMentionsInChannelParams struct {
 	RawMentions []string `json:"rawMentions"`
 }
 
-func (c *TeamsJSONClient) GetMentionsInChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params getMentionsInChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) GetMentionsInChannel(p map[string]any) (any, error) {
+	return execute(p, func(params getMentionsInChannelParams) (any, error) {
 		return c.client.Channels.GetMentions(context.TODO(), params.TeamRef, params.ChannelRef, params.RawMentions)
 	})
 }
@@ -215,8 +215,8 @@ type searchMessagesInChannelParams struct {
 	SearchConfig  decoders.SearchConfigDTO         `json:"searchConfig"`
 }
 
-func (c *TeamsJSONClient) SearchMessagesInChannel(p map[string]interface{}) (interface{}, error) {
-	return execute(p, func(params searchMessagesInChannelParams) (interface{}, error) {
+func (c *TeamsJSONClient) SearchMessagesInChannel(p map[string]any) (any, error) {
+	return execute(p, func(params searchMessagesInChannelParams) (any, error) {
 		searchOptions := decoders.DecodeSearchMessageOptions(&params.SearchOptions)
 		searchConfig, err := decoders.DecodeParams[search.SearchConfig](&params.SearchConfig)
 		if err != nil {

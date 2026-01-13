@@ -4,7 +4,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func DecodeParams[T any](p interface{}) (*T, error) {
+func DecodeParams[T any](p any) (*T, error) {
     var result T
 
     config := &mapstructure.DecoderConfig{

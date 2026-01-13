@@ -10,7 +10,7 @@ type Request struct {
 	Type   string                 `json:"type"`
 	Method string                 `json:"method,omitempty"`
 	Config Config                 `json:"config,omitempty"`
-	Params map[string]interface{} `json:"params,omitempty"`
+	Params map[string]any `json:"params,omitempty"`
 }
 
 type Config struct {
@@ -83,7 +83,7 @@ func (acm AuthConfigMap) ToAuthConfig() (*config.AuthConfig, error) {
 	}, nil
 }
 
-func ParseCachePath(value interface{}) (*string, error) {
+func ParseCachePath(value any) (*string, error) {
 	path, ok := value.(string)
 	if !ok || path == "" {
 		return nil, fmt.Errorf("cachePath must be a non-empty string")
@@ -91,7 +91,7 @@ func ParseCachePath(value interface{}) (*string, error) {
 	return &path, nil
 }
 
-func ParseCacheMode(value interface{}) (config.CacheMode, error) {
+func ParseCacheMode(value any) (config.CacheMode, error) {
 	switch value {
 	case "DISABLED":
 		return config.CacheDisabled, nil
