@@ -608,6 +608,6 @@ class ChatsService(BaseService):
                     chat_id=msg.get("ChatID"),
                 )
                 for msg in response["Messages"]
-            ],
+            ] if response.get("Messages") else [],
             next_from=response.get("NextFrom"),
         )

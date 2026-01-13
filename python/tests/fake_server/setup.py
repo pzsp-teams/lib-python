@@ -14,10 +14,12 @@ def setup_fake_server(httpserver) -> FakeServerData:
 
     data = FakeServerData()
 
-    def make_log_response(request, data_dict: dict, context_msg: str = "") -> Response:
+    def make_log_response(request, data_dict: dict, context_msg: str = "", status_code = None) -> Response:
         print(f"\n[MOCK SERVER] 🟢 REQUEST: {request.method} {request.path}", file=sys.stdout)
         if context_msg:
             print(f"[MOCK SERVER]    Context: {context_msg}", file=sys.stdout)
+
+        print(f"[MOCK SERVER] Returned body: {data_dict}", file=sys.stdout)
 
         if request.content_type == "application/json":
             try:
@@ -27,9 +29,10 @@ def setup_fake_server(httpserver) -> FakeServerData:
             except Exception as e:
                 print(f"[MOCK SERVER]    ⚠️ Body Error: {e}", file=sys.stdout)
 
-        status_code = 200 if data_dict else 404
-        if request.method in ["POST", "PUT"] and data_dict:
-            status_code = 201
+        if not status_code:
+            status_code = 200 if data_dict else 404
+            if request.method in ["POST", "PUT"] and data_dict:
+                status_code = 201
 
         print(f"[MOCK SERVER]    👉 Response: {status_code}", file=sys.stdout)
 
@@ -38,6 +41,21 @@ def setup_fake_server(httpserver) -> FakeServerData:
             mimetype="application/json",
             status=status_code
         )
+
+    # ==========================================
+    #                 SEARCH
+    # ==========================================
+
+    # POST /search/query
+    httpserver.expect_request(
+        "/v1.0/search/query",
+        method="POST"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_search_messages_response(req.json),
+        "Search Messages",
+        status_code=200
+    ))
 
     # ==========================================
     #                 USERS
@@ -420,15 +438,6 @@ def setup_fake_server(httpserver) -> FakeServerData:
     #                 CHATS
     # ==========================================
 
-    # GET /chats/{chat_id}
-    httpserver.expect_request(
-        re.compile(r"^/v1.0/chats/([^/]+)"),
-        method="GET"
-    ).respond_with_handler(lambda req: make_log_response(
-        req,
-        data.get_chat_responses(re.search(r"/chats/([^/]+)", req.path).group(1)),
-        "Get Chat"
-    ))
 
     # DELETE /chats/{chat_id}/pinnedMessages/{message_id}
     httpserver.expect_request(
@@ -556,6 +565,17 @@ def setup_fake_server(httpserver) -> FakeServerData:
         data.get_create_chat_response(req.json),
         "Create Chat"
     ))
+
+    # GET /chats/{chat_id}
+    httpserver.expect_request(
+        re.compile(r"^/v1.0/chats/([^/]+)"),
+        method="GET"
+    ).respond_with_handler(lambda req: make_log_response(
+        req,
+        data.get_chat_responses(re.search(r"/chats/([^/]+)", req.path).group(1)),
+        "Get Chat"
+    ))
+
 
     # Fallback for unmatched routes
     httpserver.expect_request(re.compile(".*")).respond_with_handler(

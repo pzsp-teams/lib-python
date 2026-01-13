@@ -4,6 +4,7 @@ from tests.fake_server.setup import setup_fake_server
 from teams_lib_pzsp2_z1.model.chat import ChatType, ChatRef
 from teams_lib_pzsp2_z1.model.message import MessageContentType, MessageBody
 from teams_lib_pzsp2_z1.model.mention import MentionKind
+from teams_lib_pzsp2_z1.model.search import SearchConfig, SearchMessagesOptions, TimeInterval
 from datetime import datetime
 
 
@@ -110,15 +111,15 @@ def test_get_chat_integration(httpserver):
 
         chat = client.chats.get_chat(
             chat_ref=ChatRef(
-                ref=data.group_chats[1].topic,
+                ref=data.group_chats[0].topic,
                 type=ChatType.GROUP,
             )
         )
 
-        assert chat.id == data.group_chats[1].id
-        assert chat.type == data.group_chats[1].type
-        assert chat.topic == data.group_chats[1].topic
-        assert chat.is_hidden == data.group_chats[1].is_hidden
+        assert chat.id == data.group_chats[0].id
+        assert chat.type == data.group_chats[0].type
+        assert chat.topic == data.group_chats[0].topic
+        assert chat.is_hidden == data.group_chats[0].is_hidden
 
     finally:
         client.close()
@@ -473,3 +474,38 @@ def test_get_mention_integration(httpserver):
     finally:
         client.close()
 
+def test_search_messages_integration(httpserver):
+
+    data = setup_fake_server(httpserver)
+
+    client = TeamsClient(auto_init=False)
+    try:
+        init_fake_client(client, httpserver.url_for(""))
+
+        results = client.chats.search_messages(
+            chat_ref=ChatRef(
+                ref=data.group_chats[0].topic,
+                type=ChatType.GROUP,
+            ),
+            options=SearchMessagesOptions(
+                query="Hello"
+            ),
+            config=SearchConfig(
+                max_workers=4,
+            )
+        )
+
+        assert len(results.messages) == 1
+
+        assert results.messages[0].chat_id == data.group_chats[0].id
+
+        assert results.messages[0].message.id == data.chat_messages[data.group_chats[0].id][0].id
+        assert results.messages[0].message.content == data.chat_messages[data.group_chats[0].id][0].content
+        assert results.messages[0].message.content_type == MessageContentType(data.chat_messages[data.group_chats[0].id][0].content_type)
+        assert results.messages[0].message.sender.user_id == data.chat_messages[data.group_chats[0].id][0].sender.user_id
+        assert results.messages[0].message.sender.display_name == data.chat_messages[data.group_chats[0].id][0].sender.display_name
+        assert results.messages[0].message.reply_count == data.chat_messages[data.group_chats[0].id][0].reply_count
+        assert results.messages[0].message.created_date_time == data.chat_messages[data.group_chats[0].id][0].created_date_time
+
+    finally:
+        client.close()
