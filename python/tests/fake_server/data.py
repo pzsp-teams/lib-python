@@ -287,24 +287,6 @@ class FakeServerData:
             response= ""
         )
 
-    # def create_team_handler(self, req):
-    #     result = self.get_createTeamFromTemplate_response(req.json)
-
-    #     base_url = "https://graph.microsoft.com/v1.0"
-    #     loc_header = f"/teams/{TEAM_ID}/operations/{OP_ID}"
-    #     content_loc_header = f"/teams/{TEAM_ID}"
-
-    #     return Response(
-    #         response=result["body"],
-    #         status=result["status"],
-    #         headers={
-    #             "Location": full_location,
-    #             "Content-Location": full_content_loc,
-    #             "Content-Type": result["headers"]["Content-Type"],
-    #             "Content-Length": result["headers"]["Content-Length"]
-    #         }
-    #     )
-
     def get_archiveTeam_response(self, team_id: str) -> dict:
         team = self._find_team(team_id)
         if not team:
@@ -795,7 +777,6 @@ class FakeServerData:
         rank = 1
         messages = []
 
-        # 1. Wyciągamy surowy KQL (to już wiesz że działa)
         raw_query = ""
         try:
             if isinstance(request_body, dict):
@@ -805,26 +786,19 @@ class FakeServerData:
         except Exception:
             raw_query = ""
 
-        # 2. CZYSZCZENIE (To jest to, czego Ci brakuje)
-        # Wywalamy wszystko co wygląda jak Klucz:"Wartość"
-        # Zamieniamy 'Hello IsRead:"false"...' -> 'Hello   ...'
         search_term = re.sub(r'\w+:"[^"]+"', '', raw_query)
 
-        # Usuwamy spacje z brzegów -> zostaje samo "Hello"
         search_term = search_term.strip()
 
 
-        # 3. Pętla szukająca
         try:
             for chat_id, messages in self.chat_messages.items():
                 for message in messages:
                     if not message.content:
                         continue
 
-                    # Teraz szukamy samego "Hello" w treści wiadomości
                     if search_term and search_term.lower() in message.content.lower():
 
-                        # (Bezpieczne pobieranie sendera)
                         sender_id = getattr(message.sender, 'user_id', 'unknown') if message.sender else 'unknown'
                         sender_name = getattr(message.sender, 'display_name', 'Unknown') if message.sender else 'Unknown'
                         created_dt = getattr(message, 'created_date_time', "2024-01-01T12:00:00Z")
@@ -900,8 +874,6 @@ class FakeServerData:
                 }
             ]
         }
-
-        # self.search_results = messages
 
 
         return response
