@@ -6,7 +6,7 @@ import (
 )
 
 type response struct {
-	Result interface{} `json:"result,omitempty"`
+	Result any `json:"result,omitempty"`
 	Error  string      `json:"error,omitempty"`
 }
 
@@ -29,7 +29,7 @@ func respondError(writer *bufio.Writer, err error) {
 	writer.Flush()
 }
 
-func respondResult(writer *bufio.Writer, result interface{}) {
+func respondResult(writer *bufio.Writer, result any) {
 	response := response{
 		Result: result,
 	}

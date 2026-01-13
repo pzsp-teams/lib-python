@@ -20,7 +20,7 @@ import (
 // --- 1. Fake Auth Provider ---
 type FakeAuthProvider struct{}
 
-func (f *FakeAuthProvider) AuthenticateRequest(ctx context.Context, request *azcore.RequestInformation, additionalAuthenticationContext map[string]interface{}) error {
+func (f *FakeAuthProvider) AuthenticateRequest(ctx context.Context, request *azcore.RequestInformation, additionalAuthenticationContext map[string]any) error {
 	if request.Headers == nil {
 		request.Headers = azcore.NewRequestHeaders()
 	}

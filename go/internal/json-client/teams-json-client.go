@@ -10,7 +10,7 @@ type TeamsJSONClient struct {
 	client *lib.Client
 }
 
-func execute[T any](p map[string]interface{}, fn func(params T) (interface{}, error)) (interface{}, error) {
+func execute[T any](p map[string]any, fn func(params T) (any, error)) (any, error) {
 	params, err := decoders.DecodeParams[T](p)
 	if err != nil {
 		return nil, err
