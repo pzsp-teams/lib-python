@@ -13,9 +13,9 @@ type createOneToOneChatParams struct {
 	RecipientRef string `json:"recipientRef"`
 }
 
-func (c *TeamsJSONClient) CreateOneToOneChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) CreateOneToOneChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params createOneToOneChatParams) (any, error) {
-		return c.client.Chats.CreateOneOnOne(context.TODO(), params.RecipientRef)
+		return c.client.Chats.CreateOneOnOne(ctx, params.RecipientRef)
 	})
 }
 
@@ -25,9 +25,9 @@ type createGroupChatParams struct {
 	IncludeMe     bool     `json:"includeMe"`
 }
 
-func (c *TeamsJSONClient) CreateGroupChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) CreateGroupChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params createGroupChatParams) (any, error) {
-		return c.client.Chats.CreateGroup(context.TODO(), params.RecipientRefs, params.Topic, params.IncludeMe)
+		return c.client.Chats.CreateGroup(ctx, params.RecipientRefs, params.Topic, params.IncludeMe)
 	})
 }
 
@@ -35,10 +35,10 @@ type baseChatParams struct {
 	ChatRef decoders.ChatRefDTO `json:"chatRef"`
 }
 
-func (c *TeamsJSONClient) GetChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) GetChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params baseChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
-		return c.client.Chats.GetChat(context.TODO(), chatRef)
+		return c.client.Chats.GetChat(ctx, chatRef)
 	})
 }
 
@@ -47,15 +47,15 @@ type groupChatMemberParams struct {
 	UserRef      string `json:"userRef"`
 }
 
-func (c *TeamsJSONClient) AddMemberToGroupChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) AddMemberToGroupChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params groupChatMemberParams) (any, error) {
-		return c.client.Chats.AddMemberToGroupChat(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
+		return c.client.Chats.AddMemberToGroupChat(ctx, chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
 	})
 }
 
-func (c *TeamsJSONClient) RemoveMemberFromGroupChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) RemoveMemberFromGroupChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params groupChatMemberParams) (any, error) {
-		err := c.client.Chats.RemoveMemberFromGroupChat(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
+		err := c.client.Chats.RemoveMemberFromGroupChat(ctx, chats.GroupChatRef{Ref: params.GroupChatRef}, params.UserRef)
 		return "removed", err
 	})
 }
@@ -64,9 +64,9 @@ type listMembersInChatParams struct {
 	GroupChatRef string `json:"groupChatRef"`
 }
 
-func (c *TeamsJSONClient) ListGroupChatMembers(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListGroupChatMembers(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params listMembersInChatParams) (any, error) {
-		return c.client.Chats.ListGroupChatMembers(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef})
+		return c.client.Chats.ListGroupChatMembers(ctx, chats.GroupChatRef{Ref: params.GroupChatRef})
 	})
 }
 
@@ -75,9 +75,9 @@ type updateGroupChatTopicParams struct {
 	Topic        string `json:"topic"`
 }
 
-func (c *TeamsJSONClient) UpdateGroupChatTopic(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) UpdateGroupChatTopic(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params updateGroupChatTopicParams) (any, error) {
-		return c.client.Chats.UpdateGroupChatTopic(context.TODO(), chats.GroupChatRef{Ref: params.GroupChatRef}, params.Topic)
+		return c.client.Chats.UpdateGroupChatTopic(ctx, chats.GroupChatRef{Ref: params.GroupChatRef}, params.Topic)
 	})
 }
 
@@ -87,11 +87,11 @@ type listMessagesInChatParams struct {
 	NextLink      decoders.NextLinkDTO `json:"nextLink"`
 }
 
-func (c *TeamsJSONClient) ListMessagesInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListMessagesInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params listMessagesInChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
 		nextLink := decoders.GetNextLink(&params.NextLink)
-		return c.client.Chats.ListMessages(context.TODO(), chatRef, params.IncludeSystem, nextLink)
+		return c.client.Chats.ListMessages(ctx, chatRef, params.IncludeSystem, nextLink)
 	})
 }
 
@@ -100,14 +100,14 @@ type sendMessageInChatParams struct {
 	Body    decoders.MessageBodyDTO `json:"body"`
 }
 
-func (c *TeamsJSONClient) SendMessageInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) SendMessageInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params sendMessageInChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
 		body, err := decoders.DecodeParams[models.MessageBody](params.Body)
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Chats.SendMessage(context.TODO(), chatRef, *body)
+		return c.client.Chats.SendMessage(ctx, chatRef, *body)
 	})
 }
 
@@ -116,18 +116,18 @@ type messageInChatParams struct {
 	MessageID string              `json:"messageId"`
 }
 
-func (c *TeamsJSONClient) DeleteMessageInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) DeleteMessageInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params messageInChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
-		err := c.client.Chats.DeleteMessage(context.TODO(), chatRef, params.MessageID)
+		err := c.client.Chats.DeleteMessage(ctx, chatRef, params.MessageID)
 		return "deleted", err
 	})
 }
 
-func (c *TeamsJSONClient) GetMessageInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) GetMessageInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params messageInChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
-		return c.client.Chats.GetMessage(context.TODO(), chatRef, params.MessageID)
+		return c.client.Chats.GetMessage(ctx, chatRef, params.MessageID)
 	})
 }
 
@@ -135,13 +135,13 @@ type ListMyChatsParams struct {
 	ChatType string `json:"chatType"`
 }
 
-func (c *TeamsJSONClient) ListMyChats(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListMyChats(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params ListMyChatsParams) (any, error) {
 		var chatType models.ChatType
 		if params.ChatType != "" {
 			chatType = models.ChatType(params.ChatType)
 		}
-		return c.client.Chats.ListChats(context.TODO(), &chatType)
+		return c.client.Chats.ListChats(ctx, &chatType)
 	})
 }
 
@@ -151,35 +151,35 @@ type listChatMessagesParams struct {
 	Top       *int32 `json:"top"`
 }
 
-func (c *TeamsJSONClient) ListMyChatMessages(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListMyChatMessages(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params listChatMessagesParams) (any, error) {
 		parsedStartTime, parsedEndTime, err := decoders.DecodeTimeRange(params.StartTime, params.EndTime)
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Chats.ListAllMessages(context.TODO(), parsedStartTime, parsedEndTime, params.Top)
+		return c.client.Chats.ListAllMessages(ctx, parsedStartTime, parsedEndTime, params.Top)
 	})
 }
 
-func (c *TeamsJSONClient) ListPinnedMessagesInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListPinnedMessagesInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params baseChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
-		return c.client.Chats.ListPinnedMessages(context.TODO(), chatRef)
+		return c.client.Chats.ListPinnedMessages(ctx, chatRef)
 	})
 }
 
-func (c *TeamsJSONClient) PinMessageInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) PinMessageInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params messageInChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
-		err := c.client.Chats.PinMessage(context.TODO(), chatRef, params.MessageID)
+		err := c.client.Chats.PinMessage(ctx, chatRef, params.MessageID)
 		return "pinned", err
 	})
 }
 
-func (c *TeamsJSONClient) UnpinMessageInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) UnpinMessageInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params messageInChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
-		err := c.client.Chats.UnpinMessage(context.TODO(), chatRef, params.MessageID)
+		err := c.client.Chats.UnpinMessage(ctx, chatRef, params.MessageID)
 		return "unpinned", err
 	})
 }
@@ -189,10 +189,10 @@ type mentionInChatParams struct {
 	RawMentions []string            `json:"rawMentions"`
 }
 
-func (c *TeamsJSONClient) GetMentionsInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) GetMentionsInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params mentionInChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
-		return c.client.Chats.GetMentions(context.TODO(), chatRef, params.RawMentions)
+		return c.client.Chats.GetMentions(ctx, chatRef, params.RawMentions)
 	})
 }
 
@@ -202,7 +202,7 @@ type searchMessagesInChatParams struct {
 	SearchConfig  decoders.SearchConfigDTO         `json:"searchConfig"`
 }
 
-func (c *TeamsJSONClient) SearchMessagesInChat(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) SearchMessagesInChat(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params searchMessagesInChatParams) (any, error) {
 		chatRef := decoders.GetChatRef(params.ChatRef)
 		searchOptions := decoders.DecodeSearchMessageOptions(&params.SearchOptions)
@@ -210,6 +210,6 @@ func (c *TeamsJSONClient) SearchMessagesInChat(p map[string]any) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Chats.SearchMessages(context.TODO(), chatRef, searchOptions, searchConfig)
+		return c.client.Chats.SearchMessages(ctx, chatRef, searchOptions, searchConfig)
 	})
 }

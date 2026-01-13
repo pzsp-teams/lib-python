@@ -12,9 +12,9 @@ type listChannelsParams struct {
 	TeamRef string `json:"teamRef"`
 }
 
-func (c *TeamsJSONClient) ListChannels(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListChannels(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params listChannelsParams) (any, error) {
-		return c.client.Channels.ListChannels(context.TODO(), params.TeamRef)
+		return c.client.Channels.ListChannels(ctx, params.TeamRef)
 	})
 }
 
@@ -23,9 +23,9 @@ type baseChannelParams struct {
 	ChannelRef string `json:"channelRef"`
 }
 
-func (c *TeamsJSONClient) GetChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) GetChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params baseChannelParams) (any, error) {
-		return c.client.Channels.Get(context.TODO(), params.TeamRef, params.ChannelRef)
+		return c.client.Channels.Get(ctx, params.TeamRef, params.ChannelRef)
 	})
 }
 
@@ -34,9 +34,9 @@ type createChannelParams struct {
 	Name    string `json:"name"`
 }
 
-func (c *TeamsJSONClient) CreateStandardChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) CreateStandardChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params createChannelParams) (any, error) {
-		return c.client.Channels.CreateStandardChannel(context.TODO(), params.TeamRef, params.Name)
+		return c.client.Channels.CreateStandardChannel(ctx, params.TeamRef, params.Name)
 	})
 }
 
@@ -47,15 +47,15 @@ type createPrivateChannelParams struct {
 	OwnerRefs  []string `json:"ownerRefs"`
 }
 
-func (c *TeamsJSONClient) CreatePrivateChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) CreatePrivateChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params createPrivateChannelParams) (any, error) {
-		return c.client.Channels.CreatePrivateChannel(context.TODO(), params.TeamRef, params.Name, params.MemberRefs, params.OwnerRefs)
+		return c.client.Channels.CreatePrivateChannel(ctx, params.TeamRef, params.Name, params.MemberRefs, params.OwnerRefs)
 	})
 }
 
-func (c *TeamsJSONClient) DeleteChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) DeleteChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params baseChannelParams) (any, error) {
-		err := c.client.Channels.Delete(context.TODO(), params.TeamRef, params.ChannelRef)
+		err := c.client.Channels.Delete(ctx, params.TeamRef, params.ChannelRef)
 		return "deleted", err
 	})
 }
@@ -66,13 +66,13 @@ type sendMessageToChannelParams struct {
 	Body       decoders.MessageBodyDTO `json:"body"`
 }
 
-func (c *TeamsJSONClient) SendMessageToChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) SendMessageToChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params sendMessageToChannelParams) (any, error) {
 		body, err := decoders.DecodeParams[models.MessageBody](&params.Body)
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Channels.SendMessage(context.TODO(), params.TeamRef, params.ChannelRef, *body)
+		return c.client.Channels.SendMessage(ctx, params.TeamRef, params.ChannelRef, *body)
 	})
 }
 
@@ -83,13 +83,13 @@ type sendReplyToChannelParams struct {
 	Body       decoders.MessageBodyDTO `json:"body"`
 }
 
-func (c *TeamsJSONClient) SendReplyToChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) SendReplyToChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params sendReplyToChannelParams) (any, error) {
 		body, err := decoders.DecodeParams[models.MessageBody](&params.Body)
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Channels.SendReply(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID, *body)
+		return c.client.Channels.SendReply(ctx, params.TeamRef, params.ChannelRef, params.MessageID, *body)
 	})
 }
 
@@ -106,14 +106,14 @@ type listMessagesParams struct {
 	NextLink      decoders.NextLinkDTO   `json:"nextLink"`
 }
 
-func (c *TeamsJSONClient) ListMessagesInChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListMessagesInChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params listMessagesParams) (any, error) {
 		options, err := decoders.DecodeParams[models.ListMessagesOptions](params.Options)
 		if err != nil {
 			return nil, err
 		}
 		nextLink := decoders.GetNextLink(&params.NextLink)
-		return c.client.Channels.ListMessages(context.TODO(), params.TeamRef, params.ChannelRef, options, params.IncludeSystem, nextLink)
+		return c.client.Channels.ListMessages(ctx, params.TeamRef, params.ChannelRef, options, params.IncludeSystem, nextLink)
 	})
 }
 
@@ -123,9 +123,9 @@ type getMessageParams struct {
 	MessageID  string `json:"messageId"`
 }
 
-func (c *TeamsJSONClient) GetMessageInChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) GetMessageInChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params getMessageParams) (any, error) {
-		return c.client.Channels.GetMessage(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID)
+		return c.client.Channels.GetMessage(ctx, params.TeamRef, params.ChannelRef, params.MessageID)
 	})
 }
 
@@ -138,10 +138,10 @@ type listRepliesParams struct {
 	NextLink      decoders.NextLinkDTO `json:"nextLink"`
 }
 
-func (c *TeamsJSONClient) ListMessageRepliesInChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListMessageRepliesInChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params listRepliesParams) (any, error) {
 		nextLink := decoders.GetNextLink(&params.NextLink)
-		return c.client.Channels.ListReplies(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID, params.Top, params.IncludeSystem, nextLink)
+		return c.client.Channels.ListReplies(ctx, params.TeamRef, params.ChannelRef, params.MessageID, params.Top, params.IncludeSystem, nextLink)
 	})
 }
 
@@ -152,15 +152,15 @@ type getReplyParams struct {
 	ReplyID    string `json:"replyId"`
 }
 
-func (c *TeamsJSONClient) GetMessageReplyInChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) GetMessageReplyInChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params getReplyParams) (any, error) {
-		return c.client.Channels.GetReply(context.TODO(), params.TeamRef, params.ChannelRef, params.MessageID, params.ReplyID)
+		return c.client.Channels.GetReply(ctx, params.TeamRef, params.ChannelRef, params.MessageID, params.ReplyID)
 	})
 }
 
-func (c *TeamsJSONClient) ListChannelMembers(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) ListChannelMembers(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params baseChannelParams) (any, error) {
-		return c.client.Channels.ListMembers(context.TODO(), params.TeamRef, params.ChannelRef)
+		return c.client.Channels.ListMembers(ctx, params.TeamRef, params.ChannelRef)
 	})
 }
 
@@ -171,15 +171,15 @@ type addOrUpdateMemberToChannelParams struct {
 	IsOwner    bool   `json:"isOwner"`
 }
 
-func (c *TeamsJSONClient) AddMemberToChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) AddMemberToChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params addOrUpdateMemberToChannelParams) (any, error) {
-		return c.client.Channels.AddMember(context.TODO(), params.TeamRef, params.ChannelRef, params.UserRef, params.IsOwner)
+		return c.client.Channels.AddMember(ctx, params.TeamRef, params.ChannelRef, params.UserRef, params.IsOwner)
 	})
 }
 
-func (c *TeamsJSONClient) UpdateMemberInChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) UpdateMemberInChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params addOrUpdateMemberToChannelParams) (any, error) {
-		return c.client.Channels.UpdateMemberRoles(context.TODO(), params.TeamRef, params.ChannelRef, params.UserRef, params.IsOwner)
+		return c.client.Channels.UpdateMemberRoles(ctx, params.TeamRef, params.ChannelRef, params.UserRef, params.IsOwner)
 	})
 }
 
@@ -189,9 +189,9 @@ type removeMemberFromChannelParams struct {
 	UserRef    string `json:"userRef"`
 }
 
-func (c *TeamsJSONClient) RemoveMemberFromChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) RemoveMemberFromChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params removeMemberFromChannelParams) (any, error) {
-		err := c.client.Channels.RemoveMember(context.TODO(), params.TeamRef, params.ChannelRef, params.UserRef)
+		err := c.client.Channels.RemoveMember(ctx, params.TeamRef, params.ChannelRef, params.UserRef)
 		return "removed", err
 	})
 }
@@ -202,9 +202,9 @@ type getMentionsInChannelParams struct {
 	RawMentions []string `json:"rawMentions"`
 }
 
-func (c *TeamsJSONClient) GetMentionsInChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) GetMentionsInChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params getMentionsInChannelParams) (any, error) {
-		return c.client.Channels.GetMentions(context.TODO(), params.TeamRef, params.ChannelRef, params.RawMentions)
+		return c.client.Channels.GetMentions(ctx, params.TeamRef, params.ChannelRef, params.RawMentions)
 	})
 }
 
@@ -215,13 +215,13 @@ type searchMessagesInChannelParams struct {
 	SearchConfig  decoders.SearchConfigDTO         `json:"searchConfig"`
 }
 
-func (c *TeamsJSONClient) SearchMessagesInChannel(p map[string]any) (any, error) {
+func (c *TeamsJSONClient) SearchMessagesInChannel(ctx context.Context, p map[string]any) (any, error) {
 	return execute(p, func(params searchMessagesInChannelParams) (any, error) {
 		searchOptions := decoders.DecodeSearchMessageOptions(&params.SearchOptions)
 		searchConfig, err := decoders.DecodeParams[search.SearchConfig](&params.SearchConfig)
 		if err != nil {
 			return nil, err
 		}
-		return c.client.Channels.SearchMessages(context.TODO(), &params.TeamRef, &params.ChannelRef, searchOptions, searchConfig)
+		return c.client.Channels.SearchMessages(ctx, &params.TeamRef, &params.ChannelRef, searchOptions, searchConfig)
 	})
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"context"
 
 	jsonClientLib "github.com/pzsp-teams/lib-python/internal/json-client"
 	jsonModel "github.com/pzsp-teams/lib-python/internal/json-model"
@@ -58,7 +59,7 @@ func main() {
 				continue
 			}
 
-			result, err := handler(client, req.Params)
+			result, err := handler(client, context.Background(), req.Params)
 			if err != nil {
 				respondError(writer, err)
 			}
