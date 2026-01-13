@@ -47,8 +47,7 @@ SCOPES=User.Read,Team.ReadBasic.All,Channel.ReadBasic.All
 AUTH_METHOD=DEVICE_CODE [or INTERACTIVE]
 ```
 
-Scopes needed by all functions could be found in .env.template.
-**//TODO add url to template**
+Scopes needed by all functions could be found in [.env.template](https://github.com/pzsp-teams/lib-python/tree/main/.env.template).
 
 ### 2. Basic usage
 
@@ -120,5 +119,5 @@ client.close()
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/pzsp-teams/lib-python/blob/main/LICENSE) file for details.
 
-## Porst
+## Port
 This lib is also available in [GO](https://github.com/pzsp-teams/lib)
