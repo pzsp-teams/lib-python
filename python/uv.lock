@@ -592,7 +592,7 @@ wheels = [
 
 [[package]]
 name = "teams-lib-pzsp2-z1"
-version = "0.1.15"
+version = "0.1.17"
 source = { virtual = "." }
 dependencies = [
     { name = "python-dotenv" },
