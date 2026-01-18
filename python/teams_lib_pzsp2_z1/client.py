@@ -208,11 +208,8 @@ class TeamsClient:
                 self.proc.stdin.write(json_payload + "\n")
                 self.proc.stdin.flush()
 
-                print("Sent to Go process:", json_payload)  # Debug print
-
                 raw_response = self.proc.stdout.readline()
 
-                print("Received from Go process:", raw_response.strip())  # Debug print
             except BrokenPipeError:
                 raise RuntimeError("Go process crashed or closed connection")  # noqa: B904
 

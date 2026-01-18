@@ -33,7 +33,7 @@ class SenderConfig:
 
     max_retries: int = 3
     next_retry_delay: int = 2
-    timeout: int = 10
+    timeout: int = 30
 
 
 @dataclass
